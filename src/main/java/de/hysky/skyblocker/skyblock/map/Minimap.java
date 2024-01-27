@@ -4,13 +4,16 @@ import de.hysky.skyblocker.SkyblockerMod;
 import de.hysky.skyblocker.utils.Utils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.joml.Quaternionf;
 
 public class Minimap {
-	private static final int dim = 128;
+	private static final int mapSize = 128; //TODO: Get these from config and add a way to configure them
 	private static final float zoomFactor = 1.0f;
 	private static final int x = 5;
 	private static final int y = 5;
+	private static final boolean rotationEnabled = true;
 
 	private Minimap() {
 		throw new IllegalStateException("Utility class can't be initialized!");
@@ -25,35 +28,33 @@ public class Minimap {
 				|| map.equals("Dungeon Hub") //Not drawing in dungeons is handled in the mixin
 		) return;
 
+		MatrixStack matrixStack = context.getMatrices();
+		matrixStack.push();
+		if (rotationEnabled) {
+			matrixStack.multiply(new Quaternionf().rotateZ((float) (Math.PI + MinecraftClient.getInstance().player.getHeadYaw()*Math.PI/-180)), x+(mapSize/2.0f), y+(mapSize/2.0f), 0);
+		}
+		if (map.equals("Deep Caverns")) { //This place isn't connected to the main islands' location scheme, so we have to handle its location separately
+			render(context, "textures/gui/map/skyblock.png", 783.5f, 519.5f, 1196, 1308);
+		} else if (map.equals("The Rift")) {
+			render(context, "textures/gui/map/rift.png", 358.5f, 391.5f, 663, 715);
+		} else {
+			render(context, "textures/gui/map/skyblock.png", 791.5f, 1094.5f, 1196, 1308);
+		}
+
+		matrixStack.pop();
+	}
+
+	private static void render(DrawContext context, String path, float offsetX, float offsetZ, int textureWidth, int textureHeight) {
 		float playerX = (float) MinecraftClient.getInstance().player.getX();
 		float playerZ = (float) MinecraftClient.getInstance().player.getZ();
-		float offset = (dim / 2.0f) / zoomFactor;
-		int regionDim = (int) (dim / zoomFactor);
-		if (map.equals("Deep Caverns")) { //This place isn't connected to the main islands' location scheme, so we have to handle its location separately
-			context.drawTexture(
-					Identifier.of(SkyblockerMod.NAMESPACE, "textures/gui/map/skyblock.png"),
-					x, y,
-					dim, dim,
-					783.5f + playerX - offset, 519.5f + playerZ - offset,
-					regionDim, regionDim,
-					1196, 1308);
-		} else if (map.equals("The Rift")) {
-			context.drawTexture(Identifier.of(SkyblockerMod.NAMESPACE, "textures/gui/map/rift.png"),
-					x, y,
-					dim, dim,
-					358.5f + playerX - offset, 391.5f + playerZ - offset,
-					regionDim, regionDim,
-					663, 715);
-
-			//385, 391
-		} else {
-			context.drawTexture(Identifier.of(SkyblockerMod.NAMESPACE, "textures/gui/map/skyblock.png"),
-					x, y,
-					dim, dim,
-					791.5f + playerX - offset, 1094.5f + playerZ - offset,
-					regionDim, regionDim,
-					1196, 1308);
-		}
+		float centerOffset = (mapSize / 2.0f) / zoomFactor;
+		int regionSize = (int) (mapSize / zoomFactor);
+		context.drawTexture(Identifier.of(SkyblockerMod.NAMESPACE, path),
+				x, y,
+				mapSize, mapSize,
+				offsetX + playerX - centerOffset, offsetZ + playerZ - centerOffset,
+				regionSize, regionSize,
+				textureWidth, textureHeight);
 	}
 
 }

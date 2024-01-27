@@ -12,6 +12,7 @@ import de.hysky.skyblocker.skyblock.item.HotbarSlotLock;
 import de.hysky.skyblocker.skyblock.item.ItemCooldowns;
 import de.hysky.skyblocker.skyblock.item.ItemProtection;
 import de.hysky.skyblocker.skyblock.item.ItemRarityBackgrounds;
+import de.hysky.skyblocker.skyblock.map.Minimap;
 import de.hysky.skyblocker.utils.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -90,6 +91,15 @@ public abstract class InGameHudMixin {
             return;
         if (statusBars.render(context, context.getScaledWindowWidth(), context.getScaledWindowHeight()))
             ci.cancel();
+
+        if (Utils.isInDungeons()) {
+            if (DungeonScore.isDungeonStarted()) {
+                if (SkyblockerConfigManager.get().locations.dungeons.enableMap) DungeonMap.render(context.getMatrices());
+                if (SkyblockerConfigManager.get().locations.dungeons.dungeonScore.enableScoreHUD) DungeonScoreHUD.render(context);
+            }
+        } else {
+            Minimap.render(context);
+        }
     }
 
     @Inject(method = "renderMountHealth", at = @At("HEAD"), cancellable = true)
@@ -124,7 +134,7 @@ public abstract class InGameHudMixin {
 
     /**
      * Hopefully other mods don't add stages into these two drawers...
-     * 
+     *
      * @implNote Check this every update to see if the indexes of each layer have changed.
      */
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;layeredDrawer:Lnet/minecraft/client/gui/LayeredDrawer;", opcode = Opcodes.GETFIELD))

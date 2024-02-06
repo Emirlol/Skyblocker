@@ -5,14 +5,15 @@ import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.MapRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.map.MapId;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
-import org.apache.commons.lang3.StringUtils;
 
 public class DungeonMap {
     public static void render(MatrixStack matrices) {
@@ -22,9 +23,7 @@ public class DungeonMap {
         NbtCompound tag = item.getNbt();
 
         if (tag != null && tag.contains("map")) {
-            String tag2 = tag.asString();
-            tag2 = StringUtils.substringBetween(tag2, "map:", "}");
-            int mapid = Integer.parseInt(tag2);
+            MapId mapid = FilledMapItem.getMapId(item);
             VertexConsumerProvider.Immediate vertices = client.getBufferBuilders().getEffectVertexConsumers();
             MapRenderer map = client.gameRenderer.getMapRenderer();
             MapState state = FilledMapItem.getMapState(mapid, client.world);
@@ -36,7 +35,7 @@ public class DungeonMap {
             matrices.push();
             matrices.translate(x, y, 0);
             matrices.scale(scaling, scaling, 0f);
-            map.draw(matrices, vertices, mapid, state, false, 15728880);
+            map.draw(matrices, vertices, mapid, state, false, LightmapTextureManager.MAX_LIGHT_COORDINATE);
             vertices.draw();
             matrices.pop();
         }

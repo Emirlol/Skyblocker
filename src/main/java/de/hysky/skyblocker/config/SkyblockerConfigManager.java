@@ -41,6 +41,17 @@ public class SkyblockerConfigManager {
 		return HANDLER.instance();
 	}
 
+
+	/**
+	 * Gets a second instance of the config class that
+	 * should be used to get default values only. No fields
+	 * should be modified in this instance.
+	 * @see ConfigClassHandler#defaults()
+	 */
+	public static SkyblockerConfig getDefaults() {
+		return HANDLER.defaults();
+	}
+
 	/**
 	 * This method is caller sensitive and can only be called by the mod initializer,
 	 * this is enforced.

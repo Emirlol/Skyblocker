@@ -2,7 +2,7 @@ package de.hysky.skyblocker.config.categories;
 
 import de.hysky.skyblocker.config.ConfigUtils;
 import de.hysky.skyblocker.config.SkyblockerConfig;
-import de.hysky.skyblocker.skyblock.dungeon.DungeonMapConfigScreen;
+import de.hysky.skyblocker.skyblock.hud.screens.DungeonMapConfigScreen;
 import de.hysky.skyblocker.utils.waypoint.Waypoint.Type;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.FloatFieldControllerBuilder;

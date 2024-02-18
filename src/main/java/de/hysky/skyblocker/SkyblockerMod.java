@@ -113,6 +113,7 @@ public class SkyblockerMod implements ClientModInitializer {
         FishingHelper.init();
         TabHud.init();
         DungeonMap.init();
+        DungeonScoreHUD.init();
         DungeonManager.init();
         DungeonBlaze.init();
         Waterboard.init();

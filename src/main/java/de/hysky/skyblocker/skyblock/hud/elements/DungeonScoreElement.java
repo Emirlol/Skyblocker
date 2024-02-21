@@ -1,7 +1,9 @@
 package de.hysky.skyblocker.skyblock.hud.elements;
 
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
+import de.hysky.skyblocker.events.HudRenderEvents;
 import de.hysky.skyblocker.skyblock.dungeon.DungeonScore;
+import de.hysky.skyblocker.utils.Utils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -9,28 +11,38 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class DungeonScoreElement extends UIElement {
-	private static final DungeonScoreElement INSTANCE = new DungeonScoreElement();
-	private DungeonScoreElement() {
-		super(
-				SkyblockerConfigManager.get().locations.dungeons.dungeonScore.scoreX,
-				SkyblockerConfigManager.get().locations.dungeons.dungeonScore.scoreY,
-				MinecraftClient.getInstance().textRenderer.getWidth(getFormattedScoreText(300)), //Create the widget based on the widest possible score text, so it doesn't go out of screen if it's on the right edge of the screen.
-				MinecraftClient.getInstance().textRenderer.fontHeight,
-				SkyblockerConfigManager.get().locations.dungeons.dungeonScore.scoreScaling
-		);
-	}
-
-	public static DungeonScoreElement getInstance() {
-		return INSTANCE;
+	private static final DungeonScoreElement INSTANCE = new DungeonScoreElement(
+			SkyblockerConfigManager.get().locations.dungeons.dungeonScore.scoreX,
+			SkyblockerConfigManager.get().locations.dungeons.dungeonScore.scoreY,
+			MinecraftClient.getInstance().textRenderer.getWidth(getFormattedScoreText(300)), //Create the widget based on the widest possible score text, so it doesn't go out of screen if it's on the right edge of the screen.
+			MinecraftClient.getInstance().textRenderer.fontHeight,
+			SkyblockerConfigManager.get().locations.dungeons.dungeonScore.scoreScaling
+	);
+	private DungeonScoreElement(int x, int y, int width, int height, float scale) {
+		super(x, y, width, height, scale);
 	}
 
 	@Override
-	public void renderNormalWidget(DrawContext context, float delta) {
+	public void init() {
+		HudRenderEvents.AFTER_MAIN_HUD.register(this::render);
+	}
+
+	@Override
+	public void renderNormalElement(DrawContext context, float tickdelta) {
 		MatrixStack matrixStack = context.getMatrices();
 		matrixStack.push();
 		matrixStack.scale(scale, scale, 0);
 		context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, getFormattedScoreText(), (int) (x / scale), (int) (y / scale), 0xFFFFFFFF);
 		matrixStack.pop();
+	}
+
+	@Override
+	public boolean shouldRender() {
+		return Utils.isInDungeons() && DungeonScore.isDungeonStarted() && SkyblockerConfigManager.get().locations.dungeons.dungeonScore.enableScoreHUD;
+	}
+
+	public static DungeonScoreElement getInstance() {
+		return INSTANCE;
 	}
 
 	@Override

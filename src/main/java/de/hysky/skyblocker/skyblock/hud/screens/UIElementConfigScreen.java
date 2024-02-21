@@ -30,7 +30,7 @@ public class UIElementConfigScreen extends Screen {
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		renderBackground(context, mouseX, mouseY, delta);
 		for (UIElement element : elements) {
-			element.renderConfigWidget(context, delta);
+			element.renderConfigElement(context, delta);
 			element.renderBorder(context);
 			element.renderScale(context);
 		}
@@ -80,10 +80,11 @@ public class UIElementConfigScreen extends Screen {
 	public void mouseMoved(double mouseX, double mouseY) {
 		UIElement hoveredElement = getHoveredElement(mouseX, mouseY);
 		if (previousHovered != hoveredElement) {
-			if (previousHovered != null && previousHovered.getState() != UIElement.State.SELECTED) previousHovered.setState(UIElement.State.INACTIVE);
-			if (hoveredElement != null && hoveredElement.getState() != UIElement.State.SELECTED) hoveredElement.setState(UIElement.State.HOVERED);
+			if (previousHovered != null && previousHovered.getState() == UIElement.State.HOVERED) previousHovered.setState(UIElement.State.INACTIVE);
+			if (hoveredElement != null && hoveredElement.getState() == UIElement.State.INACTIVE) hoveredElement.setState(UIElement.State.HOVERED);
 			previousHovered = hoveredElement;
 		}
+		if (hoveredElement != null) hoveredElement.onMouseMove(mouseX, mouseY);
 	}
 
 	@Override

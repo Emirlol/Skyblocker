@@ -75,7 +75,7 @@ public abstract class UIElement {
 	public boolean onMouseClick(double mouseX, double mouseY, int button) {
 		heldFromX = mouseX - x;
 		heldFromY = mouseY - y;
-		if (getScaledWidth() - heldFromX < 8 && getScaledHeight() - heldFromY < 8) state = State.SCALING;
+		if (getScaledWidth() - heldFromX < 9 && getScaledHeight() - heldFromY < 9) state = State.SCALING;
 		else state = State.DRAGGING;
 		return true;
 	}
@@ -198,7 +198,7 @@ public abstract class UIElement {
 	 * @see UIElementConfigScreen#render(DrawContext, int, int, float)
 	 */
 	public void renderScale(DrawContext context) {
-		context.drawTexture(SCALE_TEXTURE, x + getScaledWidth() - 8, y + getScaledHeight() - 8, 0, 0f, 0f, 8, 8, 8, 8);
+		context.drawTexture(SCALE_TEXTURE, x + getScaledWidth() - 9, y + getScaledHeight() - 9, 0, 0f, 0f, 9,9,9,9);
 	}
 
 	public enum State {

@@ -113,9 +113,9 @@ public abstract class ClientPlayNetworkHandlerMixin {
     private void skyblocker$onEntityTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity entity) {
         if (!(entity instanceof ArmorStandEntity armorStandEntity)) return;
 
-        EggFinder.checkIfEgg(armorStandEntity);
+        EggFinder.INSTANCE.checkIfEgg(armorStandEntity);
         try { //Prevent packet handling fails if something goes wrong so that entity trackers still update, just without compact damage numbers
-            CompactDamage.compactDamage(armorStandEntity);
+            CompactDamage.INSTANCE.compactDamage(armorStandEntity);
         } catch (Exception e) {
             LOGGER.error("[Skyblocker Compact Damage] Failed to compact damage number", e);
         }
@@ -123,6 +123,6 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onEntityEquipmentUpdate", at = @At(value = "TAIL"))
     private void skyblocker$onEntityEquip(EntityEquipmentUpdateS2CPacket packet, CallbackInfo ci, @Local Entity entity) {
-        EggFinder.checkIfEgg(entity);
+        EggFinder.INSTANCE.checkIfEgg(entity);
     }
 }

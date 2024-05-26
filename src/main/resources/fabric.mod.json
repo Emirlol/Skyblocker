@@ -16,7 +16,10 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "de.hysky.skyblocker.SkyblockerMod"
+      {
+        "adapter": "kotlin",
+        "value": "de.hysky.skyblocker.SkyblockerMod::onInitializeClient"
+      }
     ],
     "modmenu": [
       "de.hysky.skyblocker.compatibility.modmenu.ModMenuEntry"
@@ -37,7 +40,8 @@
     "fabric-api": ">=0.97.8+1.20.6",
     "yet_another_config_lib_v3": ">=3.4.1+1.20.5",
     "minecraft": "~1.20.5",
-    "java": ">=21"
+    "java": ">=21",
+    "fabric-language-kotlin": ">=1.11.0+kotlin.2.0.0"
   },
   "conflicts": {
     "immediatelyfast": "<=1.2.12+1.20.5"

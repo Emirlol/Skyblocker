@@ -1,32 +1,28 @@
 package de.hysky.skyblocker.utils.scheduler
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.mojang.brigadier.Command
+import de.hysky.skyblocker.SkyblockerMod
+import de.hysky.skyblocker.utils.TextLogger
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 /**
  * A scheduler for running tasks at a later time. Tasks will be run synchronously on the main client thread.
  */
 object Scheduler {
 	var currentTick = 0
-	private val LOGGER: Logger = LoggerFactory.getLogger(Scheduler::class.java)
 	private val tasks: Int2ObjectMap<MutableList<ScheduledTask>> = Int2ObjectOpenHashMap()
-	private val executors: ExecutorService = Executors.newSingleThreadExecutor(ThreadFactoryBuilder().setNameFormat("Skyblocker-Scheduler-%d").build())
 
 	fun schedule(scheduledTime: Int, task: ScheduledTask) {
 		if (scheduledTime >= currentTick) {
 			addTask(scheduledTime, task)
 		} else {
-			LOGGER.warn("Scheduled a task with negative delay")
+			TextLogger.warn("Scheduled a task with negative delay")
 		}
 	}
 
@@ -52,6 +48,8 @@ object Scheduler {
 		schedule(currentTick, ScheduledTask(period, true, multithreaded, task))
 	}
 
+	fun queueOpenScreenCommand(screenSupplier: () -> Screen) = Command<FabricClientCommandSource> { queueOpenScreen(screenSupplier) }
+
 	/**
 	 * Schedules a screen to open in the next tick. Used in commands to avoid screen immediately closing after the command is executed.
 	 *
@@ -65,7 +63,7 @@ object Scheduler {
 
 	fun tick() {
 		if (tasks.containsKey(currentTick)) {
-			val currentTickTasks: List<ScheduledTask> = tasks[currentTick]
+			val currentTickTasks = tasks[currentTick]
 			for (i in currentTickTasks.indices) {
 				val task = currentTickTasks[i]
 				if (!task.runTask()) {
@@ -87,7 +85,7 @@ object Scheduler {
 		}
 	}
 
-	open class ScheduledTask(private val interval: Int, private val cyclic: Boolean, private val multithreaded: Boolean, val task: () -> Unit)  {
+	open class ScheduledTask(private val interval: Int, private val cyclic: Boolean, private val multithreaded: Boolean, val task: () -> Unit) {
 		constructor(multithreaded: Boolean, task: () -> Unit) : this(-1, false, multithreaded, task)
 
 		/**
@@ -98,14 +96,13 @@ object Scheduler {
 		 */
 		open fun runTask(): Boolean {
 			if (multithreaded) {
-				executors.execute(task)
+				SkyblockerMod.globalJob.launch { task.invoke() }
 			} else {
 				task.invoke()
 			}
 
+			if (cyclic) addTask(currentTick + interval, this);
 			return true
 		}
 	}
-
-	fun queueOpenScreenCommand(screenSupplier: () -> Screen) = Command<FabricClientCommandSource> { queueOpenScreen(screenSupplier) }
 }

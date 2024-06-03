@@ -46,40 +46,40 @@ object Constants {
 				.append(Text.literal("] ").formatted(Formatting.GRAY))
 		}
 
-	val SEYMOUR_IDS: List<String> = listOf("VELVET_TOP_HAT", "CASHMERE_JACKET", "SATIN_TROUSERS", "OXFORD_SHOES")
+	val SEYMOUR_IDS = setOf("VELVET_TOP_HAT", "CASHMERE_JACKET", "SATIN_TROUSERS", "OXFORD_SHOES")
 
 	// Exotic Hexes
-	val CRYSTAL_HEXES: List<String> = listOf(
+	val CRYSTAL_HEXES = setOf(
 		"1F0030", "46085E", "54146E", "5D1C78", "63237D", "6A2C82", "7E4196", "8E51A6", "9C64B3", "A875BD",
 		"B88BC9", "C6A3D4", "D9C1E3", "E5D1ED", "EFE1F5", "FCF3FF"
 	)
 
-	val FAIRY_HEXES: List<String> = listOf(
+	val FAIRY_HEXES = setOf(
 		"330066", "4C0099", "660033", "660066", "6600CC", "7F00FF", "99004C", "990099", "9933FF", "B266FF",
 		"CC0066", "CC00CC", "CC99FF", "E5CCFF", "FF007F", "FF00FF", "FF3399", "FF33FF", "FF66B2", "FF66FF", "FF99CC", "FF99FF", "FFCCE5",
 		"FFCCFF"
 	)
 
-	val OG_FAIRY_HEXES: List<String> = listOf(
+	val OG_FAIRY_HEXES = setOf(
 		"FF99FF", "FFCCFF", "E5CCFF", "CC99FF", "CC00CC", "FF00FF", "FF33FF", "FF66FF",
 		"B266FF", "9933FF", "7F00FF", "660066", "6600CC", "4C0099", "330066", "990099", "660033", "99004C", "CC0066",
 		"660033", "99004C", "FFCCE5", "660033", "FFCCE5", "FF99CC", "FFCCE5", "FF99CC", "FF66B2"
 	)
 
-	val GLITCHED: List<String> = listOf(
+	val GLITCHED = setOf(
 		"FFDC51", "F7DA33", "606060", "E7413C", "45413C", "4A14B7", "1793C4", "000000", "E75C3C", "65605A",
 		"5D2FB9", "17A8C4", "E76E3C", "88837E", "8969C8", "1CD4E4"
 	) // Glitched through other means such as Shark Scale upgrade color
 
-	val SPOOK: List<String> = listOf(
+	val SPOOK = setOf(
 		"000000", "070008", "0E000F", "150017", "1B001F", "220027", "29002E", "300036", "37003E", "3E0046",
 		"45004D", "4C0055", "52005D", "590065", "60006C", "670074", "6E007C", "750084", "7C008B", "830093",
 		"89009B", "9000A3", "9700AA", "993399", "9E00B2"
 	)
 
 	// List of exceptions
-	val RANCHERS: List<String> = listOf("CC5500", "000000", "0")
-	val REAPER: List<String> = listOf("1B1B1B", "FF0000")
-	val ADAPTIVE_CHEST: List<String> = listOf("3ABE78", "82E3D8", "BFBCB2", "D579FF", "FF4242", "FFC234")
-	val ADAPTIVE: List<String> = listOf("169F57", "2AB5A5", "6E00A0", "BB0000", "BFBCB2", "FFF7E6")
+	val RANCHERS = setOf("CC5500", "000000", "0")
+	val REAPER = setOf("1B1B1B", "FF0000")
+	val ADAPTIVE_CHEST = setOf("3ABE78", "82E3D8", "BFBCB2", "D579FF", "FF4242", "FFC234")
+	val ADAPTIVE = setOf("169F57", "2AB5A5", "6E00A0", "BB0000", "BFBCB2", "FFF7E6")
 }

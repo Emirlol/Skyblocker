@@ -12,47 +12,37 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 class GeneralConfig {
-	@kotlin.jvm.JvmField
+
 	@SerialEntry
 	var enableTips: Boolean = true
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var acceptReparty: Boolean = true
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var shortcuts: Shortcuts = Shortcuts()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var quiverWarning: QuiverWarning = QuiverWarning()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var itemList: ItemList = ItemList()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var itemTooltip: ItemTooltip = ItemTooltip()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var itemInfoDisplay: ItemInfoDisplay = ItemInfoDisplay()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var itemProtection: ItemProtection = ItemProtection()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var wikiLookup: WikiLookup = WikiLookup()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var specialEffects: SpecialEffects = SpecialEffects()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var hitbox: Hitbox = Hitbox()
 
@@ -63,99 +53,80 @@ class GeneralConfig {
 	@SerialEntry
 	var protectedItems: ObjectOpenHashSet<String> = ObjectOpenHashSet()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var customItemNames: Object2ObjectOpenHashMap<String, Text> = Object2ObjectOpenHashMap()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var customDyeColors: Object2IntOpenHashMap<String> = Object2IntOpenHashMap()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var customArmorTrims: Object2ObjectOpenHashMap<String, ArmorTrimId> = Object2ObjectOpenHashMap()
 
-	@kotlin.jvm.JvmField
 	@SerialEntry
 	var customAnimatedDyes: Object2ObjectOpenHashMap<String, AnimatedDye> = Object2ObjectOpenHashMap()
 
 	class Shortcuts {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var enableShortcuts: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableCommandShortcuts: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableCommandArgShortcuts: Boolean = true
 	}
 
-
 	class QuiverWarning {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var enableQuiverWarning: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableQuiverWarningInDungeons: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableQuiverWarningAfterDungeon: Boolean = true
 	}
 
 	class ItemList {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var enableItemList: Boolean = true
 	}
 
 	class ItemTooltip {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var enableNPCPrice: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableMotesPrice: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableAvgBIN: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var avg: Average = Average.THREE_DAY
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableLowestBIN: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableBazaarPrice: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableObtainedDate: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableMuseumInfo: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableExoticTooltip: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var enableAccessoriesHelper: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var dungeonQuality: Boolean = true
 	}
@@ -169,19 +140,16 @@ class GeneralConfig {
 	}
 
 	class ItemInfoDisplay {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var attributeShardInfo: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var itemRarityBackgrounds: Boolean = false
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var itemRarityBackgroundStyle: RarityBackgroundStyle = RarityBackgroundStyle.CIRCULAR
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var itemRarityBackgroundsOpacity: Float = 1f
 	}
@@ -199,12 +167,12 @@ class GeneralConfig {
 	}
 
 	class ItemProtection {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var slotLockStyle: SlotLockStyle = SlotLockStyle.FANCY
 	}
 
-	enum class SlotLockStyle(@kotlin.jvm.JvmField val tex: Identifier) {
+	enum class SlotLockStyle(val tex: Identifier) {
 		CLASSIC(Identifier(SkyblockerMod.NAMESPACE, "textures/gui/slot_lock.png")),
 		FANCY(Identifier(SkyblockerMod.NAMESPACE, "textures/gui/fancy_slot_lock.png"));
 
@@ -217,27 +185,25 @@ class GeneralConfig {
 	}
 
 	class WikiLookup {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var enableWikiLookup: Boolean = true
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var officialWiki: Boolean = true
 	}
 
 	class SpecialEffects {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var rareDungeonDropEffects: Boolean = true
 	}
 
 	class Hitbox {
-		@kotlin.jvm.JvmField
+
 		@SerialEntry
 		var oldFarmlandHitbox: Boolean = false
 
-		@kotlin.jvm.JvmField
 		@SerialEntry
 		var oldLeverHitbox: Boolean = false
 	}

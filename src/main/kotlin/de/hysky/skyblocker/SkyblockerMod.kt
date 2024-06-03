@@ -63,6 +63,7 @@ import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.api.ModContainer
 import net.minecraft.client.MinecraftClient
 import java.nio.file.Path
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Main class for Skyblocker which initializes features, registers events, and
@@ -70,13 +71,13 @@ import java.nio.file.Path
  */
 object SkyblockerMod {
 	const val NAMESPACE = "skyblocker"
-	val SKYBLOCKER_MOD: ModContainer = FabricLoader.getInstance().getModContainer(NAMESPACE).orElseThrow()
+	val SKYBLOCKER_MOD: ModContainer = FabricLoader.getInstance().getModContainer(NAMESPACE).getOrNull() ?: error("Mod container not found")
 	val VERSION: String = SKYBLOCKER_MOD.metadata.version.friendlyString
 	val CONFIG_DIR: Path = FabricLoader.getInstance().configDir.resolve(NAMESPACE)
 	val GSON: Gson = GsonBuilder().setPrettyPrinting().create()
 	val GSON_COMPACT: Gson = GsonBuilder().create()
-	val containerSolverManager: ContainerSolverManager = ContainerSolverManager()
-	val statusBarTracker: StatusBarTracker = StatusBarTracker()
+	val containerSolverManager = ContainerSolverManager()
+	val statusBarTracker = StatusBarTracker()
 	val globalJob = MainScope() + CoroutineName("Skyblocker")
 
 	/**
@@ -91,7 +92,7 @@ object SkyblockerMod {
 		ConfigDataFixer.apply()
 		Utils.init()
 		SkyblockerConfigManager.init()
-		SkyblockerScreen.initClass()
+		SkyblockerScreen.Companion //Object declarations are initialized lazily, so we need to access it here to initialize it. Same goes for any other object below.
 		Tips.init()
 		NEURepoManager.init()
 		ImageRepoLoader.init()
@@ -173,7 +174,7 @@ object SkyblockerMod {
 		MobBoundingBoxes.init()
 		EggFinder.init()
 		TimeTowerReminder.init()
-		SkyblockTime.init()
+		SkyblockTime
 
 		Scheduler.scheduleCyclic(20) { Utils.update() }
 		Scheduler.scheduleCyclic(200) { DiscordRPCManager.updateDataAndPresence() }

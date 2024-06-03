@@ -6,12 +6,9 @@ object ColorUtils {
 	 * @param color The color to get the components of.
 	 * @return An array of the color's components as floats.
 	 */
-	@JvmStatic
-	fun getFloatComponents(color: Int): FloatArray {
-		return floatArrayOf(
-			((color shr 16) and 0xFF) / 255f,
-			((color shr 8) and 0xFF) / 255f,
-			(color and 0xFF) / 255f
-		)
-	}
+	fun Int.getFloatComponents() = floatArrayOf(
+		((this shr 16) and 0xFF) / 255f,
+		((this shr 8) and 0xFF) / 255f,
+		(this and 0xFF) / 255f
+	)
 }

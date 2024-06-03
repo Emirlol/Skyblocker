@@ -35,7 +35,7 @@ object SkyblockTime {
 		skyblockSeason.set(Season.entries[getSkyblockMonth() / 3])
 		skyblockMonth.set(Month.entries[getSkyblockMonth()])
 		skyblockDay.set(getSkyblockDay())
-		TextLogger.info("[Time] Skyblock time updated to Year ${skyblockYear.get()}, Season ${skyblockSeason.get()}, Month ${skyblockMonth.get()}, Day ${skyblockDay.get()}")
+		TextHandler.info("[Time] Skyblock time updated to Year ${skyblockYear.get()}, Season ${skyblockSeason.get()}, Month ${skyblockMonth.get()}, Day ${skyblockDay.get()}")
 	}
 
 	enum class Season {

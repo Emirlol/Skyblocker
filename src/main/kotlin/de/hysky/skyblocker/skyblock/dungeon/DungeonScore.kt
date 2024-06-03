@@ -8,7 +8,7 @@ import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager
 import de.hysky.skyblocker.skyblock.tabhud.util.PlayerListMgr.regexAt
 import de.hysky.skyblocker.utils.Constants
 import de.hysky.skyblocker.utils.ProfileUtils.updateProfile
-import de.hysky.skyblocker.utils.TextLogger
+import de.hysky.skyblocker.utils.TextHandler
 import de.hysky.skyblocker.utils.Utils
 import de.hysky.skyblocker.utils.Utils.isInDungeons
 import de.hysky.skyblocker.utils.Utils.mayor
@@ -213,7 +213,7 @@ object DungeonScore {
 		try {
 			return entity.armorItems.all { it.isEmpty }
 		} catch (e: Exception) {
-			TextLogger.error("$LOGGER_PREFIX Failed to check if entity is a mimic!", e)
+			TextHandler.error("$LOGGER_PREFIX Failed to check if entity is a mimic!", e)
 			return false
 		}
 	}
@@ -255,7 +255,7 @@ object DungeonScore {
 				if (!clearMatcher.matches()) continue
 				return clearMatcher.group("cleared").toDouble() / 100.0
 			}
-			TextLogger.error("$LOGGER_PREFIX Clear pattern doesn't match!")
+			TextHandler.error("$LOGGER_PREFIX Clear pattern doesn't match!")
 			return 0.0
 		}
 
@@ -302,7 +302,7 @@ object DungeonScore {
 				return true
 			}
 		} catch (e: Exception) {
-			TextLogger.error("$LOGGER_PREFIX Spirit pet lookup by name failed! Name: $name", e)
+			TextHandler.error("$LOGGER_PREFIX Spirit pet lookup by name failed! Name: $name", e)
 		}
 		return false
 	}
@@ -345,7 +345,7 @@ object DungeonScore {
 			currentFloor = floorMatcher.group("floor")
 			return
 		}
-		TextLogger.error("$LOGGER_PREFIX Floor pattern doesn't match!")
+		TextHandler.error("$LOGGER_PREFIX Floor pattern doesn't match!")
 	}
 
 	private enum class FloorRequirement(val percentage: Int, val timeLimit: Int) {

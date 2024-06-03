@@ -48,9 +48,8 @@ object Http {
 		return ApiResponse(body, response.statusCode(), getCacheStatuses(headers), getAge(headers))
 	}
 
-	@JvmStatic
 	@Throws(IOException::class, InterruptedException::class)
-	fun downloadContent(url: String?): InputStream {
+	fun downloadContent(url: String): InputStream {
 		val request = HttpRequest.newBuilder()
 			.GET()
 			.header("Accept", "*/*")
@@ -61,18 +60,14 @@ object Http {
 			.build()
 
 		val response = HTTP_CLIENT.send(request, BodyHandlers.ofInputStream())
-		val decodedInputStream = getDecodedInputStream(response)
-
-		return decodedInputStream
+		return getDecodedInputStream(response)
 	}
 
-	@JvmStatic
 	@Throws(IOException::class, InterruptedException::class)
 	fun sendGetRequest(url: String): String {
 		return sendCacheableGetRequest(url).content
 	}
 
-	@JvmStatic
 	@Throws(IOException::class, InterruptedException::class)
 	fun sendHeadRequest(url: String?): HttpHeaders {
 		val request = HttpRequest.newBuilder()

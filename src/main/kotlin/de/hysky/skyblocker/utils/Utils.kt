@@ -206,7 +206,7 @@ object Utils {
 					}
 				}
 			} catch (e: IndexOutOfBoundsException) {
-				TextLogger.error("Failed to get location from sidebar", e)
+				TextHandler.error("Failed to get location from sidebar", e)
 			}
 			return "Unknown"
 		}
@@ -222,7 +222,7 @@ object Utils {
 				}
 				purse = purseString?.replace("[^0-9.]".toRegex(), "")?.trim()?.toDouble() ?: 0.0
 			} catch (e: IndexOutOfBoundsException) {
-				TextLogger.error("Failed to get purse from sidebar", e)
+				TextHandler.error("Failed to get purse from sidebar", e)
 			}
 			return purse
 		}
@@ -239,7 +239,7 @@ object Utils {
 					bits = bitsString.replace("[^0-9.]".toRegex(), "").trim().toInt()
 				}
 			} catch (e: IndexOutOfBoundsException) {
-				TextLogger.error("Failed to get bits from sidebar", e)
+				TextHandler.error("Failed to get bits from sidebar", e)
 			}
 			return bits
 		}
@@ -403,7 +403,7 @@ object Utils {
 					}
 				}
 			} catch (e: Exception) {
-				TextLogger.error("Failed to get mayor status!", e)
+				TextHandler.error("Failed to get mayor status!", e)
 			}
 		}
 	}

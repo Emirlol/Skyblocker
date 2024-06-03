@@ -5,20 +5,11 @@ import de.hysky.skyblocker.utils.render.Renderable
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
-import java.util.function.Supplier
 
-open class Waypoint @JvmOverloads constructor(@JvmField val pos: BlockPos?, val typeSupplier: Supplier<Type?>?, @JvmField val colorComponents: FloatArray?, val alpha: Float = DEFAULT_HIGHLIGHT_ALPHA, val lineWidth: Float = DEFAULT_LINE_WIDTH, val throughWalls: Boolean = true, shouldRender: Boolean = true) : Renderable {
+open class Waypoint(val pos: BlockPos, val typeSupplier: () -> Type, open val colorComponents: FloatArray, val alpha: Float = DEFAULT_HIGHLIGHT_ALPHA, val lineWidth: Float = DEFAULT_LINE_WIDTH, val throughWalls: Boolean = true, private var shouldRender: Boolean = true) : Renderable {
 	val box: Box = Box(pos)
-	private var shouldRender = false
 
-	@JvmOverloads
-	constructor(pos: BlockPos?, type: Type?, colorComponents: FloatArray?, alpha: Float = DEFAULT_HIGHLIGHT_ALPHA) : this(pos, Supplier<Type?> { type }, colorComponents, alpha, DEFAULT_LINE_WIDTH)
-
-	constructor(pos: BlockPos?, typeSupplier: Supplier<Type?>?, colorComponents: FloatArray?, throughWalls: Boolean) : this(pos, typeSupplier, colorComponents, DEFAULT_HIGHLIGHT_ALPHA, DEFAULT_LINE_WIDTH, throughWalls)
-
-	init {
-		this.shouldRender = shouldRender
-	}
+	constructor(pos: BlockPos, type: Type, colorComponents: FloatArray, alpha: Float = DEFAULT_HIGHLIGHT_ALPHA, lineWidth: Float = DEFAULT_LINE_WIDTH, throughWalls: Boolean = true, shouldRender: Boolean = true) : this(pos, { type }, colorComponents, alpha, lineWidth, throughWalls, shouldRender)
 
 	open fun shouldRender(): Boolean {
 		return shouldRender
@@ -37,7 +28,7 @@ open class Waypoint @JvmOverloads constructor(@JvmField val pos: BlockPos?, val 
 	}
 
 	override fun render(context: WorldRenderContext) {
-		when (typeSupplier!!.get()) {
+		when (typeSupplier.invoke()) {
 			Type.WAYPOINT -> RenderHelper.renderFilledWithBeaconBeam(context, pos, colorComponents, alpha, throughWalls)
 			Type.OUTLINED_WAYPOINT -> {
 				val colorComponents = colorComponents
@@ -63,14 +54,12 @@ open class Waypoint @JvmOverloads constructor(@JvmField val pos: BlockPos?, val 
 		OUTLINED_HIGHLIGHT,
 		OUTLINE;
 
-		override fun toString(): String {
-			return when (this) {
-				WAYPOINT -> "Waypoint"
-				OUTLINED_WAYPOINT -> "Outlined Waypoint"
-				HIGHLIGHT -> "Highlight"
-				OUTLINED_HIGHLIGHT -> "Outlined Highlight"
-				OUTLINE -> "Outline"
-			}
+		override fun toString() = when (this) {
+			WAYPOINT -> "Waypoint"
+			OUTLINED_WAYPOINT -> "Outlined Waypoint"
+			HIGHLIGHT -> "Highlight"
+			OUTLINED_HIGHLIGHT -> "Outlined Highlight"
+			OUTLINE -> "Outline"
 		}
 	}
 

@@ -4,16 +4,14 @@ import com.google.gson.JsonParser
 import com.mojang.util.UndashedUuid
 import de.hysky.skyblocker.utils.scheduler.Scheduler
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import net.minecraft.client.MinecraftClient
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /*
 * Contains only basic helpers for using Http APIs
 */
 object ApiUtils {
-	private val LOGGER: Logger = LoggerFactory.getLogger(ApiUtils::class.java)
-
 	/**
 	 * Do not iterate over this map, it will be accessed and modified by multiple threads.
 	 */
@@ -21,19 +19,17 @@ object ApiUtils {
 
 	fun init() {
 		//Clear cache every 20 minutes
-		Scheduler.INSTANCE.scheduleCyclic({ NAME_2_UUID_CACHE.clear() }, 24000, true)
+		Scheduler.scheduleCyclic(24000, true) { NAME_2_UUID_CACHE.clear() }
 	}
 
 	/**
 	 * Multithreading is to be handled by the method caller
 	 */
-	@JvmStatic
-	fun name2Uuid(name: String): String? {
-		return name2Uuid(name, 0)
-	}
+	context(CoroutineScope)
+	suspend fun name2Uuid(name: String): String? = name2Uuid(name, 0)
 
-	private fun name2Uuid(name: String, retries: Int): String? {
-		var retries = retries
+	context(CoroutineScope)
+	private suspend fun name2Uuid(name: String, retries: Int): String? {
 		val session = MinecraftClient.getInstance().session
 
 		if (session.username == name) return UndashedUuid.toString(session.uuidOrNull)
@@ -48,15 +44,15 @@ object ApiUtils {
 
 					return uuid
 				} else if (response.ratelimited() && retries < 3) {
-					Thread.sleep(800)
+					delay(800)
 
-					return name2Uuid(name, ++retries)
+					return name2Uuid(name, retries + 1)
 				}
 			}
 		} catch (e: Exception) {
-			LOGGER.error("[Skyblocker] Name to uuid lookup failed! Name: {}", name, e)
+			TextHandler.error("Name to uuid lookup failed! Name: $name", e)
 		}
 
-		return ""
+		return null
 	}
 }

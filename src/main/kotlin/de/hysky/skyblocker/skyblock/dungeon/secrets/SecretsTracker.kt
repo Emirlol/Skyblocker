@@ -2,14 +2,18 @@ package de.hysky.skyblocker.skyblock.dungeon.secrets
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import de.hysky.skyblocker.SkyblockerMod
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.skyblock.tabhud.util.PlayerListMgr.regexAt
 import de.hysky.skyblocker.skyblock.tabhud.widget.DungeonPlayerWidget
 import de.hysky.skyblocker.utils.ApiUtils.name2Uuid
 import de.hysky.skyblocker.utils.Constants
 import de.hysky.skyblocker.utils.Http.sendHypixelRequest
+import de.hysky.skyblocker.utils.TextHandler
 import de.hysky.skyblocker.utils.Utils.isInDungeons
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import kotlinx.coroutines.async
+import kotlinx.coroutines.future.asCompletableFuture
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
@@ -136,20 +140,23 @@ object SecretsTracker {
 		return if (matcher != null) matcher.group("name") else ""
 	}
 
-	private fun getPlayerSecrets(name: String): SecretData {
-		val uuid = name2Uuid(name)
-
-		if (!uuid!!.isEmpty()) {
-			try {
-				sendHypixelRequest("player", "?uuid=$uuid").use { response ->
-					return SecretData(getSecretCountFromAchievements(JsonParser.parseString(response.content).asJsonObject), response.cached(), response.age)
+	private fun getPlayerSecrets(name: String): CompletableFuture<SecretData> {
+		return SkyblockerMod.globalJob.async {
+			name2Uuid(name)
+		}.asCompletableFuture().thenApplyAsync { uuid ->
+			if (!uuid.isNullOrEmpty()) {
+				try {
+					sendHypixelRequest("player", "?uuid=$uuid").use { response ->
+						SecretData(getSecretCountFromAchievements(JsonParser.parseString(response.content).asJsonObject), response.cached(), response.age)
+					}
+				} catch (e: Exception) {
+					TextHandler.error("Encountered an error while trying to fetch $name's secret count!", e)
+					SecretData.EMPTY
 				}
-			} catch (e: Exception) {
-				LOGGER.error("[Skyblocker] Encountered an error while trying to fetch {} secret count!", "$name's", e)
+			} else {
+				SecretData.EMPTY
 			}
 		}
-
-		return SecretData.EMPTY
 	}
 
 	/**

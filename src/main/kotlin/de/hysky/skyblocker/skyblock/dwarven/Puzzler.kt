@@ -9,22 +9,23 @@ import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 import java.util.regex.Matcher
 
-class Puzzler : ChatPatternListener("^\\[NPC] Puzzler: ((?:▲|▶|◀|▼){10})$") {
-	public override fun state(): ChatFilterResult {
+object Puzzler : ChatPatternListener("^\\[NPC] Puzzler: ((?:▲|▶|◀|▼){10})$") {
+	public override fun state(): ChatFilterResult? {
 		return if (SkyblockerConfigManager.get().mining.dwarvenMines.solvePuzzler) null else ChatFilterResult.PASS
 	}
 
-	public override fun onMatch(message: Text?, matcher: Matcher?): Boolean {
+	override fun onMatch(message: Text, matcher: Matcher): Boolean {
 		var x = 181
 		var z = 135
-		for (c in matcher!!.group(1).toCharArray()) {
-			if (c == '▲') z++
-			else if (c == '▼') z--
-			else if (c == '◀') x++
-			else if (c == '▶') x--
+		for (c in matcher.group(1)) {
+			when (c) {
+				'▲' -> z++
+				'▼' -> z--
+				'◀' -> x++
+				'▶' -> x--
+			}
 		}
-		val world = MinecraftClient.getInstance().world
-		world?.setBlockState(BlockPos(x, 195, z), Blocks.CRIMSON_PLANKS.defaultState)
+		MinecraftClient.getInstance().world?.setBlockState(BlockPos(x, 195, z), Blocks.CRIMSON_PLANKS.defaultState)
 		return false
 	}
 }

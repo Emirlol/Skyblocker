@@ -6,7 +6,7 @@ import net.minecraft.util.Formatting
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-object TextLogger {
+object TextHandler {
 	private val logger = LoggerFactory.getLogger("Skyblocker")
 	private val player get() = MinecraftClient.getInstance().player
 	private const val DEBUG = true
@@ -32,6 +32,13 @@ object TextLogger {
 		}
 	}
 
+	fun warn(message: String, throwable: Throwable, level: Level = Log) {
+		when (level) {
+			is Chat -> chat(message, Formatting.GOLD)
+			is Log -> log(message, throwable, Logger::warn)
+		}
+	}
+
 	fun error(message: String, throwable: Throwable, level: Level = Log) {
 		when (level) {
 			is Chat -> chat(message, Formatting.RED)
@@ -43,7 +50,9 @@ object TextLogger {
 		if (DEBUG) chat(message, Formatting.GREEN)
 	}
 
-	private fun chat(message: String, formatting: Formatting) = player?.sendMessage(Text.literal(message).formatted(formatting), false)
+	fun chat(message: Text) = player?.sendMessage(message, false)
+
+	private fun chat(message: String, formatting: Formatting) = chat(Text.literal(message).formatted(formatting))
 
 	private fun log(message: String, method: Logger.(String) -> Unit) {
 		logger.method(

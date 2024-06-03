@@ -42,7 +42,7 @@ object ProfileUtils {
 					return@async player
 				}
 			} catch (e: Exception) {
-				TextLogger.error("[Profile Utils] Failed to get Player Profile Data for players $name, is the API Down/Limited?", e)
+				TextHandler.error("[Profile Utils] Failed to get Player Profile Data for players $name, is the API Down/Limited?", e)
 			}
 			null
 		}

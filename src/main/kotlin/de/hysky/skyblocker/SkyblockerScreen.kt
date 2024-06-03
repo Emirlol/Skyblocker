@@ -96,7 +96,7 @@ class SkyblockerScreen private constructor() : Screen(TITLE) {
 		private val MODRINTH_TEXT = Text.translatable("text.skyblocker.modrinth")
 		private val DISCORD_TEXT = Text.translatable("text.skyblocker.discord")
 
-		fun initClass() {
+		init {
 			ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher, _ ->
 				dispatcher.register(ClientCommandManager.literal(SkyblockerMod.NAMESPACE)
 					.executes(Scheduler.queueOpenScreenCommand { SkyblockerScreen() })

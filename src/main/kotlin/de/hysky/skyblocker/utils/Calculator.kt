@@ -5,60 +5,42 @@ import java.util.regex.Pattern
 
 object Calculator {
 	private val NUMBER_PATTERN: Pattern = Pattern.compile("(\\d+\\.?\\d*)([sekmbt]?)")
-	private val MAGNITUDE_VALUES: Map<String, Long> = java.util.Map.of(
-		"s", 64L,
-		"e", 160L,
-		"k", 1000L,
-		"m", 1000000L,
-		"b", 1000000000L,
-		"t", 1000000000000L
+	private val MAGNITUDE_VALUES = mapOf(
+		"s" to 64L,
+		"e" to 160L,
+		"k" to 1000L,
+		"m" to 1000000L,
+		"b" to 1000000000L,
+		"t" to 1000000000000L
 	)
 
 	private fun lex(input: String): List<Token> {
-		var input = input
 		val tokens: MutableList<Token> = ArrayList()
-		input = input.replace(" ", "").lowercase(Locale.getDefault()).replace("x", "*")
+		val cleanInput = input.replace(" ", "").lowercase().replace("x", "*")
 		var i = 0
-		while (i < input.length) {
-			val token = Token()
-			when (input[i]) {
-				'+', '-', '*', '/' -> {
-					token.type = TokenType.OPERATOR
-					token.value = input[i].toString()
-					token.tokenLength = 1
-				}
+		while (i < cleanInput.length) {
+			lateinit var token: Token //`check` blocks leading to Nothing isn't recognized by the compiler for some reason, so this has to be lateinit even though there is no way for it to not be initialized
+			when (cleanInput[i]) {
+				'+', '-', '*', '/' -> token = Token(TokenType.OPERATOR, cleanInput[i].toString(), 1)
 
 				'(' -> {
-					token.type = TokenType.L_PARENTHESIS
-					token.value = input[i].toString()
-					token.tokenLength = 1
+					Token(TokenType.L_PARENTHESIS, cleanInput[i].toString(), 1)
 					//add implicit multiplication when there is a number before brackets
-					if (!tokens.isEmpty()) {
-						val lastType = tokens.last.type
+					if (tokens.isNotEmpty()) {
+						val lastType = tokens.last().type
 						if (lastType == TokenType.R_PARENTHESIS || lastType == TokenType.NUMBER) {
-							val mutliplyToken = Token()
-							mutliplyToken.type = TokenType.OPERATOR
-							mutliplyToken.value = "*"
-							tokens.add(mutliplyToken)
+							tokens.add(Token(TokenType.OPERATOR, "*", 0))
 						}
 					}
 				}
 
-				')' -> {
-					token.type = TokenType.R_PARENTHESIS
-					token.value = input[i].toString()
-					token.tokenLength = 1
-				}
+				')' -> token = Token(TokenType.R_PARENTHESIS, cleanInput[i].toString(), 1)
 
 				else -> {
-					token.type = TokenType.NUMBER
-					val numberMatcher = NUMBER_PATTERN.matcher(input.substring(i))
-					if (!numberMatcher.find()) { //invalid value to lex
-						throw UnsupportedOperationException("invalid character")
-					}
+					val numberMatcher = NUMBER_PATTERN.matcher(cleanInput.substring(i))
+					check(numberMatcher.find()) { "Invalid character" } //invalid value to lex
 					val end = numberMatcher.end()
-					token.value = input.substring(i, i + end)
-					token.tokenLength = end
+					token = Token(TokenType.NUMBER, cleanInput.substring(i, i + end), end)
 				}
 			}
 			tokens.add(token)
@@ -84,7 +66,7 @@ object Calculator {
 				TokenType.NUMBER -> outputQueue.add(shuntingToken)
 				TokenType.OPERATOR -> {
 					val precedence = getPrecedence(shuntingToken.value)
-					while (!operatorStack.isEmpty()) {
+					while (operatorStack.isNotEmpty()) {
 						val leftToken = operatorStack.peek()
 						if (leftToken.type == TokenType.L_PARENTHESIS) {
 							break
@@ -103,9 +85,7 @@ object Calculator {
 				TokenType.L_PARENTHESIS -> operatorStack.push(shuntingToken)
 				TokenType.R_PARENTHESIS -> {
 					while (true) {
-						if (operatorStack.isEmpty()) {
-							throw UnsupportedOperationException("Unbalanced left parenthesis")
-						}
+						check(operatorStack.isEmpty()) { "Unbalanced left parenthesis" }
 						val leftToken = operatorStack.pop()
 						if (leftToken.type == TokenType.L_PARENTHESIS) {
 							break
@@ -116,7 +96,7 @@ object Calculator {
 			}
 		}
 		//empty the operator stack
-		while (!operatorStack.isEmpty()) {
+		while (operatorStack.isNotEmpty()) {
 			val leftToken = operatorStack.pop()
 			if (leftToken.type == TokenType.L_PARENTHESIS) {
 				//technically unbalanced left parenthesis error but just assume they are close after the equation and ignore them from here
@@ -128,18 +108,10 @@ object Calculator {
 		return outputQueue.stream().toList()
 	}
 
-	private fun getPrecedence(operator: String?): Int {
-		return when (operator) {
-			"+", "-" -> {
-				0
-			}
-
-			"*", "/" -> {
-				1
-			}
-
-			else -> throw UnsupportedOperationException("Invalid operator")
-		}
+	private fun getPrecedence(operator: String?) = when (operator) {
+		"+", "-" -> 0
+		"*", "/" -> 1
+		else -> error("Invalid operator")
 	}
 
 	/**
@@ -177,39 +149,29 @@ object Calculator {
 		return values.pop()
 	}
 
-	private fun calculateValue(value: String?): Double {
-		val numberMatcher = NUMBER_PATTERN.matcher(value!!.lowercase(Locale.getDefault()))
-		if (!numberMatcher.matches()) {
-			throw UnsupportedOperationException("Invalid number")
-		}
+	private fun calculateValue(value: String): Double {
+		val numberMatcher = NUMBER_PATTERN.matcher(value.lowercase(Locale.getDefault()))
+		check(numberMatcher.matches()) { "Invalid number" }
 		var number = numberMatcher.group(1).toDouble()
 		val magnitude = numberMatcher.group(2)
 
-		if (!magnitude.isEmpty()) {
-			if (!MAGNITUDE_VALUES.containsKey(magnitude)) { //its invalid if its another letter
-				throw UnsupportedOperationException("Invalid magnitude")
-			}
+		if (magnitude.isNotEmpty()) {
+			check(MAGNITUDE_VALUES.containsKey(magnitude)) { "Invalid magnitude" } //It's invalid if it's another letter
+
 			number *= MAGNITUDE_VALUES[magnitude]!!.toDouble()
 		}
 
 		return number
 	}
 
-	@JvmStatic
-    fun calculate(equation: String): Double {
+	fun calculate(equation: String): Double {
 		//custom bit for replacing purse with its value
-		var equation = equation
-		equation = equation.lowercase(Locale.getDefault()).replace("p(urse)?".toRegex(), Utils.getPurse().toLong().toString())
-		return evaluate(shunt(lex(equation)))
+		return evaluate(shunt(lex(equation.lowercase(Locale.getDefault()).replace("p(urse)?".toRegex(), Utils.purse.toLong().toString()))))
 	}
 
 	enum class TokenType {
 		NUMBER, OPERATOR, L_PARENTHESIS, R_PARENTHESIS
 	}
 
-	class Token {
-		var type: TokenType? = null
-		var value: String? = null
-		var tokenLength: Int = 0
-	}
+	data class Token(val type: TokenType, val value: String, val tokenLength: Int)
 }

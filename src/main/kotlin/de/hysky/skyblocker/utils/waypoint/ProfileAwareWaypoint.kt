@@ -2,10 +2,8 @@ package de.hysky.skyblocker.utils.waypoint
 
 import de.hysky.skyblocker.utils.Utils.profile
 import net.minecraft.util.math.BlockPos
-import java.util.function.Supplier
 
-class ProfileAwareWaypoint(pos: BlockPos?, typeSupplier: Supplier<Type?>?, private val missingColor: FloatArray?, private val foundColor: FloatArray?) : Waypoint(pos, typeSupplier, null) {
-	@JvmField
+class ProfileAwareWaypoint(pos: BlockPos, typeSupplier: () -> Type, private val missingColor: FloatArray, private val foundColor: FloatArray) : Waypoint(pos, typeSupplier, FloatArray(3)) {
 	val foundProfiles: MutableSet<String> = HashSet()
 
 	override fun shouldRender(): Boolean {
@@ -24,6 +22,6 @@ class ProfileAwareWaypoint(pos: BlockPos?, typeSupplier: Supplier<Type?>?, priva
 		foundProfiles.remove(profile)
 	}
 
-	override val colorComponents: FloatArray?
+	override val colorComponents: FloatArray
 		get() = if (foundProfiles.contains(profile)) foundColor else missingColor
 }

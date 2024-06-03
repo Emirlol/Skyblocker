@@ -17,7 +17,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 fun interface ChatMessageListener {
-	fun onMessage(message: Text?, asString: String?): ChatFilterResult
+	fun onMessage(message: Text, asString: String): ChatFilterResult
 
 	companion object {
 		/**
@@ -25,7 +25,7 @@ fun interface ChatMessageListener {
 		 */
 		fun init() {
 			val listeners = arrayOf<ChatMessageListener>( // Features
-				Fetchur(),
+				Fetchur,
 				Puzzler(),
 				Reparty(),
 				Trivia(),
@@ -79,11 +79,9 @@ fun interface ChatMessageListener {
 		/**
 		 * An event called when a game message is received. Register your listeners in [ChatMessageListener.init].
 		 */
-		val EVENT: Event<ChatMessageListener> = EventFactory.createArrayBacked(
-			ChatMessageListener::class.java
-		) { listeners: Array<ChatMessageListener> ->
-			ChatMessageListener { message: Text?, asString: String? ->
-				for (listener in listeners) {
+		val EVENT: Event<ChatMessageListener> = EventFactory.createArrayBacked(ChatMessageListener::class.java) {
+			ChatMessageListener { message: Text, asString: String ->
+				for (listener in it) {
 					val result = listener.onMessage(message, asString)
 					if (result != ChatFilterResult.PASS) return@ChatMessageListener result
 				}

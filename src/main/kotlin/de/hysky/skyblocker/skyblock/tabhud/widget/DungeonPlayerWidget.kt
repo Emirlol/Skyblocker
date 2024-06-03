@@ -72,9 +72,7 @@ class DungeonPlayerWidget // title needs to be changeable here
 		// group 3: level (or nothing, if pre dungeon start)
 		// this regex filters out the ironman icon as well as rank prefixes and emblems
 		// \[\d*\] (?:\[[A-Za-z]+\] )?(?<name>[A-Za-z0-9_]*) (?:.* )?\((?<class>\S*) ?(?<level>[LXVI]*)\)
-		@JvmField
-		val PLAYER_PATTERN: Pattern = Pattern
-			.compile("\\[\\d*\\] (?:\\[[A-Za-z]+\\] )?(?<name>[A-Za-z0-9_]*) (?:.* )?\\((?<class>\\S*) ?(?<level>[LXVI]*)\\)")
+		val PLAYER_PATTERN: Pattern = Pattern.compile("\\[\\d*] (?:\\[[A-Za-z]+] )?(?<name>[A-Za-z0-9_]*) (?:.* )?\\((?<class>\\S*) ?(?<level>[LXVI]*)\\)")
 
 		private val ICOS = HashMap<String, ItemStack>()
 		private val MSGS = ArrayList<String>()

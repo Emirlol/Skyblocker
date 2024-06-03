@@ -20,9 +20,9 @@ object ConfigUtils {
 	val FLOAT_TWO_FORMATTER: ValueFormatter<Float> = ValueFormatter { value: Float? -> Text.literal(String.format("%,.2f", value).replace("[\u00a0\u202F]".toRegex(), " ")) }
 	private val IMAGE_DIRECTORY: Path = ImageRepoLoader.REPO_DIRECTORY.resolve("Skyblocker-Assets-images")
 
-	@JvmStatic
-	fun createBooleanController(opt: Option<Boolean?>?): BooleanControllerBuilder {
-		return BooleanControllerBuilder.create(opt).yesNoFormatter().coloured(true)
+	fun BooleanControllerBuilder.skyblockerBooleanController() = this.apply {
+		yesNoFormatter()
+		coloured(true)
 	}
 
 	@JvmStatic

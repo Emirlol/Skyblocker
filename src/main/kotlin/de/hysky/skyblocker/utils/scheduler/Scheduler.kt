@@ -2,7 +2,7 @@ package de.hysky.skyblocker.utils.scheduler
 
 import com.mojang.brigadier.Command
 import de.hysky.skyblocker.SkyblockerMod
-import de.hysky.skyblocker.utils.TextLogger
+import de.hysky.skyblocker.utils.TextHandler
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
@@ -22,7 +22,7 @@ object Scheduler {
 		if (scheduledTime >= currentTick) {
 			addTask(scheduledTime, task)
 		} else {
-			TextLogger.warn("Scheduled a task with negative delay")
+			TextHandler.warn("Scheduled a task with negative delay")
 		}
 	}
 

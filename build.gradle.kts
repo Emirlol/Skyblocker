@@ -85,6 +85,7 @@ loom {
 base {
 	archivesName = project.property("archives_base_name") as String
 }
+
 tasks {
 	processResources {
 		inputs.property("version", project.version)
@@ -104,15 +105,19 @@ tasks {
 	test {
 		useJUnitPlatform()
 	}
-	kotlin {
-		jvmToolchain(21)
-	}
 }
 
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
+}
+
+kotlin {
+	jvmToolchain(21)
+	compilerOptions {
+		freeCompilerArgs.add("-Xcontext-receivers")
+	}
 }
 
 publishMods {

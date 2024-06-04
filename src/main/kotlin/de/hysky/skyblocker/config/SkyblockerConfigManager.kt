@@ -20,7 +20,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 object SkyblockerConfigManager {
-	private const val CONFIG_VERSION = 3
+	const val CONFIG_VERSION = 3
 	private val CONFIG_FILE = FabricLoader.getInstance().configDir.resolve("skyblocker.json")
 	private val HANDLER = ConfigClassHandler.createBuilder(SkyblockerConfig::class.java)
 		.serializer {

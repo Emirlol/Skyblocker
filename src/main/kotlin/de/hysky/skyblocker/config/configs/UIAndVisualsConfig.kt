@@ -6,101 +6,81 @@ import net.minecraft.util.Formatting
 import java.awt.Color
 
 class UIAndVisualsConfig {
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var compactorDeletorPreview: Boolean = true
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var dontStripSkinAlphaValues: Boolean = true
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var backpackPreviewWithoutShift: Boolean = false
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var hideEmptyTooltips: Boolean = true
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var fancyCraftingTable: Boolean = true
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var hideStatusEffectOverlay: Boolean = false
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var chestValue: ChestValue = ChestValue()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var itemCooldown: ItemCooldown = ItemCooldown()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var titleContainer: TitleContainer = TitleContainer()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var tabHud: TabHudConf = TabHudConf()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var fancyAuctionHouse: FancyAuctionHouse = FancyAuctionHouse()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var bars: Bars = Bars()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var waypoints: Waypoints = Waypoints()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var teleportOverlay: TeleportOverlay = TeleportOverlay()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var searchOverlay: SearchOverlay = SearchOverlay()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var inputCalculator: InputCalculator = InputCalculator()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var flameOverlay: FlameOverlay = FlameOverlay()
 
-	@kotlin.jvm.JvmField
-    @SerialEntry
+	@SerialEntry
 	var compactDamage: CompactDamage = CompactDamage()
 
 	class ChestValue {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enableChestValue: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var color: Formatting = Formatting.DARK_GREEN
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var incompleteColor: Formatting = Formatting.BLUE
 	}
 
 	class ItemCooldown {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enableItemCooldowns: Boolean = true
 	}
 
 	class TitleContainer {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var titleContainerScale: Float = 100f
 
 		@SerialEntry
@@ -140,24 +120,20 @@ class UIAndVisualsConfig {
 	}
 
 	class TabHudConf {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var tabHudEnabled: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var tabHudScale: Int = 100
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableHudBackground: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var plainPlayerNames: Boolean = false
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var nameSorting: NameSorting = NameSorting.DEFAULT
 	}
 
@@ -173,18 +149,17 @@ class UIAndVisualsConfig {
 	}
 
 	class FancyAuctionHouse {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enabled: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var highlightCheapBIN: Boolean = true
 	}
 
 	class Bars {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enableBars: Boolean = true
 
 		// Kept in for backwards compatibility, remove if needed
@@ -217,64 +192,53 @@ class UIAndVisualsConfig {
 	}
 
 	class Waypoints {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enableWaypoints: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var waypointType: Waypoint.Type = Waypoint.Type.WAYPOINT
 	}
 
 	class TeleportOverlay {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enableTeleportOverlays: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableWeirdTransmission: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableInstantTransmission: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableEtherTransmission: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableSinrecallTransmission: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableWitherImpact: Boolean = true
 	}
 
 	class SearchOverlay {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enableBazaar: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableAuctionHouse: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var keepPreviousSearches: Boolean = false
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var maxSuggestions: Int = 3
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var historyLength: Int = 3
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var enableCommands: Boolean = false
 
 		@SerialEntry
@@ -285,44 +249,38 @@ class UIAndVisualsConfig {
 	}
 
 	class InputCalculator {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enabled: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var requiresEquals: Boolean = false
 	}
 
 	class FlameOverlay {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var flameHeight: Int = 100
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var flameOpacity: Int = 100
 	}
 
 	class CompactDamage {
-		@kotlin.jvm.JvmField
-        @SerialEntry
+
+		@SerialEntry
 		var enabled: Boolean = true
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var precision: Int = 1
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var normalDamageColor: Color = Color(0xFFFFFF)
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var critDamageGradientStart: Color = Color(0xFFFF55)
 
-		@kotlin.jvm.JvmField
-        @SerialEntry
+		@SerialEntry
 		var critDamageGradientEnd: Color = Color(0xFF5555)
 	}
 }

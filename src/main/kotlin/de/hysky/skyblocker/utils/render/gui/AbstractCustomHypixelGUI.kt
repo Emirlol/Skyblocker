@@ -11,7 +11,6 @@ import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.text.Text
 
 abstract class AbstractCustomHypixelGUI<T : ScreenHandler?>(handler: T, inventory: PlayerInventory?, title: Text?) : HandledScreen<T>(handler, inventory, title), ScreenHandlerListener {
-	@JvmField
     var isWaitingForServer: Boolean = true
 
 	init {

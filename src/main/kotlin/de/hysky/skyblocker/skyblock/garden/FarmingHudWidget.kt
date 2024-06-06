@@ -17,8 +17,8 @@ class FarmingHudWidget : Widget(TITLE, Formatting.YELLOW.colorValue) {
 	private val client: MinecraftClient = MinecraftClient.getInstance()
 
 	init {
-		x = SkyblockerConfigManager.get().farming.garden.farmingHud.x
-		y = SkyblockerConfigManager.get().farming.garden.farmingHud.y
+		x = SkyblockerConfigManager.config.farming.garden.farmingHud.x
+		y = SkyblockerConfigManager.config.farming.garden.farmingHud.y
 		update()
 	}
 

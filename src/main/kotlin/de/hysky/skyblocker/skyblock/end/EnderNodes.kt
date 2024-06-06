@@ -101,14 +101,14 @@ object EnderNodes {
 	}
 
 	private fun shouldProcess(): Boolean {
-		return SkyblockerConfigManager.get().otherLocations.end.enableEnderNodeHelper && isInTheEnd
+		return SkyblockerConfigManager.config.otherLocations.end.enableEnderNodeHelper && isInTheEnd
 	}
 
 	private fun reset() {
 		enderNodes.clear()
 	}
 
-	class EnderNode(pos: BlockPos) : Waypoint(pos, Supplier { SkyblockerConfigManager.get().uiAndVisuals.waypoints.waypointType }, DyeColor.CYAN.colorComponents, false) {
+	class EnderNode(pos: BlockPos) : Waypoint(pos, Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType }, DyeColor.CYAN.colorComponents, false) {
 		val particles: Map<Direction, IntIntPair> = java.util.Map.of<Direction, IntIntPair>(
 			Direction.UP, IntIntMutablePair(0, 0),
 			Direction.DOWN, IntIntMutablePair(0, 0),

@@ -62,10 +62,10 @@ class StatusBarTracker {
 	}
 
 	private fun onOverlayMessage(text: Text, overlay: Boolean): Text {
-		if (!overlay || !isOnSkyblock || !SkyblockerConfigManager.get().uiAndVisuals.bars.enableBars || isInTheRift) {
+		if (!overlay || !isOnSkyblock || !SkyblockerConfigManager.config.uiAndVisuals.bars.enableBars || isInTheRift) {
 			return text
 		}
-		return Text.of(update(text.string, SkyblockerConfigManager.get().chat.hideMana))
+		return Text.of(update(text.string, SkyblockerConfigManager.config.chat.hideMana))
 	}
 
 	fun update(actionBar: String, filterManaUse: Boolean): String? {

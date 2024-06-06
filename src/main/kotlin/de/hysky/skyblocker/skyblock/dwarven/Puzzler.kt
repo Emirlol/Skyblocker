@@ -11,7 +11,7 @@ import java.util.regex.Matcher
 
 object Puzzler : ChatPatternListener("^\\[NPC] Puzzler: ((?:▲|▶|◀|▼){10})$") {
 	public override fun state(): ChatFilterResult? {
-		return if (SkyblockerConfigManager.get().mining.dwarvenMines.solvePuzzler) null else ChatFilterResult.PASS
+		return if (SkyblockerConfigManager.config.mining.dwarvenMines.solvePuzzler) null else ChatFilterResult.PASS
 	}
 
 	override fun onMatch(message: Text, matcher: Matcher): Boolean {

@@ -26,7 +26,7 @@ class ThreeWeirdos private constructor() : DungeonPuzzle("three-weirdos", "three
 	init {
 		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { message: Text, overlay: Boolean ->
 			val world: World? = MinecraftClient.getInstance().world
-			if (overlay || !shouldSolve() || !SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveThreeWeirdos || world == null || !DungeonManager.isCurrentRoomMatched()) return@register
+			if (overlay || !shouldSolve() || !SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveThreeWeirdos || world == null || !DungeonManager.isCurrentRoomMatched()) return@register
 
 			val matcher = PATTERN.matcher(Formatting.strip(message.string))
 			if (!matcher.matches()) return@register

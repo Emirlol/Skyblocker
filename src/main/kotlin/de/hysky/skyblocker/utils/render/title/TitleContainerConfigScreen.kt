@@ -21,16 +21,16 @@ class TitleContainerConfigScreen @JvmOverloads constructor(private val parent: S
 	private val example1 = Title(Text.literal("Test1").formatted(Formatting.RED))
 	private val example2 = Title(Text.literal("Test23").formatted(Formatting.AQUA))
 	private val example3 = Title(Text.literal("Testing1234").formatted(Formatting.DARK_GREEN))
-	private var hudX = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.x.toFloat()
-	private var hudY = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.y.toFloat()
+	private var hudX = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.x.toFloat()
+	private var hudY = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.y.toFloat()
 	private var changedScale = false
 
 	override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
 		super.render(context, mouseX, mouseY, delta)
 		renderBackground(context, mouseX, mouseY, delta)
 		TitleContainer.render(context, Set.of(example1, example2, example3), hudX.toInt(), hudY.toInt(), delta)
-		val direction = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.direction
-		val alignment = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment
+		val direction = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.direction
+		val alignment = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment
 		context.drawCenteredTextWithShadow(textRenderer, "Press Q/E to change Alignment: $alignment", width / 2, textRenderer.fontHeight * 2, Color.WHITE.rgb)
 		context.drawCenteredTextWithShadow(textRenderer, "Press R to change Direction: $direction", width / 2, textRenderer.fontHeight * 3 + 5, Color.WHITE.rgb)
 		context.drawCenteredTextWithShadow(textRenderer, "Press +/- to change Scale", width / 2, textRenderer.fontHeight * 4 + 10, Color.WHITE.rgb)
@@ -50,7 +50,7 @@ class TitleContainerConfigScreen @JvmOverloads constructor(private val parent: S
 
 	private val selectionBoundingBox: Pair<Vector2f, Vector2f>
 		get() {
-			val alignment = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment
+			val alignment = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment
 
 			val midWidth = selectionWidth / 2f
 			var x1 = 0f
@@ -78,20 +78,20 @@ class TitleContainerConfigScreen @JvmOverloads constructor(private val parent: S
 
 	private val selectionHeight: Float
 		get() {
-			val scale = (3f * (SkyblockerConfigManager.get().uiAndVisuals.titleContainer.titleContainerScale / 100f))
-			return if (SkyblockerConfigManager.get().uiAndVisuals.titleContainer.direction == UIAndVisualsConfig.Direction.HORIZONTAL) (textRenderer.fontHeight * scale) else (textRenderer.fontHeight + 10f) * 3f * scale
+			val scale = (3f * (SkyblockerConfigManager.config.uiAndVisuals.titleContainer.titleContainerScale / 100f))
+			return if (SkyblockerConfigManager.config.uiAndVisuals.titleContainer.direction == UIAndVisualsConfig.Direction.HORIZONTAL) (textRenderer.fontHeight * scale) else (textRenderer.fontHeight + 10f) * 3f * scale
 		}
 
 	private val selectionWidth: Float
 		get() {
-			val scale = (3f * (SkyblockerConfigManager.get().uiAndVisuals.titleContainer.titleContainerScale / 100f))
-			return if (SkyblockerConfigManager.get().uiAndVisuals.titleContainer.direction == UIAndVisualsConfig.Direction.HORIZONTAL) (textRenderer.getWidth("Test1") + 10 + textRenderer.getWidth("Test23") + 10 + textRenderer.getWidth("Testing1234")) * scale else textRenderer.getWidth("Testing1234") * scale
+			val scale = (3f * (SkyblockerConfigManager.config.uiAndVisuals.titleContainer.titleContainerScale / 100f))
+			return if (SkyblockerConfigManager.config.uiAndVisuals.titleContainer.direction == UIAndVisualsConfig.Direction.HORIZONTAL) (textRenderer.getWidth("Test1") + 10 + textRenderer.getWidth("Test23") + 10 + textRenderer.getWidth("Testing1234")) * scale else textRenderer.getWidth("Testing1234") * scale
 		}
 
 	override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
 		val midWidth = selectionWidth / 2
 		val midHeight = selectionHeight / 2
-		val alignment = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment
+		val alignment = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment
 
 		val boundingBox = selectionBoundingBox
 		val x1 = boundingBox.left.x
@@ -120,34 +120,34 @@ class TitleContainerConfigScreen @JvmOverloads constructor(private val parent: S
 
 	override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
 		if (keyCode == GLFW.GLFW_KEY_Q) {
-			val current = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment
-			SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment = when (current) {
+			val current = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment
+			SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment = when (current) {
 				UIAndVisualsConfig.Alignment.LEFT -> UIAndVisualsConfig.Alignment.MIDDLE
 				UIAndVisualsConfig.Alignment.MIDDLE -> UIAndVisualsConfig.Alignment.RIGHT
 				UIAndVisualsConfig.Alignment.RIGHT -> UIAndVisualsConfig.Alignment.LEFT
 			}
 		}
 		if (keyCode == GLFW.GLFW_KEY_E) {
-			val current = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment
-			SkyblockerConfigManager.get().uiAndVisuals.titleContainer.alignment = when (current) {
+			val current = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment
+			SkyblockerConfigManager.config.uiAndVisuals.titleContainer.alignment = when (current) {
 				UIAndVisualsConfig.Alignment.LEFT -> UIAndVisualsConfig.Alignment.RIGHT
 				UIAndVisualsConfig.Alignment.MIDDLE -> UIAndVisualsConfig.Alignment.LEFT
 				UIAndVisualsConfig.Alignment.RIGHT -> UIAndVisualsConfig.Alignment.MIDDLE
 			}
 		}
 		if (keyCode == GLFW.GLFW_KEY_R) {
-			val current = SkyblockerConfigManager.get().uiAndVisuals.titleContainer.direction
-			SkyblockerConfigManager.get().uiAndVisuals.titleContainer.direction = when (current) {
+			val current = SkyblockerConfigManager.config.uiAndVisuals.titleContainer.direction
+			SkyblockerConfigManager.config.uiAndVisuals.titleContainer.direction = when (current) {
 				UIAndVisualsConfig.Direction.HORIZONTAL -> UIAndVisualsConfig.Direction.VERTICAL
 				UIAndVisualsConfig.Direction.VERTICAL -> UIAndVisualsConfig.Direction.HORIZONTAL
 			}
 		}
 		if (keyCode == GLFW.GLFW_KEY_EQUAL) {
-			SkyblockerConfigManager.get().uiAndVisuals.titleContainer.titleContainerScale += 10f
+			SkyblockerConfigManager.config.uiAndVisuals.titleContainer.titleContainerScale += 10f
 			changedScale = true
 		}
 		if (keyCode == GLFW.GLFW_KEY_MINUS) {
-			SkyblockerConfigManager.get().uiAndVisuals.titleContainer.titleContainerScale -= 10f
+			SkyblockerConfigManager.config.uiAndVisuals.titleContainer.titleContainerScale -= 10f
 			changedScale = true
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers)
@@ -155,8 +155,8 @@ class TitleContainerConfigScreen @JvmOverloads constructor(private val parent: S
 
 
 	override fun close() {
-		SkyblockerConfigManager.get().uiAndVisuals.titleContainer.x = hudX.toInt()
-		SkyblockerConfigManager.get().uiAndVisuals.titleContainer.y = hudY.toInt()
+		SkyblockerConfigManager.config.uiAndVisuals.titleContainer.x = hudX.toInt()
+		SkyblockerConfigManager.config.uiAndVisuals.titleContainer.y = hudY.toInt()
 
 		//TODO Come up with a better, less hacky solution for this in the future (:
 		if (parent is YACLScreen) {

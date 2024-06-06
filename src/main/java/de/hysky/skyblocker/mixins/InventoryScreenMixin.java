@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class InventoryScreenMixin {
     @ModifyExpressionValue(method = "<init>", at = @At(value = "NEW", target = "net/minecraft/client/gui/screen/recipebook/RecipeBookWidget"))
     private RecipeBookWidget skyblocker$replaceRecipeBook(RecipeBookWidget original) {
-        return SkyblockerConfigManager.get().general.itemList.enableItemList && Utils.isOnSkyblock() ? new ItemListWidget() : original;
+        return SkyblockerConfigManager.config.general.itemList.enableItemList && Utils.isOnSkyblock() ? new ItemListWidget() : original;
     }
 }

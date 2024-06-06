@@ -28,8 +28,8 @@ import kotlin.math.min
 
 
 object DungeonScore {
-	private val SCORE_CONFIG: DungeonsConfig.DungeonScore = SkyblockerConfigManager.get().dungeons.dungeonScore
-	private val MIMIC_MESSAGE_CONFIG: MimicMessage = SkyblockerConfigManager.get().dungeons.mimicMessage
+	private val SCORE_CONFIG: DungeonsConfig.DungeonScore = SkyblockerConfigManager.config.dungeons.dungeonScore
+	private val MIMIC_MESSAGE_CONFIG: MimicMessage = SkyblockerConfigManager.config.dungeons.mimicMessage
 	private const val LOGGER_PREFIX = "[Dungeon Score]"
 
 	//Scoreboard patterns

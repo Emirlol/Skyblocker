@@ -41,13 +41,13 @@ object LividColor {
 	)
 	@JvmField
     val LIVID_NAMES: Set<String> = java.util.Set.copyOf(LIVID_TO_FORMATTING.keys)
-	val CONFIG: Livid = SkyblockerConfigManager.get().dungeons.livid
+	val CONFIG: Livid = SkyblockerConfigManager.config.dungeons.livid
 	private var tenTicks = 0
 	private var color: Formatting? = null
 
 	fun init() {
 		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { message: Text, overlay: Boolean ->
-			val config = SkyblockerConfigManager.get().dungeons.livid
+			val config = SkyblockerConfigManager.config.dungeons.livid
 			if ((config.enableLividColorText || config.enableLividColorTitle || config.enableLividColorGlow) && (message.string == "[BOSS] Livid: I respect you for making it to here, but I'll be your undoing.")) {
 				tenTicks = 8
 			}
@@ -57,7 +57,7 @@ object LividColor {
 	fun update() {
 		val client = MinecraftClient.getInstance()
 		if (tenTicks != 0) {
-			val config = SkyblockerConfigManager.get().dungeons.livid
+			val config = SkyblockerConfigManager.config.dungeons.livid
 			if ((config.enableLividColorText || config.enableLividColorTitle || config.enableLividColorGlow) && isInDungeons && (client.world != null)) {
 				if (tenTicks == 1) {
 					onLividColorFound(client, Blocks.RED_WOOL)
@@ -94,12 +94,12 @@ object LividColor {
 
 	@JvmStatic
     fun allowGlow(): Boolean {
-		return !SkyblockerConfigManager.get().dungeons.livid.enableLividColorGlow || !DungeonManager.getBoss().isFloor(5)
+		return !SkyblockerConfigManager.config.dungeons.livid.enableLividColorGlow || !DungeonManager.getBoss().isFloor(5)
 	}
 
 	@JvmStatic
     fun shouldGlow(name: String): Boolean {
-		return SkyblockerConfigManager.get().dungeons.livid.enableLividColorGlow && color == LIVID_TO_FORMATTING[name]
+		return SkyblockerConfigManager.config.dungeons.livid.enableLividColorGlow && color == LIVID_TO_FORMATTING[name]
 	}
 
 	@JvmStatic

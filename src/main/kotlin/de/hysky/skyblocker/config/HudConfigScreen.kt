@@ -52,7 +52,7 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	 */
 	protected open fun renderWidget(context: DrawContext?, widgets: List<Widget>) {
 		for (widget in widgets) {
-			widget.render(context!!, SkyblockerConfigManager.get().uiAndVisuals.tabHud.enableHudBackground)
+			widget.render(context!!, SkyblockerConfigManager.config.uiAndVisuals.tabHud.enableHudBackground)
 		}
 	}
 
@@ -89,7 +89,7 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	 * Resets the positions of the widgets to the positions in the config. Override to change the behavior.
 	 */
 	protected fun resetPos() {
-		val configPositions = getConfigPos(SkyblockerConfigManager.get())
+		val configPositions = getConfigPos(SkyblockerConfigManager.config)
 		check(configPositions.size == widgets.size) { "The number of positions (" + configPositions.size + ") does not match the number of widgets (" + widgets.size + ")" }
 		for (i in widgets.indices) {
 			val widget = widgets[i]
@@ -107,7 +107,7 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	protected abstract fun getConfigPos(config: SkyblockerConfig?): List<IntIntMutablePair>
 
 	override fun close() {
-		val skyblockerConfig = SkyblockerConfigManager.get()
+		val skyblockerConfig = SkyblockerConfigManager.config
 		savePos(skyblockerConfig, widgets)
 		SkyblockerConfigManager.save()
 

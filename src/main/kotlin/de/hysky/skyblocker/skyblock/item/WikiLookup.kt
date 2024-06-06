@@ -35,7 +35,7 @@ object WikiLookup {
 
 	@JvmStatic
     fun openWiki(slot: Slot, player: PlayerEntity) {
-		if (!isOnSkyblock || !SkyblockerConfigManager.get().general.wikiLookup.enableWikiLookup) return
+		if (!isOnSkyblock || !SkyblockerConfigManager.config.general.wikiLookup.enableWikiLookup) return
 
 		getItemIdOptional(slot.stack)
 			.map<String>(Function<String, String> { obj: String -> obj.getWikiLink() })

@@ -30,9 +30,9 @@ object MobBoundingBoxes {
 			val name = entity.name.string
 
 			return when (entity) {
-				-> SkyblockerConfigManager.get().dungeons.starredMobBoundingBoxes
+				-> SkyblockerConfigManager.config.dungeons.starredMobBoundingBoxes
 				-> false
-				else -> SkyblockerConfigManager.get().dungeons.starredMobBoundingBoxes && MobGlow.isStarred(entity)
+				else -> SkyblockerConfigManager.config.dungeons.starredMobBoundingBoxes && MobGlow.isStarred(entity)
 			}
 		}
 

@@ -76,7 +76,6 @@ object SkyblockerMod {
 	val CONFIG_DIR: Path = FabricLoader.getInstance().configDir.resolve(NAMESPACE)
 	val GSON: Gson = GsonBuilder().setPrettyPrinting().create()
 	val GSON_COMPACT: Gson = GsonBuilder().create()
-	val containerSolverManager = ContainerSolverManager()
 	val statusBarTracker = StatusBarTracker()
 	val globalJob = MainScope() + CoroutineName("Skyblocker")
 

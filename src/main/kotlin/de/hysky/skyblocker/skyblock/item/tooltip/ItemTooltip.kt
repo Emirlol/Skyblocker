@@ -40,7 +40,7 @@ object ItemTooltip {
 	@JvmField
     val LOGGER: Logger = LoggerFactory.getLogger(ItemTooltip::class.java.name)
 	private val client: MinecraftClient = MinecraftClient.getInstance()
-	internal val config: GeneralConfig.ItemTooltip = SkyblockerConfigManager.get().general.itemTooltip
+	internal val config: GeneralConfig.ItemTooltip = SkyblockerConfigManager.config.general.itemTooltip
 
 	@Volatile
 	private var sentNullWarning = false
@@ -111,7 +111,7 @@ object ItemTooltip {
 			lbinExist = true
 		}
 
-		if (SkyblockerConfigManager.get().general.itemTooltip.enableAvgBIN) {
+		if (SkyblockerConfigManager.config.general.itemTooltip.enableAvgBIN) {
 			if (TooltipInfoType.ONE_DAY_AVERAGE.data == null || TooltipInfoType.THREE_DAY_AVERAGE.data == null) {
 				nullWarning()
 			} else {
@@ -164,7 +164,7 @@ object ItemTooltip {
 			10, "M7"
 		)
 
-		if (SkyblockerConfigManager.get().general.itemTooltip.dungeonQuality) {
+		if (SkyblockerConfigManager.config.general.itemTooltip.dungeonQuality) {
 			val customData = getCustomData(stack)
 			if (customData != null && customData.contains("baseStatBoostPercentage")) {
 				val baseStatBoostPercentage = customData.getInt("baseStatBoostPercentage")
@@ -236,7 +236,7 @@ object ItemTooltip {
 
 		if (TooltipInfoType.COLOR.isTooltipEnabledAndHasOrNullWarning(internalID) && stack.contains(DataComponentTypes.DYED_COLOR)) {
 			val uuid = getItemUuid(stack)
-			val hasCustomDye = SkyblockerConfigManager.get().general.customDyeColors.containsKey(uuid) || SkyblockerConfigManager.get().general.customAnimatedDyes.containsKey(uuid)
+			val hasCustomDye = SkyblockerConfigManager.config.general.customDyeColors.containsKey(uuid) || SkyblockerConfigManager.config.general.customAnimatedDyes.containsKey(uuid)
 			//DyedColorComponent#getColor returns ARGB so we mask out the alpha bits
 			var dyeColor = DyedColorComponent.getColor(stack, 0)
 
@@ -409,7 +409,7 @@ object ItemTooltip {
 	}
 
 	private fun getMotesMessage(price: Int, count: Int): Text {
-		val motesMultiplier = SkyblockerConfigManager.get().otherLocations.rift.mcGrubberStacks * 0.05f + 1
+		val motesMultiplier = SkyblockerConfigManager.config.otherLocations.rift.mcGrubberStacks * 0.05f + 1
 
 		// Calculate the total price
 		val totalPrice = price * count

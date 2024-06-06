@@ -9,7 +9,7 @@ import net.minecraft.text.Text
 import java.util.regex.Matcher
 
 object Fetchur : ChatPatternListener("^\\[NPC] Fetchur: (?:its|theyre) ([a-zA-Z, \\-]*)$") {
-	public override fun state() = if (SkyblockerConfigManager.get().mining.dwarvenMines.solveFetchur) ChatFilterResult.FILTER else ChatFilterResult.PASS
+	public override fun state() = if (SkyblockerConfigManager.config.mining.dwarvenMines.solveFetchur) ChatFilterResult.FILTER else ChatFilterResult.PASS
 
 	public override fun onMatch(message: Text, matcher: Matcher): Boolean {
 		TextHandler.info("Original Fetchur message: ${message.string}")

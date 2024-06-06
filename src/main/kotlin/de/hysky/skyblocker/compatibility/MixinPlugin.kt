@@ -24,7 +24,7 @@ class MixinPlugin : IMixinConfigPlugin {
 	}
 
 	override fun getMixins(): List<String> {
-		return listOf()
+		returnemptyList()
 	}
 
 	override fun preApply(targetClassName: String, targetClass: ClassNode, mixinClassName: String, mixinInfo: IMixinInfo) {

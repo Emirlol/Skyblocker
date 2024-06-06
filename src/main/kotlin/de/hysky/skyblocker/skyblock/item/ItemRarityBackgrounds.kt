@@ -22,7 +22,7 @@ import java.util.Map
 import java.util.function.Supplier
 
 object ItemRarityBackgrounds {
-	private val CONFIG: ItemInfoDisplay = SkyblockerConfigManager.get().general.itemInfoDisplay
+	private val CONFIG: ItemInfoDisplay = SkyblockerConfigManager.config.general.itemInfoDisplay
 	private val SPRITE = Supplier { MinecraftClient.getInstance().guiAtlasManager.getSprite(CONFIG.itemRarityBackgroundStyle.tex) }
 	@JvmField
 	val LORE_RARITIES: ImmutableMap<String, SkyblockItemRarity> = ImmutableMap.ofEntries(
@@ -95,7 +95,7 @@ object ItemRarityBackgrounds {
 		RenderSystem.enableBlend()
 		RenderSystem.defaultBlendFunc()
 
-		context.drawSprite(x, y, 0, 16, 16, SPRITE.get(), rarity.r, rarity.g, rarity.b, SkyblockerConfigManager.get().general.itemInfoDisplay.itemRarityBackgroundsOpacity)
+		context.drawSprite(x, y, 0, 16, 16, SPRITE.get(), rarity.r, rarity.g, rarity.b, SkyblockerConfigManager.config.general.itemInfoDisplay.itemRarityBackgroundsOpacity)
 
 		RenderSystem.disableBlend()
 	}

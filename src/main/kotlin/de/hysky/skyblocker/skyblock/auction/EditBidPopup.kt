@@ -43,7 +43,7 @@ class EditBidPopup(auctionViewScreen: AuctionViewScreen?, private val signBlockE
 	override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
 		super.renderBackground(context, mouseX, mouseY, delta)
 		drawPopupBackground(context, layout.x, layout.y, layout.width, layout.height)
-		if (SkyblockerConfigManager.get().uiAndVisuals.inputCalculator.enabled) {
+		if (SkyblockerConfigManager.config.uiAndVisuals.inputCalculator.enabled) {
 			SignCalculator.renderCalculator(context, textFieldWidget!!.text, context.scaledWindowWidth / 2, textFieldWidget!!.y - 8)
 		}
 	}
@@ -60,7 +60,7 @@ class EditBidPopup(auctionViewScreen: AuctionViewScreen?, private val signBlockE
 	}
 
 	private fun done(widget: ButtonWidget?) {
-		if (SkyblockerConfigManager.get().uiAndVisuals.inputCalculator.enabled) {
+		if (SkyblockerConfigManager.config.uiAndVisuals.inputCalculator.enabled) {
 			if (!isStringGood(SignCalculator.getNewValue(false))) return
 			sendPacket(SignCalculator.getNewValue(false))
 		} else {

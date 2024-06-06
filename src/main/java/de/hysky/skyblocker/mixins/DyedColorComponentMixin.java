@@ -22,11 +22,11 @@ public record DyedColorComponentMixin() {
 		if (Utils.isOnSkyblock()) {
 			String itemUuid = ItemUtils.getItemUuid(stack);
 
-			if (SkyblockerConfigManager.get().general.customAnimatedDyes.containsKey(itemUuid)) {
-				return ColorHelper.Argb.fullAlpha(CustomArmorAnimatedDyes.animateColorTransition(SkyblockerConfigManager.get().general.customAnimatedDyes.get(itemUuid)));
+			if (SkyblockerConfigManager.config.general.customAnimatedDyes.containsKey(itemUuid)) {
+				return ColorHelper.Argb.fullAlpha(CustomArmorAnimatedDyes.animateColorTransition(SkyblockerConfigManager.config.general.customAnimatedDyes.get(itemUuid)));
 			}
 
-			return ColorHelper.Argb.fullAlpha(SkyblockerConfigManager.get().general.customDyeColors.getOrDefault(itemUuid, originalColor));
+			return ColorHelper.Argb.fullAlpha(SkyblockerConfigManager.config.general.customDyeColors.getOrDefault(itemUuid, originalColor));
 		}
 
 		return originalColor;

@@ -1,6 +1,8 @@
 package de.hysky.skyblocker.skyblock.dungeon.terminal
 
 import de.hysky.skyblocker.config.SkyblockerConfigManager
+import de.hysky.skyblocker.skyblock.dungeon.terminal.ColorTerminal.Companion.colorFromName
+import de.hysky.skyblocker.skyblock.dungeon.terminal.ColorTerminal.Companion.itemColor
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.green
 import de.hysky.skyblocker.utils.render.gui.ContainerSolver
@@ -14,12 +16,12 @@ import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class ColorTerminal : ContainerSolver("^Select all the ([A-Z ]+) items!$"), TerminalSolver {
+object ColorTerminal : ContainerSolver("^Select all the ([A-Z ]+) items!$"), TerminalSolver {
 	private var targetColor: DyeColor? = null
 	override val isEnabled: Boolean
 		get() {
 			targetColor = null
-			return SkyblockerConfigManager.get().dungeons.terminals.solveColor
+			return SkyblockerConfigManager.config.dungeons.terminals.solveColor
 		}
 
 	protected override fun getColors(groups: Array<String?>?, slots: Int2ObjectMap<ItemStack?>?): List<ColorHighlight?>? {
@@ -50,7 +52,7 @@ class ColorTerminal : ContainerSolver("^Select all the ([A-Z ]+) items!$"), Term
 		return false
 	}
 
-	companion object {
+
 		private val LOGGER: Logger = LoggerFactory.getLogger(ColorTerminal::class.java.name)
 		private val colorFromName: MutableMap<String?, DyeColor> = HashMap()
 		private val itemColor: MutableMap<Item, DyeColor>
@@ -67,5 +69,5 @@ class ColorTerminal : ContainerSolver("^Select all the ([A-Z ]+) items!$"), Term
 			itemColor[Items.COCOA_BEANS] = DyeColor.BROWN
 			itemColor[Items.INK_SAC] = DyeColor.BLACK
 		}
-	}
+
 }

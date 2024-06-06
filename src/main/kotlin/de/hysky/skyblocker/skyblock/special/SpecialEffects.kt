@@ -24,7 +24,7 @@ object SpecialEffects {
 	private fun displayRareDropEffect(message: Text, overlay: Boolean) {
 		//We don't check if we're in dungeons because that check doesn't work in m7 which defeats the point of this
 		//It might also allow it to work with Croesus
-		if (isOnSkyblock && SkyblockerConfigManager.get().general.specialEffects.rareDungeonDropEffects && !overlay) {
+		if (isOnSkyblock && SkyblockerConfigManager.config.general.specialEffects.rareDungeonDropEffects && !overlay) {
 			try {
 				val stringForm = message.string
 				val matcher = DROP_PATTERN.matcher(stringForm)

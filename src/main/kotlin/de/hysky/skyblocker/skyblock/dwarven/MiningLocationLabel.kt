@@ -16,7 +16,7 @@ data class MiningLocationLabel(val category: Category, val centerPos: Vec3d) : R
 
 	private val name: Text
 		get() {
-			if (SkyblockerConfigManager.get().mining.commissionWaypoints.useColor) {
+			if (SkyblockerConfigManager.config.mining.commissionWaypoints.useColor) {
 				return Text.literal(category.name).withColor(category.color)
 			}
 			return Text.literal(category.name)
@@ -29,7 +29,7 @@ data class MiningLocationLabel(val category: Category, val centerPos: Vec3d) : R
 	override fun render(context: WorldRenderContext?) {
 		val posUp = centerPos.add(0.0, 1.0, 0.0)
 		val distance = context!!.camera().pos.distanceTo(centerPos)
-		val scale = (SkyblockerConfigManager.get().mining.commissionWaypoints.textScale * (distance / 10)).toFloat()
+		val scale = (SkyblockerConfigManager.config.mining.commissionWaypoints.textScale * (distance / 10)).toFloat()
 		renderText(context, name, posUp, scale, true)
 		renderText(context, Text.literal(Math.round(distance).toString() + "m").formatted(Formatting.YELLOW), posUp, scale, (MinecraftClient.getInstance().textRenderer.fontHeight + 1).toFloat(), true)
 	}

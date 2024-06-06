@@ -15,7 +15,7 @@ object StakeIndicator {
 	private val title = Title("skyblocker.rift.stakeNow", Formatting.RED)
 
 	fun updateStake() {
-		if (!SkyblockerConfigManager.get().slayers.vampireSlayer.enableSteakStakeIndicator || !isOnSkyblock || !isInTheRift || !islandArea.contains("Stillgore Château") || !isInSlayer) {
+		if (!SkyblockerConfigManager.config.slayers.vampireSlayer.enableSteakStakeIndicator || !isOnSkyblock || !isInTheRift || !islandArea.contains("Stillgore Château") || !isInSlayer) {
 			removeTitle(title)
 			return
 		}

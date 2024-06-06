@@ -102,7 +102,7 @@ class FancyStatusBars {
 			// Fetch from old status bar config
 			val counts = IntArray(3) // counts for RIGHT, LAYER1, LAYER2
 			val health = statusBars["health"]
-			val barPositions = SkyblockerConfigManager.get().uiAndVisuals.bars.barPositions
+			val barPositions = SkyblockerConfigManager.config.uiAndVisuals.bars.barPositions
 			loadOldBarPosition(health, counts, barPositions.healthBarPosition)
 			val intelligence = statusBars["intelligence"]
 			loadOldBarPosition(intelligence, counts, barPositions.manaBarPosition)
@@ -315,6 +315,6 @@ class FancyStatusBars {
 
 		@JvmStatic
         val isEnabled: Boolean
-			get() = SkyblockerConfigManager.get().uiAndVisuals.bars.enableBars && !isInTheRift
+			get() = SkyblockerConfigManager.config.uiAndVisuals.bars.enableBars && !isInTheRift
 	}
 }

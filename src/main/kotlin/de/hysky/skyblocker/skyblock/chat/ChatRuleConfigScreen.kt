@@ -15,14 +15,14 @@ import java.util.function.Consumer
 import kotlin.math.max
 
 class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex: Int) : Screen(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen")) {
-	private val soundsLookup: Map<MutableText, SoundEvent> = java.util.Map.ofEntries(
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.pling"), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value()),
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.cave"), SoundEvents.AMBIENT_CAVE.value()),
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.zombie"), SoundEvents.ENTITY_ZOMBIE_AMBIENT),
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.crit"), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT),
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.arrowHit"), SoundEvents.ENTITY_ARROW_HIT_PLAYER),
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.amethyst"), SoundEvents.BLOCK_AMETHYST_BLOCK_HIT),
-		java.util.Map.entry(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.anvil"), SoundEvents.BLOCK_ANVIL_LAND)
+	private val soundsLookup = mapOf(
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.pling") to SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.cave") to SoundEvents.AMBIENT_CAVE.value(),
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.zombie") to SoundEvents.ENTITY_ZOMBIE_AMBIENT,
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.crit") to SoundEvents.ENTITY_PLAYER_ATTACK_CRIT,
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.arrowHit") to SoundEvents.ENTITY_ARROW_HIT_PLAYER,
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.amethyst") to SoundEvents.BLOCK_AMETHYST_BLOCK_HIT,
+		Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.anvil") to SoundEvents.BLOCK_ANVIL_LAND
 	)
 
 	private var buttonWidth = 75
@@ -62,11 +62,11 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 	}
 
 	private fun getCurrentSoundIndex(): Int {
-		if (chatRule.getCustomSound() == null) return -1 //if no sound just return -1
+		chatRule?.customSound ?: return -1 //if no sound just return -1
 
 
 		val soundOptions = soundsLookup.values.stream().toList()
-		val ruleSoundId = chatRule.getCustomSound().id
+		val ruleSoundId = chatRule.customSound.id
 
 		for (i in soundOptions.indices) {
 			if (soundOptions[i].id.compareTo(ruleSoundId) == 0) {
@@ -87,7 +87,7 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		nameLabelTextPos = currentPos
 		var lineXOffset = client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.name")) + SPACER_X
 		nameInput = TextFieldWidget(client!!.textRenderer, currentPos.leftInt() + lineXOffset, currentPos.rightInt(), 100, 20, Text.of(""))
-		nameInput!!.text = chatRule.getName()
+		nameInput!!.text = chatRule?.name
 		nameInput!!.tooltip = Tooltip.of(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.name.@Tooltip"))
 		currentPos = IntIntPair.of(currentPos.leftInt(), currentPos.rightInt() + SPACER_Y)
 
@@ -98,14 +98,14 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		lineXOffset = client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.filter")) + SPACER_X
 		filterInput = TextFieldWidget(client!!.textRenderer, currentPos.leftInt() + lineXOffset, currentPos.rightInt(), 200, 20, Text.of(""))
 		filterInput!!.setMaxLength(96)
-		filterInput!!.text = chatRule.getFilter()
+		filterInput!!.text = chatRule.filter
 		filterInput!!.tooltip = Tooltip.of(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.filter.@Tooltip"))
 		currentPos = IntIntPair.of(currentPos.leftInt(), currentPos.rightInt() + SPACER_Y)
 		lineXOffset = 0
 
 		partialMatchTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.partialMatch")) + SPACER_X
-		partialMatchToggle = ButtonWidget.builder(enabledButtonText(chatRule.getPartialMatch())) { a: ButtonWidget? ->
+		partialMatchToggle = ButtonWidget.builder(enabledButtonText(chatRule.isPartialMatch)) { a: ButtonWidget? ->
 			chatRule.setPartialMatch(!chatRule.getPartialMatch())
 			partialMatchToggle!!.message = enabledButtonText(chatRule.getPartialMatch())
 		}

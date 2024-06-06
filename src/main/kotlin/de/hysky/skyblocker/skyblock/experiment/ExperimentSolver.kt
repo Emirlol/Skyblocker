@@ -23,7 +23,7 @@ abstract class ExperimentSolver protected constructor(containerName: String?) : 
 	}
 
 	override val isEnabled: Boolean
-		get() = isEnabled(SkyblockerConfigManager.get().helpers.experiments)
+		get() = isEnabled(SkyblockerConfigManager.config.helpers.experiments)
 
 	protected abstract fun isEnabled(experimentsConfig: Experiments): Boolean
 

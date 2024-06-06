@@ -122,11 +122,11 @@ class OptionDropdownWidget(protected val screen: PartyFinderScreen, name: Text, 
 
 	inner class Option(val message: String, private val icon: ItemStack?, private val optionSlotId: Int) : Entry<Option?>() {
 		override fun selectableChildren(): List<Selectable> {
-			return listOf()
+			returnemptyList()
 		}
 
 		override fun children(): List<Element> {
-			return listOf()
+			returnemptyList()
 		}
 
 		override fun render(context: DrawContext, index: Int, y: Int, x: Int, entryWidth: Int, entryHeight: Int, mouseX: Int, mouseY: Int, hovered: Boolean, tickDelta: Float) {

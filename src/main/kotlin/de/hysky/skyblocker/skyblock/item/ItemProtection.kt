@@ -38,7 +38,7 @@ object ItemProtection {
 	fun isItemProtected(stack: ItemStack?): Boolean {
 		if (stack == null) return false
 		val itemUuid = getItemUuid(stack)
-		return SkyblockerConfigManager.get().general.protectedItems.contains(itemUuid)
+		return SkyblockerConfigManager.config.general.protectedItems.contains(itemUuid)
 	}
 
 	private fun registerCommand(dispatcher: CommandDispatcher<FabricClientCommandSource>, registryAccess: CommandRegistryAccess) {
@@ -56,7 +56,7 @@ object ItemProtection {
 			val itemUuid = getItemUuid(heldItem)
 
 			if (!itemUuid.isEmpty()) {
-				val protectedItems = SkyblockerConfigManager.get().general.protectedItems
+				val protectedItems = SkyblockerConfigManager.config.general.protectedItems
 
 				if (!protectedItems.contains(itemUuid)) {
 					protectedItems.add(itemUuid)
@@ -94,7 +94,7 @@ object ItemProtection {
 
 		val itemUuid = getItemUuid(heldItem)
 		if (!itemUuid.isEmpty()) {
-			val protectedItems = SkyblockerConfigManager.get().general.protectedItems
+			val protectedItems = SkyblockerConfigManager.config.general.protectedItems
 
 			if (!protectedItems.contains(itemUuid)) {
 				protectedItems.add(itemUuid)

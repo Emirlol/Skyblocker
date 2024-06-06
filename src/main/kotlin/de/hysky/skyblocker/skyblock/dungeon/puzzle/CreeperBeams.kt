@@ -63,7 +63,7 @@ class CreeperBeams private constructor() : DungeonPuzzle("creeper", "creeper-roo
 	override fun render(wrc: WorldRenderContext?) {
 		// don't render if solved or disabled
 
-		if (!shouldSolve() || !SkyblockerConfigManager.get().dungeons.puzzleSolvers.creeperSolver) {
+		if (!shouldSolve() || !SkyblockerConfigManager.config.dungeons.puzzleSolvers.creeperSolver) {
 			return
 		}
 

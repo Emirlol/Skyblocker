@@ -42,7 +42,7 @@ class Reparty : ChatPatternListener(
 	}
 
 	public override fun state(): ChatFilterResult {
-		return if ((SkyblockerConfigManager.get().general.acceptReparty || this.repartying)) ChatFilterResult.FILTER else ChatFilterResult.PASS
+		return if ((SkyblockerConfigManager.config.general.acceptReparty || this.repartying)) ChatFilterResult.FILTER else ChatFilterResult.PASS
 	}
 
 	public override fun onMatch(message: Text?, matcher: Matcher?): Boolean {

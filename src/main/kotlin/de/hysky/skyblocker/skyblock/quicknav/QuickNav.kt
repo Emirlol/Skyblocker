@@ -20,7 +20,7 @@ object QuickNav {
 	@JvmStatic
 	fun init(screenTitle: String): List<QuickNavButton> {
 		val buttons: MutableList<QuickNavButton> = ArrayList()
-		val data = SkyblockerConfigManager.get().quickNav
+		val data = SkyblockerConfigManager.config.quickNav
 		try {
 			if (data.button1.render) buttons.add(parseButton(data.button1, screenTitle, 0))
 			if (data.button2.render) buttons.add(parseButton(data.button2, screenTitle, 1))

@@ -9,8 +9,7 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
 
-class UltrasequencerSolver private constructor() : ExperimentSolver("^Ultrasequencer \\(\\w+\\)$") {
-	@JvmField
+object UltrasequencerSolver: ExperimentSolver("^Ultrasequencer \\(\\w+\\)$") {
     var ultrasequencerNextSlot: Int = 0
 
 	override fun isEnabled(experimentsConfig: Experiments): Boolean {
@@ -63,10 +62,5 @@ class UltrasequencerSolver private constructor() : ExperimentSolver("^Ultraseque
 
 	protected override fun getColors(groups: Array<String?>?, slots: Int2ObjectMap<ItemStack?>?): List<ColorHighlight?>? {
 		return if (state == State.SHOW && ultrasequencerNextSlot != 0) java.util.List.of(green(ultrasequencerNextSlot)) else ArrayList()
-	}
-
-	companion object {
-		@JvmField
-        val INSTANCE: UltrasequencerSolver = UltrasequencerSolver()
 	}
 }

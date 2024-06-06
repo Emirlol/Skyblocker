@@ -25,7 +25,7 @@ class OverlayScreen(title: Text?) : Screen(title) {
 		super.init()
 		val rowWidth = (this.width * 0.4).toInt()
 		val startX = (this.width * 0.5).toInt() - rowWidth / 2
-		val startY = ((this.height * 0.5).toInt() - (rowHeight * (1 + SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.maxSuggestions + 0.75 + SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.historyLength)) / 2).toInt()
+		val startY = ((this.height * 0.5).toInt() - (rowHeight * (1 + SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.maxSuggestions + 0.75 + SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.historyLength)) / 2).toInt()
 
 		// Search field
 		this.searchField = TextFieldWidget(textRenderer, startX, startY, rowWidth - rowHeight, rowHeight, Text.translatable("gui.recipebook.search_hint"))
@@ -40,7 +40,7 @@ class OverlayScreen(title: Text?) : Screen(title) {
 
 		// suggested item buttons
 		var rowOffset = rowHeight
-		val totalSuggestions = SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.maxSuggestions
+		val totalSuggestions = SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.maxSuggestions
 		this.suggestionButtons = arrayOfNulls(totalSuggestions)
 		for (i in 0 until totalSuggestions) {
 			suggestionButtons[i] = ButtonWidget.builder(Text.literal(SearchOverManager.getSuggestion(i)).setStyle(Style.EMPTY)) { a: ButtonWidget ->
@@ -54,7 +54,7 @@ class OverlayScreen(title: Text?) : Screen(title) {
 		}
 		// history item buttons
 		rowOffset += (rowHeight * 0.75).toInt()
-		val historyLength = SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.historyLength
+		val historyLength = SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.historyLength
 		this.historyButtons = arrayOfNulls(historyLength)
 		for (i in 0 until historyLength) {
 			val text = SearchOverManager.getHistory(i)
@@ -127,7 +127,7 @@ class OverlayScreen(title: Text?) : Screen(title) {
 	override fun tick() {
 		super.tick()
 		//update suggestion buttons text
-		for (i in 0 until SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.maxSuggestions) {
+		for (i in 0 until SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.maxSuggestions) {
 			val text = SearchOverManager.getSuggestion(i)
 			if (!text!!.isEmpty()) {
 				suggestionButtons[i]!!.visible = true

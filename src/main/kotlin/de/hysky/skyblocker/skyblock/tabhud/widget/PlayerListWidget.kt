@@ -39,7 +39,7 @@ class PlayerListWidget : Widget(TITLE, Formatting.GREEN.colorValue) {
 			list.add(PlayerListMgr.getRaw(i))
 		}
 
-		if (SkyblockerConfigManager.get().uiAndVisuals.tabHud.nameSorting == UIAndVisualsConfig.NameSorting.ALPHABETICAL) {
+		if (SkyblockerConfigManager.config.uiAndVisuals.tabHud.nameSorting == UIAndVisualsConfig.NameSorting.ALPHABETICAL) {
 			list.sort(Comparator.comparing { o: PlayerListEntry -> o.profile.name.lowercase(Locale.getDefault()) })
 		}
 

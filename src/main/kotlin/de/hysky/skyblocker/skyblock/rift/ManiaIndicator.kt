@@ -19,7 +19,7 @@ object ManiaIndicator {
 	private val title = Title("skyblocker.rift.mania", Formatting.RED)
 
 	fun updateMania() {
-		if (!SkyblockerConfigManager.get().slayers.vampireSlayer.enableManiaIndicator || !isOnSkyblock || !isInTheRift || !(islandArea.contains("Stillgore Château")) || !isInSlayer) {
+		if (!SkyblockerConfigManager.config.slayers.vampireSlayer.enableManiaIndicator || !isOnSkyblock || !isInTheRift || !(islandArea.contains("Stillgore Château")) || !isInSlayer) {
 			removeTitle(title)
 			return
 		}

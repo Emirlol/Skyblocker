@@ -122,7 +122,7 @@ object SecretsTracker {
 	}
 
 	private fun onMessage(text: Text, overlay: Boolean) {
-		if (isInDungeons && SkyblockerConfigManager.get().dungeons.playerSecretsTracker && !overlay) {
+		if (isInDungeons && SkyblockerConfigManager.config.dungeons.playerSecretsTracker && !overlay) {
 			val message = Formatting.strip(text.string)
 
 			try {

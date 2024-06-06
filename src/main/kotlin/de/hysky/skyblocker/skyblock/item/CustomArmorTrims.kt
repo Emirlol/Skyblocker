@@ -107,7 +107,7 @@ object CustomArmorTrims {
 				val itemUuid = getItemUuid(heldItem)
 
 				if (!itemUuid.isEmpty()) {
-					val customArmorTrims = SkyblockerConfigManager.get().general.customArmorTrims
+					val customArmorTrims = SkyblockerConfigManager.config.general.customArmorTrims
 
 					if (material == null && pattern == null) {
 						if (customArmorTrims.containsKey(itemUuid)) {

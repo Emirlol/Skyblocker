@@ -15,7 +15,7 @@ object OldLever {
 
 	@JvmStatic
     fun getShape(face: BlockFace, direction: Direction?): VoxelShape? {
-		if (!SkyblockerConfigManager.get().general.hitbox.oldLeverHitbox) return null
+		if (!SkyblockerConfigManager.config.general.hitbox.oldLeverHitbox) return null
 
 		if (face == BlockFace.FLOOR) {
 			return FLOOR_SHAPE

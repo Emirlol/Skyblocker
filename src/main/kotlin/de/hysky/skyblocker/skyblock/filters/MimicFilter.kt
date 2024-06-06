@@ -8,9 +8,9 @@ import de.hysky.skyblocker.utils.chat.ChatPatternListener
 import net.minecraft.text.Text
 import java.util.regex.Matcher
 
-class MimicFilter : ChatPatternListener(".*?(?:Mimic dead!?|Mimic Killed!|\\\$SKYTILS-DUNGEON-SCORE-MIMIC\\$|\\Q" + SkyblockerConfigManager.get().dungeons.mimicMessage.mimicMessage + "\\E)$") {
+class MimicFilter : ChatPatternListener(".*?(?:Mimic dead!?|Mimic Killed!|\\\$SKYTILS-DUNGEON-SCORE-MIMIC\\$|\\Q" + SkyblockerConfigManager.config.dungeons.mimicMessage.mimicMessage + "\\E)$") {
 	public override fun state(): ChatFilterResult {
-		return SkyblockerConfigManager.get().chat.hideMimicKill
+		return SkyblockerConfigManager.config.chat.hideMimicKill
 	}
 
 	override fun onMatch(message: Text?, matcher: Matcher?): Boolean {

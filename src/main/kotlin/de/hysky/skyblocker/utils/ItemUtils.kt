@@ -133,7 +133,7 @@ object ItemUtils {
 		return null
 	}
 
-	fun getLoreLineIf(item: ItemStack, predicate: (String) -> Boolean): String {
+	fun getLoreLineIf(item: ItemStack, predicate: (String) -> Boolean): String? {
 		for (line in getLore(item)) {
 			val string = line.string
 			if (predicate.invoke(string)) {
@@ -141,7 +141,7 @@ object ItemUtils {
 			}
 		}
 
-		return ""
+		return null
 	}
 
 	fun getLoreLineIfMatch(item: ItemStack, pattern: Pattern): Matcher? {

@@ -32,7 +32,7 @@ object WarpAutocomplete {
 			} catch (e: Exception) {
 				LOGGER.error("[Skyblocker] Failed to download warps list", e)
 			}
-			listOf()
+		emptyList()
 		}.thenAccept { warps: List<String>? ->
 			commandNode = ClientCommandManager.literal("warp")
 				.requires { fabricClientCommandSource: FabricClientCommandSource? -> isOnSkyblock }

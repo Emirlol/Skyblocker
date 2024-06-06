@@ -16,7 +16,7 @@ class AdFilter : ChatPatternListener("(?:\\[[0-9]+\\] )?(?:[" + Constants.LEVEL_
 	}
 
 	override fun state(): ChatFilterResult {
-		return SkyblockerConfigManager.get().chat.hideAds
+		return SkyblockerConfigManager.config.chat.hideAds
 	}
 
 	companion object {

@@ -32,7 +32,7 @@ object KuudraWaypoints {
 	private val SUPPLIES_COLOR = floatArrayOf(255f / 255f, 0f, 0f)
 	private val PEARL_COLOR = floatArrayOf(57f / 255f, 117f / 255f, 125f / 255f)
 	private val SAFE_SPOT_COLOR = floatArrayOf(255f / 255f, 85f / 255f, 255f / 255f)
-	private val SUPPLIES_AND_FUEL_TYPE = Supplier { SkyblockerConfigManager.get().crimsonIsle.kuudra.suppliesAndFuelWaypointType }
+	private val SUPPLIES_AND_FUEL_TYPE = Supplier { SkyblockerConfigManager.config.crimsonIsle.kuudra.suppliesAndFuelWaypointType }
 	private val SAFE_SPOT_WAYPOINTS = ObjectArrayList<Waypoint>()
 	private val PEARL_WAYPOINTS = ObjectArrayList<Waypoint>()
 	private val CODEC = Function { cc: FloatArray? ->
@@ -75,7 +75,7 @@ object KuudraWaypoints {
 
 	fun tick() {
 		val client = MinecraftClient.getInstance()
-		val config = SkyblockerConfigManager.get().crimsonIsle.kuudra
+		val config = SkyblockerConfigManager.config.crimsonIsle.kuudra
 
 		if (isInKuudra && (config.supplyWaypoints || config.fuelWaypoints || config.ballistaBuildWaypoints) && client.player != null) {
 			val searchBox = client.player!!.boundingBox.expand(500.0)
@@ -123,7 +123,7 @@ object KuudraWaypoints {
 	}
 
 	fun render(context: WorldRenderContext?) {
-		val config = SkyblockerConfigManager.get().crimsonIsle.kuudra
+		val config = SkyblockerConfigManager.config.crimsonIsle.kuudra
 
 		if (isInKuudra && loaded) {
 			if (config.supplyWaypoints) {

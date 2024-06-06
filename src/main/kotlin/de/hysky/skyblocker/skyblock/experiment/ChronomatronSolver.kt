@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import java.util.AbstractMap.SimpleImmutableEntry
 
-class ChronomatronSolver : ExperimentSolver("^Chronomatron \\(\\w+\\)$") {
+object ChronomatronSolver : ExperimentSolver("^Chronomatron \\(\\w+\\)$") {
 	private val chronomatronSlots: MutableList<Item?> = ArrayList()
 	private var chronomatronChainLengthCount = 0
 	private var chronomatronCurrentSlot = 0
@@ -102,8 +102,8 @@ class ChronomatronSolver : ExperimentSolver("^Chronomatron \\(\\w+\\)$") {
 		chronomatronCurrentOrdinal = 0
 	}
 
-	companion object {
-		@JvmField
+
+
         val TERRACOTTA_TO_GLASS: ImmutableMap<Item, Item> = ImmutableMap.ofEntries(
 			SimpleImmutableEntry(Items.RED_TERRACOTTA, Items.RED_STAINED_GLASS),
 			SimpleImmutableEntry(Items.ORANGE_TERRACOTTA, Items.ORANGE_STAINED_GLASS),
@@ -116,5 +116,5 @@ class ChronomatronSolver : ExperimentSolver("^Chronomatron \\(\\w+\\)$") {
 			SimpleImmutableEntry(Items.PURPLE_TERRACOTTA, Items.PURPLE_STAINED_GLASS),
 			SimpleImmutableEntry(Items.PINK_TERRACOTTA, Items.PINK_STAINED_GLASS)
 		)
-	}
+
 }

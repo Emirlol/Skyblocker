@@ -1,7 +1,6 @@
 package de.hysky.skyblocker.skyblock
 
 import com.mojang.brigadier.Command
-import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.context.CommandContext
 import de.hysky.skyblocker.SkyblockerMod
 import de.hysky.skyblocker.config.SkyblockerConfigManager
@@ -11,14 +10,12 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.MinecraftClient
-import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.Style
 import net.minecraft.text.Text
-import java.util.*
+import kotlin.random.Random
 
 object Tips {
-	private val RANDOM = Random()
 	private var previousTipIndex = -1
 	private val TIPS = listOf(
 		getTipFactory("skyblocker.tips.customItemNames", ClickEvent.Action.SUGGEST_COMMAND, "/skyblocker custom renameItem"),
@@ -52,39 +49,31 @@ object Tips {
 	}
 
 	fun init() {
-		ClientCommandRegistrationCallback.EVENT.register(::registerTipsCommand)
+		ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+			dispatcher.register(
+				ClientCommandManager.literal(SkyblockerMod.NAMESPACE).then(
+					ClientCommandManager.literal("tips")
+						.then(ClientCommandManager.literal("enable").executes { toggleTips(it, true) })
+						.then(ClientCommandManager.literal("disable").executes { toggleTips(it, false) })
+						.then(ClientCommandManager.literal("next").executes { nextTip(it) })
+				)
+			)
+		}
 		SkyblockEvents.JOIN.register { sendNextTip() }
 	}
 
-	private fun registerTipsCommand(dispatcher: CommandDispatcher<FabricClientCommandSource>, registryAccess: CommandRegistryAccess) {
-		dispatcher.register(
-			ClientCommandManager.literal(SkyblockerMod.NAMESPACE).then(
-				ClientCommandManager.literal("tips")
-					.then(ClientCommandManager.literal("enable").executes { enableTips(it) })
-					.then(ClientCommandManager.literal("disable").executes { disableTips(it) })
-					.then(ClientCommandManager.literal("next").executes { nextTip(it) })
-			)
-		)
-	}
-
 	private fun sendNextTip() {
-		if (SkyblockerConfigManager.get().general.enableTips && !sentTip) {
+		if (SkyblockerConfigManager.config.general.enableTips && !sentTip) {
 			MinecraftClient.getInstance()?.player?.sendMessage(nextTip(), false)
 			sentTip = true
 		}
 	}
 
-	private fun enableTips(context: CommandContext<FabricClientCommandSource>): Int {
-		SkyblockerConfigManager.get().general.enableTips = true
+	private fun toggleTips(context: CommandContext<FabricClientCommandSource>, state: Boolean): Int {
+		SkyblockerConfigManager.config.general.enableTips = state
 		SkyblockerConfigManager.save()
-		context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.tips.enabled")).append(" ").append(Text.translatable("skyblocker.tips.clickDisable").styled { style: Style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips disable")) }))
-		return Command.SINGLE_SUCCESS
-	}
-
-	private fun disableTips(context: CommandContext<FabricClientCommandSource>): Int {
-		SkyblockerConfigManager.get().general.enableTips = false
-		SkyblockerConfigManager.save()
-		context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.tips.disabled")).append(" ").append(Text.translatable("skyblocker.tips.clickEnable").styled { style: Style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips enable")) }))
+		if (state) context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.tips.enabled")).append(" ").append(Text.translatable("skyblocker.tips.clickDisable").styled { style: Style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips disable")) }))
+		else context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.tips.disabled")).append(" ").append(Text.translatable("skyblocker.tips.clickEnable").styled { style: Style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips enable")) }))
 		return Command.SINGLE_SUCCESS
 	}
 
@@ -93,16 +82,14 @@ object Tips {
 		return Command.SINGLE_SUCCESS
 	}
 
-	private fun nextTip(): Text {
-		return Constants.PREFIX.append(Text.translatable("skyblocker.tips.tip", nextTipInternal()))
-			.append(Text.translatable("skyblocker.tips.clickNextTip").styled { style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips next")) })
-			.append(" ")
-			.append(Text.translatable("skyblocker.tips.clickDisable").styled { style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips disable")) })
-	}
+	private fun nextTip() = Constants.PREFIX.append(Text.translatable("skyblocker.tips.tip", nextTipInternal()))
+		.append(Text.translatable("skyblocker.tips.clickNextTip").styled { style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips next")) })
+		.append(" ")
+		.append(Text.translatable("skyblocker.tips.clickDisable").styled { style -> style.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker tips disable")) })
 
 	fun nextTipInternal(): Text {
-		var randomInt = RANDOM.nextInt(TIPS.size)
-		while (randomInt == previousTipIndex) randomInt = RANDOM.nextInt(TIPS.size)
+		var randomInt = Random.nextInt(TIPS.size)
+		while (randomInt == previousTipIndex) randomInt = Random.nextInt(TIPS.size)
 		previousTipIndex = randomInt
 		return TIPS[randomInt].invoke()
 	}

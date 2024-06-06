@@ -15,7 +15,7 @@ class OcclusionCuller internal constructor(tracingDistance: Int, worldProvider: 
 	private val max = Vec3d(0.0, 0.0, 0.0)
 
 	private fun updateCameraPos() {
-		val camera = CLIENT.gameRenderer.camera.pos
+		val camera = MinecraftClient.getInstance().gameRenderer.camera.pos
 		cameraPos[camera.x, camera.y] = camera.z
 	}
 
@@ -34,9 +34,5 @@ class OcclusionCuller internal constructor(tracingDistance: Int, worldProvider: 
 		max[x2, y2] = z2
 
 		return instance.isAABBVisible(min, max, cameraPos)
-	}
-
-	companion object {
-		private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
 	}
 }

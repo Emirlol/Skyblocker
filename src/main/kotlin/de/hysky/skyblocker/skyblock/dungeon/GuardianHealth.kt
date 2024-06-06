@@ -32,7 +32,7 @@ object GuardianHealth {
 	}
 
 	private fun onWorldRender(context: WorldRenderContext) {
-		if (!SkyblockerConfigManager.get().dungeons.theProfessor.floor3GuardianHealthDisplay) return
+		if (!SkyblockerConfigManager.config.dungeons.theProfessor.floor3GuardianHealthDisplay) return
 
 		val client = MinecraftClient.getInstance()
 
@@ -80,7 +80,7 @@ object GuardianHealth {
 	}
 
 	private fun onChatMessage(text: Text, overlay: Boolean) {
-		if (isInDungeons && SkyblockerConfigManager.get().dungeons.theProfessor.floor3GuardianHealthDisplay && !inBoss) {
+		if (isInDungeons && SkyblockerConfigManager.config.dungeons.theProfessor.floor3GuardianHealthDisplay && !inBoss) {
 			val unformatted = Formatting.strip(text.string)
 
 			inBoss = unformatted == "[BOSS] The Professor: I was burdened with terrible news recently..."

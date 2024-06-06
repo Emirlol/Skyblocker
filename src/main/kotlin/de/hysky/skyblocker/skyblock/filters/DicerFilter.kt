@@ -5,6 +5,6 @@ import de.hysky.skyblocker.utils.chat.ChatFilterResult
 
 class DicerFilter : SimpleChatFilter("[A-Z]+ DROP! .*Dicer dropped [0-9]+x.+!$") {
 	public override fun state(): ChatFilterResult {
-		return SkyblockerConfigManager.get().chat.hideDicer
+		return SkyblockerConfigManager.config.chat.hideDicer
 	}
 }

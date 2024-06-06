@@ -19,7 +19,7 @@ object TwinClawsIndicator {
 	private var scheduled = false
 
 	fun updateIce() {
-		if (!SkyblockerConfigManager.get().slayers.vampireSlayer.enableHolyIceIndicator || !isOnSkyblock || !isInTheRift || !(islandArea.contains("Stillgore Château")) || !isInSlayer) {
+		if (!SkyblockerConfigManager.config.slayers.vampireSlayer.enableHolyIceIndicator || !isOnSkyblock || !isInTheRift || !(islandArea.contains("Stillgore Château")) || !isInSlayer) {
 			removeTitle(title)
 			return
 		}
@@ -35,7 +35,7 @@ object TwinClawsIndicator {
 					Scheduler.INSTANCE.schedule({
 						displayInTitleContainerAndPlaySound(title)
 						scheduled = false
-					}, SkyblockerConfigManager.get().slayers.vampireSlayer.holyIceIndicatorTickDelay)
+					}, SkyblockerConfigManager.config.slayers.vampireSlayer.holyIceIndicatorTickDelay)
 				}
 			}
 		}

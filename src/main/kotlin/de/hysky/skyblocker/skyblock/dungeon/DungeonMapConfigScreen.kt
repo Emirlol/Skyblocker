@@ -11,10 +11,10 @@ import kotlin.math.max
 import kotlin.math.min
 
 class DungeonMapConfigScreen @JvmOverloads constructor(private val parent: Screen? = null) : Screen(Text.literal("Dungeon Map Config")) {
-	private var mapX = SkyblockerConfigManager.get().dungeons.dungeonMap.mapX
-	private var mapY = SkyblockerConfigManager.get().dungeons.dungeonMap.mapY
-	private var scoreX = SkyblockerConfigManager.get().dungeons.dungeonScore.scoreX
-	private var scoreY = SkyblockerConfigManager.get().dungeons.dungeonScore.scoreY
+	private var mapX = SkyblockerConfigManager.config.dungeons.dungeonMap.mapX
+	private var mapY = SkyblockerConfigManager.config.dungeons.dungeonMap.mapY
+	private var scoreX = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreX
+	private var scoreY = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreY
 
 	override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
 		super.render(context, mouseX, mouseY, delta)
@@ -25,8 +25,8 @@ class DungeonMapConfigScreen @JvmOverloads constructor(private val parent: Scree
 	}
 
 	override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
-		val mapSize = (128 * SkyblockerConfigManager.get().dungeons.dungeonMap.mapScaling).toInt()
-		val scoreScaling = SkyblockerConfigManager.get().dungeons.dungeonScore.scoreScaling
+		val mapSize = (128 * SkyblockerConfigManager.config.dungeons.dungeonMap.mapScaling).toInt()
+		val scoreScaling = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreScaling
 		val scoreWidth = (textRenderer.getWidth(DungeonScoreHUD.getFormattedScoreText()) * scoreScaling).toInt()
 		val scoreHeight = (textRenderer.fontHeight * scoreScaling).toInt()
 		if (pointIsInArea(mouseX, mouseY, mapX.toDouble(), mapY.toDouble(), (mapX + mapSize).toDouble(), (mapY + mapSize).toDouble()) && button == 0) {
@@ -43,25 +43,25 @@ class DungeonMapConfigScreen @JvmOverloads constructor(private val parent: Scree
 		if (button == 1) {
 			mapX = 2
 			mapY = 2
-			scoreX = max(((mapX + (64 * SkyblockerConfigManager.get().dungeons.dungeonMap.mapScaling)) - textRenderer.getWidth(DungeonScoreHUD.getFormattedScoreText()) * SkyblockerConfigManager.get().dungeons.dungeonScore.scoreScaling / 2).toInt().toDouble(), 0.0).toInt()
-			scoreY = (mapY + (128 * SkyblockerConfigManager.get().dungeons.dungeonMap.mapScaling) + 4).toInt()
+			scoreX = max(((mapX + (64 * SkyblockerConfigManager.config.dungeons.dungeonMap.mapScaling)) - textRenderer.getWidth(DungeonScoreHUD.getFormattedScoreText()) * SkyblockerConfigManager.config.dungeons.dungeonScore.scoreScaling / 2).toInt().toDouble(), 0.0).toInt()
+			scoreY = (mapY + (128 * SkyblockerConfigManager.config.dungeons.dungeonMap.mapScaling) + 4).toInt()
 		}
 
 		return super.mouseClicked(mouseX, mouseY, button)
 	}
 
 	override fun close() {
-		SkyblockerConfigManager.get().dungeons.dungeonMap.mapX = mapX
-		SkyblockerConfigManager.get().dungeons.dungeonMap.mapY = mapY
-		SkyblockerConfigManager.get().dungeons.dungeonScore.scoreX = scoreX
-		SkyblockerConfigManager.get().dungeons.dungeonScore.scoreY = scoreY
+		SkyblockerConfigManager.config.dungeons.dungeonMap.mapX = mapX
+		SkyblockerConfigManager.config.dungeons.dungeonMap.mapY = mapY
+		SkyblockerConfigManager.config.dungeons.dungeonScore.scoreX = scoreX
+		SkyblockerConfigManager.config.dungeons.dungeonScore.scoreY = scoreY
 		SkyblockerConfigManager.save()
 
 		client!!.setScreen(parent)
 	}
 
 	fun renderHUDMap(context: DrawContext, x: Int, y: Int) {
-		val scaling = SkyblockerConfigManager.get().dungeons.dungeonMap.mapScaling
+		val scaling = SkyblockerConfigManager.config.dungeons.dungeonMap.mapScaling
 		val size = (128 * scaling).toInt()
 		context.drawTexture(MAP_BACKGROUND, x, y, 0f, 0f, size, size, size, size)
 	}

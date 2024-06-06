@@ -103,7 +103,7 @@ abstract class Widget(title: MutableText, colorValue: Int?) {
 		RenderSystem.enableDepthTest()
 		ms.push()
 
-		val scale = SkyblockerConfigManager.get().uiAndVisuals.tabHud.tabHudScale / 100f
+		val scale = SkyblockerConfigManager.config.uiAndVisuals.tabHud.tabHudScale / 100f
 		ms.scale(scale, scale, 1f)
 
 		// move above other UI elements

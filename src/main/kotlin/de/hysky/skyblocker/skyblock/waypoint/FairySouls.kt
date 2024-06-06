@@ -43,7 +43,7 @@ import java.util.stream.Collectors
 
 object FairySouls {
 	private val LOGGER: Logger = LoggerFactory.getLogger(FairySouls::class.java)
-	private val TYPE_SUPPLIER = Supplier { SkyblockerConfigManager.get().uiAndVisuals.waypoints.waypointType }
+	private val TYPE_SUPPLIER = Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType }
 	private var fairySoulsLoaded: CompletableFuture<Void>? = null
 	private var maxSouls = 0
 	private val fairySouls: MutableMap<String, Map<BlockPos, ProfileAwareWaypoint>> = HashMap()
@@ -149,7 +149,7 @@ object FairySouls {
 	}
 
 	private fun render(context: WorldRenderContext) {
-		val fairySoulsConfig = SkyblockerConfigManager.get().helpers.fairySouls
+		val fairySoulsConfig = SkyblockerConfigManager.config.helpers.fairySouls
 
 		if (fairySoulsConfig.enableFairySoulsHelper && fairySoulsLoaded!!.isDone && fairySouls.containsKey(locationRaw)) {
 			for (fairySoul in fairySouls[locationRaw]!!.values) {

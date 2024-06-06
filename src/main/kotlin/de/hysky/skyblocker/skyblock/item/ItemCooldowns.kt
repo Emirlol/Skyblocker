@@ -77,7 +77,7 @@ object ItemCooldowns {
 		}
 
 	fun afterBlockBreak(world: World?, player: PlayerEntity, pos: BlockPos?, state: BlockState) {
-		if (!SkyblockerConfigManager.get().uiAndVisuals.itemCooldown.enableItemCooldowns) return
+		if (!SkyblockerConfigManager.config.uiAndVisuals.itemCooldown.enableItemCooldowns) return
 		val usedItemId = getItemId(player.mainHandStack)
 		if (usedItemId.isEmpty()) return
 		if (state.isIn(BlockTags.LOGS)) {
@@ -91,7 +91,7 @@ object ItemCooldowns {
 	}
 
 	private fun onItemInteract(player: PlayerEntity, world: World, hand: Hand): TypedActionResult<ItemStack?> {
-		if (!SkyblockerConfigManager.get().uiAndVisuals.itemCooldown.enableItemCooldowns) return TypedActionResult.pass(ItemStack.EMPTY)
+		if (!SkyblockerConfigManager.config.uiAndVisuals.itemCooldown.enableItemCooldowns) return TypedActionResult.pass(ItemStack.EMPTY)
 		val usedItemId = getItemId(player.mainHandStack)
 		if (usedItemId == GRAPPLING_HOOK_ID && player.fishHook != null) {
 			if (!isOnCooldown(GRAPPLING_HOOK_ID) && !isWearingBatArmor(player)) {

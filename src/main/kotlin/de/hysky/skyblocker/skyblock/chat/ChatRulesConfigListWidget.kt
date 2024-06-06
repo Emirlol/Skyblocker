@@ -63,11 +63,11 @@ class ChatRulesConfigListWidget(client: MinecraftClient?, private val screen: Ch
 
 	private inner class ChatRuleLabelsEntry : AbstractChatRuleEntry() {
 		override fun selectableChildren(): List<Selectable> {
-			return listOf()
+			returnemptyList()
 		}
 
 		override fun children(): List<Element> {
-			return listOf()
+			returnemptyList()
 		}
 
 		override fun render(context: DrawContext, index: Int, y: Int, x: Int, entryWidth: Int, entryHeight: Int, mouseX: Int, mouseY: Int, hovered: Boolean, tickDelta: Float) {

@@ -38,7 +38,7 @@ class DungeonBlaze private constructor() : DungeonPuzzle("blaze", "blaze-room-1-
 	 */
 	override fun render(wrc: WorldRenderContext?) {
 		try {
-			if (highestBlaze != null && lowestBlaze != null && highestBlaze!!.isAlive && lowestBlaze!!.isAlive && SkyblockerConfigManager.get().dungeons.puzzleSolvers.blazeSolver) {
+			if (highestBlaze != null && lowestBlaze != null && highestBlaze!!.isAlive && lowestBlaze!!.isAlive && SkyblockerConfigManager.config.dungeons.puzzleSolvers.blazeSolver) {
 				if (highestBlaze!!.y < 69) {
 					renderBlazeOutline(highestBlaze, nextHighestBlaze, wrc)
 				}

@@ -5,87 +5,40 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import de.hysky.skyblocker.utils.Utils.map
 import net.minecraft.sound.SoundEvent
 import java.util.*
-import java.util.regex.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Data class to contain all the settings for a chat rule
  */
-class ChatRule {
-	var name: String
-
-	//inputs
-	var enabled: Boolean
-	var partialMatch: Boolean
-	var regex: Boolean
-	var ignoreCase: Boolean
-	var filter: String
-	var validLocations: String
-
-	//output
-	var hideMessage: Boolean
-	var showActionBar: Boolean
-	var showAnnouncement: Boolean
-	var replaceMessage: String?
-	var customSound: SoundEvent?
-
-	/**
-	 * Creates a chat rule with default options.
-	 */
-	constructor() {
-		this.name = "New Rule"
-
-		this.enabled = true
-		this.partialMatch = false
-		this.regex = false
-		this.ignoreCase = true
-		this.filter = ""
-		this.validLocations = ""
-
-		this.hideMessage = true
-		this.showActionBar = false
-		this.showAnnouncement = false
-		this.replaceMessage = null
-		this.customSound = null
-	}
-
-	constructor(name: String, enabled: Boolean, isPartialMatch: Boolean, isRegex: Boolean, isIgnoreCase: Boolean, filter: String, validLocations: String, hideMessage: Boolean, showActionBar: Boolean, showAnnouncement: Boolean, replaceMessage: String?, customSound: SoundEvent?) {
-		this.name = name
-		this.enabled = enabled
-		this.partialMatch = isPartialMatch
-		this.regex = isRegex
-		this.ignoreCase = isIgnoreCase
-		this.filter = filter
-		this.validLocations = validLocations
-		this.hideMessage = hideMessage
-		this.showActionBar = showActionBar
-		this.showAnnouncement = showAnnouncement
-		this.replaceMessage = replaceMessage
-		this.customSound = customSound
-	}
-
-	private constructor(name: String, enabled: Boolean, isPartialMatch: Boolean, isRegex: Boolean, isIgnoreCase: Boolean, filter: String, validLocations: String, hideMessage: Boolean, showActionBar: Boolean, showAnnouncement: Boolean, replaceMessage: Optional<String?>, customSound: Optional<SoundEvent?>) : this(name, enabled, isPartialMatch, isRegex, isIgnoreCase, filter, validLocations, hideMessage, showActionBar, showAnnouncement, replaceMessage.orElse(null), customSound.orElse(null))
-
-	private val replaceMessageOpt: Optional<String>
-		get() = if (replaceMessage == null) Optional.empty() else Optional.of(replaceMessage!!)
-
-	private val customSoundOpt: Optional<SoundEvent>
-		get() = if (customSound == null) Optional.empty() else Optional.of(customSound!!)
-
+data class ChatRule(
+	val name: String = "New Rule",
+	val enabled: Boolean = true,
+	val isPartialMatch: Boolean = false,
+	val isRegex: Boolean = false,
+	val isIgnoreCase: Boolean = true,
+	val filter: String = "",
+	val validLocations: String = "",
+	val hideMessage: Boolean = true,
+	val showActionBar: Boolean = false,
+	val showAnnouncement: Boolean = false,
+	val replaceMessage: String? = null,
+	val customSound: SoundEvent? = null
+) {
 	/**
 	 * checks every input option and if the games state and the inputted str matches them returns true.
 	 * @param inputString the chat message to check if fits
 	 * @return if the inputs are all true and the outputs should be performed
 	 */
-	fun isMatch(inputString: String?): Boolean {
+	fun isMatch(inputString: String): Boolean {
 		//enabled
 		if (!enabled) return false
 
 		//ignore case
-		val testString: String?
+		val testString: String
 		val testFilter: String
 
-		if (ignoreCase) {
-			testString = inputString!!.lowercase(Locale.getDefault())
+		if (isIgnoreCase) {
+			testString = inputString.lowercase(Locale.getDefault())
 			testFilter = filter.lowercase(Locale.getDefault())
 		} else {
 			testString = inputString
@@ -94,29 +47,27 @@ class ChatRule {
 
 		//filter
 		if (testFilter.isBlank()) return false
-		if (regex) {
-			if (partialMatch) {
-				if (!Pattern.compile(testFilter).matcher(testString).find()) return false
+		if (isRegex) {
+			val regex = testFilter.toRegex()
+			if (isPartialMatch) {
+				regex.find(testString) ?: return false
 			} else {
-				if (!testString!!.matches(testFilter.toRegex())) return false
+				regex.matchEntire(testString) ?: return false
 			}
 		} else {
-			if (partialMatch) {
-				if (!testString!!.contains(testFilter)) return false
+			if (isPartialMatch) {
+				if (testString !in testFilter) return false
 			} else {
 				if (testFilter != testString) return false
 			}
 		}
 
 		//location
-		if (validLocations.isBlank()) { //if no locations do not check
-			return true
-		}
+		if (validLocations.isBlank()) return true //if no locations do not check
 
 		val cleanedMapLocation = map.lowercase(Locale.getDefault()).replace(" ", "")
 		var isLocationValid: Boolean? = null
-		for (validLocation in validLocations.replace(" ", "").lowercase(Locale.getDefault()).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) { //the locations are split by "," and start with ! if not locations
-			if (validLocation == null) continue
+		for (validLocation in validLocations.replace(" ", "").lowercase(Locale.getDefault()).split(",").dropLastWhile { it.isEmpty() }) { //the locations are split by "," and start with ! if not locations
 			if (validLocation.startsWith("!")) { //not location
 				if (validLocation.substring(1) == cleanedMapLocation) {
 					isLocationValid = false
@@ -124,40 +75,34 @@ class ChatRule {
 				} else {
 					isLocationValid = true
 				}
-			} else {
-				if (validLocation == cleanedMapLocation) { //normal location
-					isLocationValid = true
-					break
-				}
+			} else if (validLocation == cleanedMapLocation) { //normal location
+				isLocationValid = true
+				break
 			}
 		}
 
 		//if location is not in the list at all and is a not a "!" location or and is a normal location
-		if (isLocationValid != null && isLocationValid) {
-			return true
-		}
-
-		return false
+		return isLocationValid != null && isLocationValid
 	}
 
 	companion object {
-		private val CODEC: Codec<ChatRule?> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<ChatRule?> ->
+		private val CODEC: Codec<ChatRule> = RecordCodecBuilder.create { instance ->
 			instance.group(
-				Codec.STRING.fieldOf("name").forGetter { obj: ChatRule? -> obj!!.name },
-				Codec.BOOL.fieldOf("enabled").forGetter { obj: ChatRule -> obj.enabled },
-				Codec.BOOL.fieldOf("isPartialMatch").forGetter { obj: ChatRule -> obj.partialMatch },
-				Codec.BOOL.fieldOf("isRegex").forGetter { obj: ChatRule -> obj.regex },
-				Codec.BOOL.fieldOf("isIgnoreCase").forGetter { obj: ChatRule -> obj.ignoreCase },
-				Codec.STRING.fieldOf("filter").forGetter { obj: ChatRule -> obj.filter },
-				Codec.STRING.fieldOf("validLocations").forGetter { obj: ChatRule -> obj.validLocations },
-				Codec.BOOL.fieldOf("hideMessage").forGetter { obj: ChatRule -> obj.hideMessage },
-				Codec.BOOL.fieldOf("showActionBar").forGetter { obj: ChatRule -> obj.showActionBar },
-				Codec.BOOL.fieldOf("showAnnouncement").forGetter { obj: ChatRule -> obj.showAnnouncement },
-				Codec.STRING.optionalFieldOf("replaceMessage").forGetter { obj: ChatRule -> obj.replaceMessageOpt },
-				SoundEvent.CODEC.optionalFieldOf("customSound").forGetter { obj: ChatRule -> obj.customSoundOpt })
-				.apply(instance) { name: String, enabled: Boolean, isPartialMatch: Boolean, isRegex: Boolean, isIgnoreCase: Boolean, filter: String, validLocations: String, hideMessage: Boolean, showActionBar: Boolean, showAnnouncement: Boolean, replaceMessage: Optional<String?>, customSound: Optional<SoundEvent?> -> ChatRule(name, enabled, isPartialMatch, isRegex, isIgnoreCase, filter, validLocations, hideMessage, showActionBar, showAnnouncement, replaceMessage, customSound) }
+				Codec.STRING.fieldOf("name").forGetter { it.name },
+				Codec.BOOL.fieldOf("enabled").forGetter { it.enabled },
+				Codec.BOOL.fieldOf("isPartialMatch").forGetter { it.isPartialMatch },
+				Codec.BOOL.fieldOf("isRegex").forGetter { it.isRegex },
+				Codec.BOOL.fieldOf("isIgnoreCase").forGetter { it.isIgnoreCase },
+				Codec.STRING.fieldOf("filter").forGetter { it.filter },
+				Codec.STRING.fieldOf("validLocations").forGetter { it.validLocations },
+				Codec.BOOL.fieldOf("hideMessage").forGetter { it.hideMessage },
+				Codec.BOOL.fieldOf("showActionBar").forGetter { it.showActionBar },
+				Codec.BOOL.fieldOf("showAnnouncement").forGetter { it.showAnnouncement },
+				Codec.STRING.optionalFieldOf("replaceMessage").forGetter { Optional.ofNullable(it.replaceMessage) },
+				SoundEvent.CODEC.optionalFieldOf("customSound").forGetter { it: ChatRule -> Optional.ofNullable(it.customSound) }
+			).apply(instance) { name, enabled, isPartialMatch, isRegex, isIgnoreCase, filter, validLocations, hideMessage, showActionBar, showAnnouncement, replaceMessage, customSound -> ChatRule(name, enabled, isPartialMatch, isRegex, isIgnoreCase, filter, validLocations, hideMessage, showActionBar, showAnnouncement, replaceMessage.getOrNull(), customSound.getOrNull()) }
 		}
-		val LIST_CODEC: Codec<List<ChatRule?>> = CODEC.listOf()
+		val LIST_CODEC: Codec<List<ChatRule>> = CODEC.listOf()
 	}
 }
 

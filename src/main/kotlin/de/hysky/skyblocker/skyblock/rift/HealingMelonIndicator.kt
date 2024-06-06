@@ -15,12 +15,12 @@ object HealingMelonIndicator {
 
 	@JvmStatic
 	fun updateHealth() {
-		if (!SkyblockerConfigManager.get().slayers.vampireSlayer.enableHealingMelonIndicator || !isOnSkyblock || !isInTheRift || !islandArea.contains("Stillgore Château")) {
+		if (!SkyblockerConfigManager.config.slayers.vampireSlayer.enableHealingMelonIndicator || !isOnSkyblock || !isInTheRift || !islandArea.contains("Stillgore Château")) {
 			removeTitle(title)
 			return
 		}
 		val player = MinecraftClient.getInstance().player
-		if (player != null && player.health <= SkyblockerConfigManager.get().slayers.vampireSlayer.healingMelonHealthThreshold * 2f) {
+		if (player != null && player.health <= SkyblockerConfigManager.config.slayers.vampireSlayer.healingMelonHealthThreshold * 2f) {
 			displayInTitleContainerAndPlaySound(title)
 		} else {
 			removeTitle(title)

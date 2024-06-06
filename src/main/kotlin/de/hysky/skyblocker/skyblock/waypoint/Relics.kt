@@ -40,7 +40,7 @@ import java.util.function.Supplier
 
 object Relics {
 	private val LOGGER: Logger = LoggerFactory.getLogger(Relics::class.java)
-	private val TYPE_SUPPLIER = Supplier { SkyblockerConfigManager.get().uiAndVisuals.waypoints.waypointType }
+	private val TYPE_SUPPLIER = Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType }
 	private var relicsLoaded: CompletableFuture<Void>? = null
 
 	@Suppress("unused")
@@ -137,7 +137,7 @@ object Relics {
 	}
 
 	private fun render(context: WorldRenderContext) {
-		val config = SkyblockerConfigManager.get().otherLocations.spidersDen.relics
+		val config = SkyblockerConfigManager.config.otherLocations.spidersDen.relics
 
 		if (config.enableRelicsHelper && relicsLoaded!!.isDone && locationRaw == "combat_1") {
 			for (relic in relics.values) {

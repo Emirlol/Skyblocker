@@ -26,7 +26,7 @@ import kotlin.math.max
 
 class Boulder private constructor() : DungeonPuzzle("boulder", "boxes-room") {
 	override fun tick(client: MinecraftClient?) {
-		if (!shouldSolve() || !SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveBoulder || client!!.world == null || !DungeonManager.isCurrentRoomMatched()) {
+		if (!shouldSolve() || !SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveBoulder || client!!.world == null || !DungeonManager.isCurrentRoomMatched()) {
 			return
 		}
 
@@ -109,7 +109,7 @@ class Boulder private constructor() : DungeonPuzzle("boulder", "boxes-room") {
 	}
 
 	override fun render(context: WorldRenderContext?) {
-		if (!shouldSolve() || !SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveBoulder || !DungeonManager.isCurrentRoomMatched()) return
+		if (!shouldSolve() || !SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveBoulder || !DungeonManager.isCurrentRoomMatched()) return
 		val alpha = 1.0f
 		val lineWidth = 5.0f
 

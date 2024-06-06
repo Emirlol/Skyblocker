@@ -70,7 +70,7 @@ object FarmingHud {
 				}
 
 				FarmingHudWidget.Companion.INSTANCE.update()
-				FarmingHudWidget.Companion.INSTANCE.render(context!!, SkyblockerConfigManager.get().uiAndVisuals.tabHud.enableHudBackground)
+				FarmingHudWidget.Companion.INSTANCE.render(context!!, SkyblockerConfigManager.config.uiAndVisuals.tabHud.enableHudBackground)
 			}
 		})
 		ClientPlayerBlockBreakEvents.AFTER.register(ClientPlayerBlockBreakEvents.After { world: ClientWorld?, player: ClientPlayerEntity?, pos: BlockPos?, state: BlockState? ->
@@ -103,7 +103,7 @@ object FarmingHud {
 	}
 
 	private fun shouldRender(): Boolean {
-		return SkyblockerConfigManager.get().farming.garden.farmingHud.enableHud && location == Location.GARDEN
+		return SkyblockerConfigManager.config.farming.garden.farmingHud.enableHud && location == Location.GARDEN
 	}
 
 	fun counter(): Int {

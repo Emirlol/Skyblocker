@@ -26,7 +26,7 @@ object FireFreezeStaffTimer {
 
 		if (client.currentScreen != null) return
 
-		if (SkyblockerConfigManager.get().dungeons.theProfessor.fireFreezeStaffTimer && fireFreezeTimer != 0L) {
+		if (SkyblockerConfigManager.config.dungeons.theProfessor.fireFreezeStaffTimer && fireFreezeTimer != 0L) {
 			val now = System.currentTimeMillis()
 
 			if (now >= fireFreezeTimer + 5000) {
@@ -54,7 +54,7 @@ object FireFreezeStaffTimer {
 	}
 
 	private fun onChatMessage(text: Text, overlay: Boolean) {
-		if (!overlay && SkyblockerConfigManager.get().dungeons.theProfessor.fireFreezeStaffTimer && (Formatting.strip(text.string)
+		if (!overlay && SkyblockerConfigManager.config.dungeons.theProfessor.fireFreezeStaffTimer && (Formatting.strip(text.string)
 					== "[BOSS] The Professor: Oh? You found my Guardians' one weakness?")
 		) {
 			fireFreezeTimer = System.currentTimeMillis() + 5000L

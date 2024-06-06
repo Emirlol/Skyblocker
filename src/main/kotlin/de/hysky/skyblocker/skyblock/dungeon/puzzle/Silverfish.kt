@@ -33,7 +33,7 @@ class Silverfish private constructor() : DungeonPuzzle("silverfish", "ice-silver
 	val silverfishPath: MutableList<Vector2ic> = ArrayList()
 
 	override fun tick(client: MinecraftClient?) {
-		if (!SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveSilverfish || client!!.world == null || !DungeonManager.isCurrentRoomMatched()) {
+		if (!SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveSilverfish || client!!.world == null || !DungeonManager.isCurrentRoomMatched()) {
 			return
 		}
 		val room = DungeonManager.getCurrentRoom()
@@ -131,7 +131,7 @@ class Silverfish private constructor() : DungeonPuzzle("silverfish", "ice-silver
 	}
 
 	override fun render(context: WorldRenderContext?) {
-		if (!SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveSilverfish || !DungeonManager.isCurrentRoomMatched() || silverfishPath.isEmpty()) {
+		if (!SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveSilverfish || !DungeonManager.isCurrentRoomMatched() || silverfishPath.isEmpty()) {
 			return
 		}
 		val room = DungeonManager.getCurrentRoom()

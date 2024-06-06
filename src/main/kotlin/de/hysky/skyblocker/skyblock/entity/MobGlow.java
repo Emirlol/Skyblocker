@@ -32,27 +32,27 @@ public class MobGlow {
 			if (Utils.isInDungeons() && !entity.isInvisible()) {
 				return switch (entity) {
 					// Minibosses
-					case PlayerEntity p when name.equals("Lost Adventurer") || name.equals("Shadow Assassin") || name.equals("Diamond Guy") -> SkyblockerConfigManager.get().dungeons.starredMobGlow;
+					case PlayerEntity p when name.equals("Lost Adventurer") || name.equals("Shadow Assassin") || name.equals("Diamond Guy") -> SkyblockerConfigManager.config.dungeons.starredMobGlow;
 					case PlayerEntity p when LividColor.LIVID_NAMES.contains(name) -> LividColor.shouldGlow(name);
 
 					// Bats
-					case BatEntity b -> SkyblockerConfigManager.get().dungeons.starredMobGlow || SkyblockerConfigManager.get().dungeons.starredMobBoundingBoxes;
+					case BatEntity b -> SkyblockerConfigManager.config.dungeons.starredMobGlow || SkyblockerConfigManager.config.dungeons.starredMobBoundingBoxes;
 
 					// Armor Stands
 					case ArmorStandEntity _armorStand -> false;
 
 					// Regular Mobs
-					default -> SkyblockerConfigManager.get().dungeons.starredMobGlow && isStarred(entity);
+					default -> SkyblockerConfigManager.config.dungeons.starredMobGlow && isStarred(entity);
 				};
 			}
 
 			return switch (entity) {
 				// Rift
-				case PlayerEntity p when Utils.isInTheRift() && !entity.isInvisible() && name.equals("Blobbercyst ") -> SkyblockerConfigManager.get().otherLocations.rift.blobbercystGlow;
+				case PlayerEntity p when Utils.isInTheRift() && !entity.isInvisible() && name.equals("Blobbercyst ") -> SkyblockerConfigManager.config.otherLocations.rift.blobbercystGlow;
 
 				// Enderman Slayer
 				// Highlights Nukekubi Heads
-				case ArmorStandEntity armorStand when Utils.isInTheEnd() && SlayerUtils.isInSlayer() && isNukekubiHead(armorStand) -> SkyblockerConfigManager.get().slayers.endermanSlayer.highlightNukekubiHeads;
+				case ArmorStandEntity armorStand when Utils.isInTheEnd() && SlayerUtils.isInSlayer() && isNukekubiHead(armorStand) -> SkyblockerConfigManager.config.slayers.endermanSlayer.highlightNukekubiHeads;
 
 				// Special Zelot
 				case EndermanEntity enderman when Utils.isInTheEnd() && !entity.isInvisible() -> TheEnd.isSpecialZealot(enderman);

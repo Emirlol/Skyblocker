@@ -53,9 +53,9 @@ object DungeonMap {
 
 		val state = FilledMapItem.getMapState(mapId, client.world) ?: return
 
-		val x = SkyblockerConfigManager.get().dungeons.dungeonMap.mapX
-		val y = SkyblockerConfigManager.get().dungeons.dungeonMap.mapY
-		val scaling = SkyblockerConfigManager.get().dungeons.dungeonMap.mapScaling
+		val x = SkyblockerConfigManager.config.dungeons.dungeonMap.mapX
+		val y = SkyblockerConfigManager.config.dungeons.dungeonMap.mapY
+		val scaling = SkyblockerConfigManager.config.dungeons.dungeonMap.mapScaling
 		val vertices = client.bufferBuilders.effectVertexConsumers
 		val mapRenderer = client.gameRenderer.mapRenderer
 
@@ -77,7 +77,7 @@ object DungeonMap {
 	}
 
 	private fun render(context: DrawContext) {
-		if (isInDungeons && DungeonScore.isDungeonStarted() && !DungeonManager.isInBoss() && SkyblockerConfigManager.get().dungeons.dungeonMap.enableMap) {
+		if (isInDungeons && DungeonScore.isDungeonStarted() && !DungeonManager.isInBoss() && SkyblockerConfigManager.config.dungeons.dungeonMap.enableMap) {
 			render(context.matrices)
 		}
 	}

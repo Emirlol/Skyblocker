@@ -21,13 +21,13 @@ object HotbarSlotLock {
 
 	@JvmStatic
 	fun isLocked(slot: Int): Boolean {
-		return SkyblockerConfigManager.get().general.lockedSlots.contains(slot)
+		return SkyblockerConfigManager.config.general.lockedSlots.contains(slot)
 	}
 
 	@JvmStatic
 	fun handleInputEvents(player: ClientPlayerEntity) {
 		while (hotbarSlotLock!!.wasPressed()) {
-			val lockedSlots = SkyblockerConfigManager.get().general.lockedSlots
+			val lockedSlots = SkyblockerConfigManager.config.general.lockedSlots
 			val selected = player.inventory.selectedSlot
 			if (!isLocked(player.inventory.selectedSlot)) lockedSlots.add(selected)
 			else lockedSlots.remove(selected)

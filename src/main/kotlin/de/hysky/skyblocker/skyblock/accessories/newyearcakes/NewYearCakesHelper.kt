@@ -1,79 +1,66 @@
 package de.hysky.skyblocker.skyblock.accessories.newyearcakes
 
 import de.hysky.skyblocker.config.SkyblockerConfigManager
+import de.hysky.skyblocker.utils.TextHandler
 import de.hysky.skyblocker.utils.Utils.profile
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.green
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.red
 import de.hysky.skyblocker.utils.render.gui.ContainerSolver
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import it.unimi.dsi.fastutil.ints.IntSet
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.minecraft.item.ItemStack
-import net.minecraft.text.Text
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import net.minecraft.screen.slot.Slot
 import java.text.NumberFormat
 import java.text.ParseException
 import java.util.*
-import java.util.regex.Pattern
 
-class NewYearCakesHelper private constructor() : ContainerSolver("Auctions: \".*\"") {
+object NewYearCakesHelper : ContainerSolver("Auctions: \".*\"") {
 	private val cakes: MutableMap<String, IntSet> = HashMap()
 
 	init {
-		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { message: Text, overlay: Boolean -> this.onChatMessage(message, overlay) })
-	}
-
-	override val isEnabled: Boolean
-		get() = SkyblockerConfigManager.get().helpers.enableNewYearCakesHelper
-
-	fun addCake(year: Int): Boolean {
-		if (year < 0) return false
-		return cakes.computeIfAbsent(profile) { _profile: String? -> IntOpenHashSet() }.add(year)
-	}
-
-	private fun onChatMessage(message: Text, overlay: Boolean) {
-		if (isEnabled) {
-			addCake(getCakeYear(NEW_YEAR_CAKE_PURCHASE, message.string))
+		ClientReceiveMessageEvents.GAME.register { message, _ ->
+			if (isEnabled) {
+				addCake(getCakeYear(NEW_YEAR_CAKE_PURCHASE, message.string))
+			}
 		}
 	}
 
-	protected override fun getColors(groups: Array<String?>?, slots: Int2ObjectMap<ItemStack?>?): List<ColorHighlight?>? {
+	override val isEnabled: Boolean
+		get() = SkyblockerConfigManager.config.helpers.enableNewYearCakesHelper
+
+	fun addCake(year: Int?) {
+		year ?: return //Easier to check nullability here than in the caller
+		cakes.computeIfAbsent(profile) { IntOpenHashSet() }.add(year)
+	}
+
+	override fun getColors(groups: Array<String>, slots: List<Slot>): List<ColorHighlight> {
 		val profile = profile
-		if (cakes.isEmpty() || !cakes.containsKey(profile) || cakes.containsKey(profile) && cakes[profile]!!.isEmpty()) return listOf<ColorHighlight>()
-		val highlights: MutableList<ColorHighlight?> = ArrayList()
-		for (entry in slots!!.int2ObjectEntrySet()) {
-			val year = getCakeYear(entry.value)
-			if (year >= 0 && cakes.containsKey(profile)) {
-				highlights.add(if (cakes[profile]!!.contains(year)) red(entry.intKey) else green(entry.intKey))
+		if (cakes.isEmpty() || !cakes.containsKey(profile) || cakes.containsKey(profile) && cakes[profile]!!.isEmpty()) returnemptyList()
+		val highlights: MutableList<ColorHighlight> = arrayListOf()
+		for (entry in slots) {
+			val year = getCakeYear(entry.stack) ?: continue
+			if (cakes.containsKey(profile)) {
+				highlights.add(if (cakes[profile]!!.contains(year)) red(entry.id) else green(entry.id))
 			}
 		}
 		return highlights
 	}
 
-	companion object {
-		private val LOGGER: Logger = LoggerFactory.getLogger(NewYearCakeBagHelper::class.java)
-		private val NEW_YEAR_CAKE: Pattern = Pattern.compile("New Year Cake \\(Year (?<year>\\d+)\\)")
-		private val NEW_YEAR_CAKE_PURCHASE: Pattern = Pattern.compile("You purchased New Year Cake \\(Year (?<year>\\d+)\\) for .+ coins!")
-		private val NUMBER_FORMAT: NumberFormat = NumberFormat.getInstance(Locale.US)
-		@JvmField
-        val INSTANCE: NewYearCakesHelper = NewYearCakesHelper()
-		fun getCakeYear(stack: ItemStack?): Int {
-			return getCakeYear(NEW_YEAR_CAKE, stack!!.name.string)
-		}
+	private val NEW_YEAR_CAKE = Regex("New Year Cake \\(Year (?<year>\\d+)\\)")
+	private val NEW_YEAR_CAKE_PURCHASE = Regex("You purchased New Year Cake \\(Year (?<year>\\d+)\\) for .+ coins!")
+	private val NUMBER_FORMAT: NumberFormat = NumberFormat.getInstance(Locale.US)
 
-		fun getCakeYear(pattern: Pattern, name: String): Int {
-			val matcher = pattern.matcher(name)
-			if (matcher.matches()) {
-				try {
-					return NUMBER_FORMAT.parse(matcher.group("year")).toInt()
-				} catch (e: ParseException) {
-					LOGGER.info("Failed to parse year from New Year Cake: $name", e)
-				}
-			}
-			return -1
+	fun getCakeYear(stack: ItemStack) = getCakeYear(NEW_YEAR_CAKE, stack.name.string)
+
+	private fun getCakeYear(regex: Regex, name: String): Int? {
+		val result = regex.matchEntire(name) ?: return null
+		return try {
+			NUMBER_FORMAT.parse(result.groups["year"]!!.value).toInt()
+		} catch (e: ParseException) {
+			TextHandler.error("Failed to parse year from New Year Cake: $name", e)
+			null
 		}
 	}
 }

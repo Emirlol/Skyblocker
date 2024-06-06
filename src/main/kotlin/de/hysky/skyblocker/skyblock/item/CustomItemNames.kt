@@ -37,7 +37,7 @@ object CustomItemNames {
 			val itemUuid = getItemUuid(source.player.mainHandStack)
 
 			if (!itemUuid.isEmpty()) {
-				val customItemNames = SkyblockerConfigManager.get().general.customItemNames
+				val customItemNames = SkyblockerConfigManager.config.general.customItemNames
 
 				if (text == null) {
 					if (customItemNames.containsKey(itemUuid)) {

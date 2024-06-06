@@ -63,7 +63,7 @@ object SearchOverManager {
 	}
 
 	private fun registerSearchCommands(dispatcher: CommandDispatcher<FabricClientCommandSource>, registryAccess: CommandRegistryAccess) {
-		if (SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.enableCommands) {
+		if (SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.enableCommands) {
 			dispatcher.register(ClientCommandManager.literal("ahs").executes { context: CommandContext<FabricClientCommandSource?>? -> startCommand(true) })
 			dispatcher.register(ClientCommandManager.literal("bzs").executes { context: CommandContext<FabricClientCommandSource?>? -> startCommand(false) })
 		}
@@ -188,7 +188,7 @@ object SearchOverManager {
 		SearchOverManager.sign = sign
 		isCommand = false
 		SearchOverManager.isAuction = isAuction
-		if (SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.keepPreviousSearches) {
+		if (SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.keepPreviousSearches) {
 			val messages = SearchOverManager.sign!!.getText(signFront).getMessages(CLIENT.shouldFilterText())
 			search = messages[0].string
 			if (!messages[1].string.isEmpty()) {
@@ -210,7 +210,7 @@ object SearchOverManager {
 	fun updateSearch(newValue: String) {
 		search = newValue
 		//update the suggestion values
-		val totalSuggestions = SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.maxSuggestions
+		val totalSuggestions = SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.maxSuggestions
 		if (newValue.isBlank() || totalSuggestions == 0) return  //do not search for empty value
 
 		suggestionsArray = (if (isAuction) auctionItems else bazaarItems)!!.stream().filter { item: String? -> item!!.lowercase(Locale.getDefault()).contains(search.lowercase(Locale.getDefault())) }.limit(totalSuggestions.toLong()).toArray<String?> { _Dummy_.__Array__() }
@@ -238,12 +238,12 @@ object SearchOverManager {
 	 */
 	fun getHistory(index: Int): String? {
 		if (isAuction) {
-			if (SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.auctionHistory.size > index) {
-				return SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.auctionHistory[index]
+			if (SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.auctionHistory.size > index) {
+				return SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.auctionHistory[index]
 			}
 		} else {
-			if (SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.bazaarHistory.size > index) {
-				return SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.bazaarHistory[index]
+			if (SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.bazaarHistory.size > index) {
+				return SkyblockerConfigManager.config.uiAndVisuals.searchOverlay.bazaarHistory[index]
 			}
 		}
 		return null
@@ -258,7 +258,7 @@ object SearchOverManager {
 	 */
 	private fun saveHistory() {
 		//save to history
-		val config = SkyblockerConfigManager.get().uiAndVisuals.searchOverlay
+		val config = SkyblockerConfigManager.config.uiAndVisuals.searchOverlay
 		if (isAuction) {
 			if (config.auctionHistory.isEmpty() || config.auctionHistory.first != search) {
 				config.auctionHistory.addFirst(search)

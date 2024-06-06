@@ -110,7 +110,7 @@ class SecretWaypoint internal constructor(val secretIndex: Int, val category: Ca
 			get() = this == BAT
 
 		val isEnabled: Boolean
-			get() = enabledPredicate.test(SkyblockerConfigManager.get().dungeons.secretWaypoints)
+			get() = enabledPredicate.test(SkyblockerConfigManager.config.dungeons.secretWaypoints)
 
 		override fun toString(): String {
 			return name
@@ -150,7 +150,7 @@ class SecretWaypoint internal constructor(val secretIndex: Int, val category: Ca
 		}
 		val LIST_CODEC: Codec<List<SecretWaypoint>> = CODEC.listOf()
 		val SECRET_ITEMS: List<String> = listOf("Decoy", "Defuse Kit", "Dungeon Chest Key", "Healing VIII", "Inflatable Jerry", "Spirit Leap", "Training Weights", "Trap", "Treasure Talisman")
-		private val CONFIG = Supplier { SkyblockerConfigManager.get().dungeons.secretWaypoints }
+		private val CONFIG = Supplier { SkyblockerConfigManager.config.dungeons.secretWaypoints }
 		val TYPE_SUPPLIER: Supplier<Type> = Supplier { CONFIG.get().waypointType }
 		fun getSquaredDistanceToFunction(entity: Entity): ToDoubleFunction<SecretWaypoint> {
 			return ToDoubleFunction { secretWaypoint: SecretWaypoint -> entity.squaredDistanceTo(secretWaypoint.centerPos) }

@@ -1,16 +1,15 @@
 package de.hysky.skyblocker.utils.render
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.logging.LogUtils
 import de.hysky.skyblocker.SkyblockerMod
 import de.hysky.skyblocker.mixins.accessors.BeaconBlockEntityRendererInvoker
 import de.hysky.skyblocker.mixins.accessors.DrawContextInvoker
+import de.hysky.skyblocker.utils.TextHandler
 import de.hysky.skyblocker.utils.render.culling.OcclusionCulling
 import de.hysky.skyblocker.utils.render.title.Title
 import de.hysky.skyblocker.utils.render.title.TitleContainer
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterTranslucent
 import net.fabricmc.fabric.api.event.Event
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
@@ -29,7 +28,6 @@ import net.minecraft.util.math.Vec3d
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.opengl.GL11
-import org.slf4j.Logger
 import java.awt.Color
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
@@ -37,7 +35,6 @@ import java.lang.invoke.MethodType
 import kotlin.math.min
 
 object RenderHelper {
-	private val LOGGER: Logger = LogUtils.getLogger()
 	private val TRANSLUCENT_DRAW = Identifier(SkyblockerMod.NAMESPACE, "translucent_draw")
 	private val SCHEDULE_DEFERRED_RENDER_TASK = deferredRenderTaskHandle
 	private val ONE = Vec3d(1.0, 1.0, 1.0)
@@ -46,28 +43,25 @@ object RenderHelper {
 
 	fun init() {
 		WorldRenderEvents.AFTER_TRANSLUCENT.addPhaseOrdering(Event.DEFAULT_PHASE, TRANSLUCENT_DRAW)
-		WorldRenderEvents.AFTER_TRANSLUCENT.register(TRANSLUCENT_DRAW, AfterTranslucent { obj: WorldRenderContext? -> drawTranslucents() })
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(TRANSLUCENT_DRAW, ::drawTranslucents)
 	}
 
-	@JvmStatic
 	fun renderFilledWithBeaconBeam(context: WorldRenderContext, pos: BlockPos, colorComponents: FloatArray, alpha: Float, throughWalls: Boolean) {
 		renderFilled(context, pos, colorComponents, alpha, throughWalls)
 		renderBeaconBeam(context, pos, colorComponents)
 	}
 
-	@JvmStatic
 	fun renderFilled(context: WorldRenderContext, pos: BlockPos?, colorComponents: FloatArray, alpha: Float, throughWalls: Boolean) {
 		renderFilled(context, Vec3d.of(pos), ONE, colorComponents, alpha, throughWalls)
 	}
 
-	@JvmStatic
 	fun renderFilled(context: WorldRenderContext, pos: BlockPos, dimensions: Vec3d, colorComponents: FloatArray, alpha: Float, throughWalls: Boolean) {
 		if (throughWalls) {
 			if (FrustumUtils.isVisible(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), pos.x + dimensions.x, pos.y + dimensions.y, pos.z + dimensions.z)) {
 				renderFilled(context, Vec3d.of(pos), dimensions, colorComponents, alpha, true)
 			}
 		} else {
-			if (OcclusionCulling.getRegularCuller().isVisible(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), pos.x + dimensions.x, pos.y + dimensions.y, pos.z + dimensions.z)) {
+			if (OcclusionCulling.regularCuller.isVisible(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), pos.x + dimensions.x, pos.y + dimensions.y, pos.z + dimensions.z)) {
 				renderFilled(context, Vec3d.of(pos), dimensions, colorComponents, alpha, false)
 			}
 		}
@@ -106,8 +100,7 @@ object RenderHelper {
 	 * Renders the outline of a box with the specified color components and line width.
 	 * This does not use renderer since renderer draws outline using debug lines with a fixed width.
 	 */
-	@JvmStatic
-	fun renderOutline(context: WorldRenderContext, box: Box?, colorComponents: FloatArray, lineWidth: Float, throughWalls: Boolean) {
+	fun renderOutline(context: WorldRenderContext, box: Box, colorComponents: FloatArray, lineWidth: Float, throughWalls: Boolean) {
 		if (FrustumUtils.isVisible(box)) {
 			val matrices = context.matrixStack()
 			val camera = context.camera().pos
@@ -152,7 +145,6 @@ object RenderHelper {
 	 * @param lineWidth       The width of the lines
 	 * @param throughWalls    Whether to render through walls or not
 	 */
-	@JvmStatic
 	fun renderLinesFromPoints(context: WorldRenderContext, points: Array<Vec3d>, colorComponents: FloatArray, alpha: Float, lineWidth: Float, throughWalls: Boolean) {
 		val camera = context.camera().pos
 		val matrices = context.matrixStack()
@@ -198,7 +190,6 @@ object RenderHelper {
 		RenderSystem.depthFunc(GL11.GL_LEQUAL)
 	}
 
-	@JvmStatic
 	fun renderLineFromCursor(context: WorldRenderContext, point: Vec3d, colorComponents: FloatArray, alpha: Float, lineWidth: Float) {
 		val camera = context.camera().pos
 		val matrices = context.matrixStack()
@@ -249,7 +240,6 @@ object RenderHelper {
 		RenderSystem.depthFunc(GL11.GL_LEQUAL)
 	}
 
-	@JvmStatic
 	fun renderQuad(context: WorldRenderContext, points: Array<Vec3d>, colorComponents: FloatArray, alpha: Float, throughWalls: Boolean) {
 		val positionMatrix = Matrix4f()
 		val camera = context.camera().pos
@@ -276,17 +266,14 @@ object RenderHelper {
 		RenderSystem.depthFunc(GL11.GL_LEQUAL)
 	}
 
-	@JvmStatic
 	fun renderText(context: WorldRenderContext, text: Text, pos: Vec3d, throughWalls: Boolean) {
 		renderText(context, text, pos, 1f, throughWalls)
 	}
 
-	@JvmStatic
 	fun renderText(context: WorldRenderContext, text: Text, pos: Vec3d, scale: Float, throughWalls: Boolean) {
 		renderText(context, text, pos, scale, 0f, throughWalls)
 	}
 
-	@JvmStatic
 	fun renderText(context: WorldRenderContext, text: Text, pos: Vec3d, scale: Float, yOffset: Float, throughWalls: Boolean) {
 		renderText(context, text.asOrderedText(), pos, scale, yOffset, throughWalls)
 	}
@@ -296,7 +283,7 @@ object RenderHelper {
 	 *
 	 * @param throughWalls whether the text should be able to be seen through walls or not.
 	 */
-	fun renderText(context: WorldRenderContext, text: OrderedText?, pos: Vec3d, scale: Float, yOffset: Float, throughWalls: Boolean) {
+	fun renderText(context: WorldRenderContext, text: OrderedText, pos: Vec3d, scale: Float, yOffset: Float, throughWalls: Boolean) {
 		var scale = scale
 		val positionMatrix = Matrix4f()
 		val camera = context.camera()
@@ -329,21 +316,20 @@ object RenderHelper {
 	 */
 	private fun drawTranslucents(context: WorldRenderContext) {
 		//Draw all render layers that haven't been drawn yet - drawing a specific layer does nothing and idk why
-		(context.consumers() as VertexConsumerProvider.Immediate?)!!.draw()
+		(context.consumers() as VertexConsumerProvider.Immediate).draw()
 	}
 
-	@JvmStatic
-	fun runOnRenderThread(runnable: Runnable) {
+	fun runOnRenderThread(runnable: () -> Unit) {
 		if (RenderSystem.isOnRenderThread()) {
-			runnable.run()
+			runnable.invoke()
 		} else if (SCHEDULE_DEFERRED_RENDER_TASK != null) { //Sodium
 			try {
 				SCHEDULE_DEFERRED_RENDER_TASK.invokeExact(runnable)
 			} catch (t: Throwable) {
-				LOGGER.error("[Skyblocker] Failed to schedule a render task!", t)
+				TextHandler.error("Failed to schedule a render task!", t)
 			}
 		} else { //Vanilla
-			RenderSystem.recordRenderCall { runnable.run() }
+			RenderSystem.recordRenderCall { runnable.invoke() }
 		}
 	}
 
@@ -353,8 +339,7 @@ object RenderHelper {
 	 *
 	 * @param title the title
 	 */
-	@JvmStatic
-	fun displayInTitleContainerAndPlaySound(title: Title?) {
+	fun displayInTitleContainerAndPlaySound(title: Title) {
 		if (TitleContainer.addTitle(title)) {
 			playNotificationSound()
 		}
@@ -367,23 +352,15 @@ object RenderHelper {
 	 * @param title the title
 	 * @param ticks the number of ticks the title will remain
 	 */
-	@JvmStatic
-	fun displayInTitleContainerAndPlaySound(title: Title?, ticks: Int) {
+	fun displayInTitleContainerAndPlaySound(title: Title, ticks: Int) {
 		if (TitleContainer.addTitle(title, ticks)) {
 			playNotificationSound()
 		}
 	}
 
-	private fun playNotificationSound() {
-		if (client.player != null) {
-			client.player!!.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 100f, 0.1f)
-		}
-	}
+	private fun playNotificationSound() = client.player?.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 100f, 0.1f)
 
-	@JvmStatic
-	fun pointIsInArea(x: Double, y: Double, x1: Double, y1: Double, x2: Double, y2: Double): Boolean {
-		return x >= x1 && x <= x2 && y >= y1 && y <= y2
-	}
+	fun pointIsInArea(x: Double, y: Double, x1: Double, y1: Double, x2: Double, y2: Double) = x in x1..x2 && y in y1..y2
 
 	private fun drawSprite(context: DrawContext, sprite: Sprite, i: Int, j: Int, k: Int, l: Int, x: Int, y: Int, z: Int, width: Int, height: Int, red: Float, green: Float, blue: Float, alpha: Float) {
 		if (width == 0 || height == 0) {
@@ -396,7 +373,7 @@ object RenderHelper {
 		if (width <= 0 || height <= 0) {
 			return
 		}
-		require(!(tileWidth <= 0 || tileHeight <= 0)) { "Tiled sprite texture size must be positive, got " + tileWidth + "x" + tileHeight }
+		require(tileWidth > 0 && tileHeight > 0) { "Tiled sprite texture size must be positive, got " + tileWidth + "x" + tileHeight }
 		var m = 0
 		while (m < width) {
 			val n = min(tileWidth.toDouble(), (width - m).toDouble()).toInt()

@@ -99,7 +99,7 @@ object MetalDetector {
 	 * @param overlay if the message is an overlay message
 	 */
 	private fun getDistanceMessage(text: Text, overlay: Boolean) {
-		if (!overlay || !SkyblockerConfigManager.get().mining.crystalHollows.metalDetectorHelper || !isInCrystalHollows || islandArea.substring(2) != "Mines of Divan" || CLIENT.player == null) {
+		if (!overlay || !SkyblockerConfigManager.config.mining.crystalHollows.metalDetectorHelper || !isInCrystalHollows || islandArea.substring(2) != "Mines of Divan" || CLIENT.player == null) {
 			checkChestFound(text)
 			return
 		}
@@ -237,7 +237,7 @@ object MetalDetector {
 	 */
 	private fun render(context: WorldRenderContext) {
 		//only render enabled and if there is a few location options and in the mines of divan
-		if (!SkyblockerConfigManager.get().mining.crystalHollows.metalDetectorHelper || !isInCrystalHollows || possibleBlocks.isEmpty() || possibleBlocks.size > 8 || islandArea.substring(2) != "Mines of Divan") {
+		if (!SkyblockerConfigManager.config.mining.crystalHollows.metalDetectorHelper || !isInCrystalHollows || possibleBlocks.isEmpty() || possibleBlocks.size > 8 || islandArea.substring(2) != "Mines of Divan") {
 			return
 		}
 		//only one location render just that and guiding line to it

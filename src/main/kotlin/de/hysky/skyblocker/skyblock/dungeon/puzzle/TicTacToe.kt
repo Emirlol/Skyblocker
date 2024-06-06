@@ -88,7 +88,7 @@ class TicTacToe private constructor() : DungeonPuzzle("tic-tac-toe", "tic-tac-to
 
 	override fun render(context: WorldRenderContext?) {
 		try {
-			if (SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveTicTacToe && nextBestMoveToMake != null) {
+			if (SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveTicTacToe && nextBestMoveToMake != null) {
 				renderOutline(context!!, nextBestMoveToMake, RED_COLOR_COMPONENTS, 5f, false)
 			}
 		} catch (e: Exception) {

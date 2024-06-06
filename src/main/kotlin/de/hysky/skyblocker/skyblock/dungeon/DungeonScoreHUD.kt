@@ -18,15 +18,15 @@ object DungeonScoreHUD {
 	private val extraSpace: Text = Text.literal(" ").append(Text.literal(" ").formatted(Formatting.BOLD))
 
 	private fun render(context: DrawContext) {
-		if (isInDungeons && DungeonScore.isDungeonStarted() && SkyblockerConfigManager.get().dungeons.dungeonScore.enableScoreHUD) {
-			val x = SkyblockerConfigManager.get().dungeons.dungeonScore.scoreX
-			val y = SkyblockerConfigManager.get().dungeons.dungeonScore.scoreY
+		if (isInDungeons && DungeonScore.isDungeonStarted() && SkyblockerConfigManager.config.dungeons.dungeonScore.enableScoreHUD) {
+			val x = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreX
+			val y = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreY
 			render(context, x, y)
 		}
 	}
 
 	fun render(context: DrawContext, x: Int, y: Int) {
-		val scale = SkyblockerConfigManager.get().dungeons.dungeonScore.scoreScaling
+		val scale = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreScaling
 		val matrixStack = context.matrices
 		matrixStack.push()
 		matrixStack.scale(scale, scale, 0f)

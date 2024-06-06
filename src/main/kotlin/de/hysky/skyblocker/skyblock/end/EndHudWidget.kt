@@ -25,7 +25,7 @@ class EndHudWidget(title: MutableText?, colorValue: Int?) : Widget(title!!, colo
 
 	override fun updateContent() {
 		// Zealots
-		if (SkyblockerConfigManager.get().otherLocations.end.zealotKillsEnabled) {
+		if (SkyblockerConfigManager.config.otherLocations.end.zealotKillsEnabled) {
 			addComponent(IcoTextComponent(ENDERMAN_HEAD, Text.literal("Zealots").formatted(Formatting.BOLD)))
 			addComponent(PlainTextComponent(Text.translatable("skyblocker.end.hud.zealotsSinceLastEye", TheEnd.zealotsSinceLastEye)))
 			addComponent(PlainTextComponent(Text.translatable("skyblocker.end.hud.zealotsTotalKills", TheEnd.zealotsKilled)))
@@ -37,7 +37,7 @@ class EndHudWidget(title: MutableText?, colorValue: Int?) : Widget(title!!, colo
 		}
 
 		// Endstone protector
-		if (SkyblockerConfigManager.get().otherLocations.end.protectorLocationEnabled) {
+		if (SkyblockerConfigManager.config.otherLocations.end.protectorLocationEnabled) {
 			addComponent(IcoTextComponent(POPPY, Text.literal("Endstone Protector").formatted(Formatting.BOLD)))
 			if (TheEnd.stage == 5) {
 				addComponent(PlainTextComponent(Text.translatable("skyblocker.end.hud.stage", "IMMINENT")))
@@ -65,8 +65,8 @@ class EndHudWidget(title: MutableText?, colorValue: Int?) : Widget(title!!, colo
 			ENDERMAN_HEAD.set(DataComponentTypes.PROFILE, ProfileComponent(Optional.of("MHF_Enderman"), Optional.empty(), PropertyMap()))
 			POPPY.addEnchantment(Enchantments.INFINITY, 1)
 
-			INSTANCE.x = SkyblockerConfigManager.get().otherLocations.end.x
-			INSTANCE.y = SkyblockerConfigManager.get().otherLocations.end.y
+			INSTANCE.x = SkyblockerConfigManager.config.otherLocations.end.x
+			INSTANCE.y = SkyblockerConfigManager.config.otherLocations.end.y
 		}
 	}
 }

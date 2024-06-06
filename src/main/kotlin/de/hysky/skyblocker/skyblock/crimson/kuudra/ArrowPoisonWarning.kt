@@ -13,7 +13,7 @@ import net.minecraft.util.Formatting
 import java.util.function.Supplier
 
 object ArrowPoisonWarning {
-	private val CONFIG = Supplier { SkyblockerConfigManager.get().crimsonIsle.kuudra }
+	private val CONFIG = Supplier { SkyblockerConfigManager.config.crimsonIsle.kuudra }
 	private const val THREE_SECONDS = 20 * 3
 	private val NONE_TITLE = Title(Text.translatable("skyblocker.crimson.kuudra.noArrowPoison").formatted(Formatting.GREEN))
 	private val LOW_TITLE = Title(Text.translatable("skyblocker.crimson.kuudra.lowArrowPoison").formatted(Formatting.GREEN))

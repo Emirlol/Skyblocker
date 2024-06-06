@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 @Mixin(InGameHud.class)
 public abstract class InGameHudMixin {
     @Unique
-    private static final Supplier<Identifier> SLOT_LOCK_ICON = () -> SkyblockerConfigManager.get().general.itemProtection.slotLockStyle.tex;
+    private static final Supplier<Identifier> SLOT_LOCK_ICON = () -> SkyblockerConfigManager.config.general.itemProtection.slotLockStyle.tex;
 
     @Unique
     private static final Identifier ITEM_PROTECTION = new Identifier(SkyblockerMod.NAMESPACE, "textures/gui/item_protection.png");
@@ -62,7 +62,7 @@ public abstract class InGameHudMixin {
     public void skyblocker$renderHotbarItemLockOrRarityBg(CallbackInfo ci, @Local(argsOnly = true) DrawContext context, @Local(ordinal = 4, name = "m") int index, @Local(ordinal = 5, name = "n") int x, @Local(ordinal = 6, name = "o") int y, @Local PlayerEntity player) {
         if (Utils.isOnSkyblock()) {
             // slot lock
-            if (SkyblockerConfigManager.get().general.itemInfoDisplay.itemRarityBackgrounds) ItemRarityBackgrounds.tryDraw(player.getInventory().main.get(index), context, x, y);
+            if (SkyblockerConfigManager.config.general.itemInfoDisplay.itemRarityBackgrounds) ItemRarityBackgrounds.tryDraw(player.getInventory().main.get(index), context, x, y);
             if (HotbarSlotLock.isLocked(index)) {
                 RenderSystem.enableBlend();
                 context.drawTexture(SLOT_LOCK_ICON.get(), x, y, 0, 0, 16, 16, 16, 16);
@@ -112,7 +112,7 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     private void skyblocker$dontRenderStatusEffects(CallbackInfo ci) {
-        if (Utils.isOnSkyblock() && SkyblockerConfigManager.get().uiAndVisuals.hideStatusEffectOverlay) ci.cancel();
+        if (Utils.isOnSkyblock() && SkyblockerConfigManager.config.uiAndVisuals.hideStatusEffectOverlay) ci.cancel();
     }
 
     @Inject(method = "renderMiscOverlays", at = @At("TAIL"))
@@ -134,7 +134,7 @@ public abstract class InGameHudMixin {
 
     @Inject(method = "setTitle", at = @At("HEAD"), cancellable = true)
     private void skyblocker$dicerTitlePrevent(Text title, CallbackInfo ci) {
-        if (Utils.isOnSkyblock() && SkyblockerConfigManager.get().farming.garden.dicerTitlePrevent && title != null && DICER_TITLE_BLACKLIST.matcher(title.getString()).matches()) {
+        if (Utils.isOnSkyblock() && SkyblockerConfigManager.config.farming.garden.dicerTitlePrevent && title != null && DICER_TITLE_BLACKLIST.matcher(title.getString()).matches()) {
             ci.cancel();
         }
     }

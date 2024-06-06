@@ -41,18 +41,18 @@ object CrystalsHud {
 		})
 
 		HudRenderEvents.AFTER_MAIN_HUD.register(HudRenderStage { context: DrawContext, tickDelta: Float ->
-			if (!SkyblockerConfigManager.get().mining.crystalsHud.enabled || CLIENT.player == null || !visible) {
+			if (!SkyblockerConfigManager.config.mining.crystalsHud.enabled || CLIENT.player == null || !visible) {
 				return@register
 			}
 			render(
-				context, tickDelta, SkyblockerConfigManager.get().mining.crystalsHud.x,
-				SkyblockerConfigManager.get().mining.crystalsHud.y
+				context, tickDelta, SkyblockerConfigManager.config.mining.crystalsHud.x,
+				SkyblockerConfigManager.config.mining.crystalsHud.y
 			)
 		})
 	}
 
 	val dimensionsForConfig: Int
-		get() = (62 * SkyblockerConfigManager.get().mining.crystalsHud.mapScaling).toInt()
+		get() = (62 * SkyblockerConfigManager.config.mining.crystalsHud.mapScaling).toInt()
 
 
 	/**
@@ -64,7 +64,7 @@ object CrystalsHud {
 	 * @param hudY Top left Y coordinate of the map
 	 */
 	private fun render(context: DrawContext, tickDelta: Float, hudX: Int, hudY: Int) {
-		val scale = SkyblockerConfigManager.get().mining.crystalsHud.mapScaling
+		val scale = SkyblockerConfigManager.config.mining.crystalsHud.mapScaling
 
 		//make sure the map renders infront of some stuff - improve this in the future with better layering (1.20.5?)
 		//and set position and scale
@@ -77,13 +77,13 @@ object CrystalsHud {
 		context.drawTexture(MAP_TEXTURE, 0, 0, 0f, 0f, 62, 62, 62, 62)
 
 		//if enabled add waypoint locations to map
-		if (SkyblockerConfigManager.get().mining.crystalsHud.showLocations) {
+		if (SkyblockerConfigManager.config.mining.crystalsHud.showLocations) {
 			val ActiveWaypoints = CrystalsLocationsManager.activeWaypoints
 
 			for (waypoint in ActiveWaypoints!!.values) {
 				val waypointColor = waypoint!!.category!!.color
 				val renderPos = transformLocation(waypoint.pos!!.x.toDouble(), waypoint.pos!!.z.toDouble())
-				var locationSize = SkyblockerConfigManager.get().mining.crystalsHud.locationSize
+				var locationSize = SkyblockerConfigManager.config.mining.crystalsHud.locationSize
 
 				if (SMALL_LOCATIONS.contains(waypoint.name.string)) { //if small location half the location size
 					locationSize /= 2
@@ -156,7 +156,7 @@ object CrystalsHud {
 	 *
 	 */
 	fun update() {
-		if (CLIENT.player == null || CLIENT.networkHandler == null || !SkyblockerConfigManager.get().mining.crystalsHud.enabled) {
+		if (CLIENT.player == null || CLIENT.networkHandler == null || !SkyblockerConfigManager.config.mining.crystalsHud.enabled) {
 			visible = false
 			return
 		}

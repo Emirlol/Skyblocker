@@ -191,7 +191,7 @@ object MythologicalRitual {
 	}
 
 	private val isActive: Boolean
-		get() = SkyblockerConfigManager.get().helpers.mythologicalRitual.enableMythologicalRitualHelper && locationRaw == "hub"
+		get() = SkyblockerConfigManager.config.helpers.mythologicalRitual.enableMythologicalRitualHelper && locationRaw == "hub"
 
 	private fun reset() {
 		griffinBurrows.clear()

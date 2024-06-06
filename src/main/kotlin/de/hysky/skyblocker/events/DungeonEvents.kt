@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.event.Event
 import net.fabricmc.fabric.api.event.EventFactory
 
 object DungeonEvents {
-	@JvmField
     val PUZZLE_MATCHED: Event<RoomMatched> = EventFactory.createArrayBacked(RoomMatched::class.java) { callbacks: Array<RoomMatched> ->
 		RoomMatched { room: Room ->
 			for (callback in callbacks) {
@@ -17,7 +16,6 @@ object DungeonEvents {
 		}
 	}
 
-	@JvmField
     val ROOM_MATCHED: Event<RoomMatched> = EventFactory.createArrayBacked(RoomMatched::class.java) { callbacks: Array<RoomMatched> ->
 		RoomMatched { room: Room ->
 			for (callback in callbacks) {

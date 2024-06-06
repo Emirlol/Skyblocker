@@ -23,7 +23,7 @@ object TeleportOverlay {
 	}
 
 	private fun render(wrc: WorldRenderContext) {
-		if (isOnSkyblock && SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableTeleportOverlays && client.player != null && client.world != null) {
+		if (isOnSkyblock && SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableTeleportOverlays && client.player != null && client.world != null) {
 			val heldItem = client.player!!.mainHandStack
 			val itemId = ItemTooltip.getInternalNameFromNBT(heldItem, true)
 			val customData = getCustomData(heldItem)
@@ -31,39 +31,39 @@ object TeleportOverlay {
 			if (itemId != null) {
 				when (itemId) {
 					"ASPECT_OF_THE_LEECH_1" -> {
-						if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableWeirdTransmission) {
+						if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableWeirdTransmission) {
 							render(wrc, 3)
 						}
 					}
 
 					"ASPECT_OF_THE_LEECH_2" -> {
-						if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableWeirdTransmission) {
+						if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableWeirdTransmission) {
 							render(wrc, 4)
 						}
 					}
 
 					"ASPECT_OF_THE_END", "ASPECT_OF_THE_VOID" -> {
-						if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableEtherTransmission && client.options.sneakKey.isPressed && customData != null && customData.getInt("ethermerge") == 1) {
+						if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableEtherTransmission && client.options.sneakKey.isPressed && customData != null && customData.getInt("ethermerge") == 1) {
 							render(wrc, customData, 57)
-						} else if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableInstantTransmission) {
+						} else if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableInstantTransmission) {
 							render(wrc, customData, 8)
 						}
 					}
 
 					"ETHERWARP_CONDUIT" -> {
-						if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableEtherTransmission) {
+						if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableEtherTransmission) {
 							render(wrc, customData, 57)
 						}
 					}
 
 					"SINSEEKER_SCYTHE" -> {
-						if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableSinrecallTransmission) {
+						if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableSinrecallTransmission) {
 							render(wrc, customData, 4)
 						}
 					}
 
 					"NECRON_BLADE", "ASTRAEA", "HYPERION", "SCYLLA", "VALKYRIE" -> {
-						if (SkyblockerConfigManager.get().uiAndVisuals.teleportOverlay.enableWitherImpact) {
+						if (SkyblockerConfigManager.config.uiAndVisuals.teleportOverlay.enableWitherImpact) {
 							render(wrc, 10)
 						}
 					}

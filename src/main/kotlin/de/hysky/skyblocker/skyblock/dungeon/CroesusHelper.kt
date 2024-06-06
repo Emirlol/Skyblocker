@@ -6,23 +6,22 @@ import de.hysky.skyblocker.utils.render.gui.ColorHighlight
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.gray
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.red
 import de.hysky.skyblocker.utils.render.gui.ContainerSolver
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import net.minecraft.component.DataComponentTypes
-import net.minecraft.item.ItemStack
+import net.minecraft.screen.slot.Slot
 
-class CroesusHelper : ContainerSolver("^Croesus$") {
+object CroesusHelper : ContainerSolver("^Croesus$") {
 	override val isEnabled: Boolean
-		get() = SkyblockerConfigManager.get().dungeons.croesusHelper
+		get() = SkyblockerConfigManager.config.dungeons.croesusHelper
 
-	protected override fun getColors(groups: Array<String?>?, slots: Int2ObjectMap<ItemStack?>?): List<ColorHighlight?>? {
-		val highlights: MutableList<ColorHighlight?> = ArrayList()
-		for (entry in slots!!.int2ObjectEntrySet()) {
-			val stack = entry.value
-			if (stack != null && stack.contains(DataComponentTypes.LORE)) {
-				if (getLoreLineIf(stack) { s: String -> s.contains("Opened Chest:") } != null) {
-					highlights.add(gray(entry.intKey))
-				} else if (getLoreLineIf(stack) { s: String -> s.contains("No more Chests to open!") } != null) {
-					highlights.add(red(entry.intKey))
+	override fun getColors(groups: Array<String>, slots: List<Slot>): List<ColorHighlight> {
+		val highlights: MutableList<ColorHighlight> = ArrayList()
+		for (slot in slots) {
+			val stack = slot.stack
+			if (!stack.isEmpty && stack.contains(DataComponentTypes.LORE)) {
+				if (getLoreLineIf(stack) { it.contains("Opened Chest:") } != null) {
+					highlights += gray(slot.id)
+				} else if (getLoreLineIf(stack) { it.contains("No more Chests to open!") } != null) {
+					highlights += red(slot.id)
 				}
 			}
 		}

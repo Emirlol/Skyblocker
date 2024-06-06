@@ -223,7 +223,7 @@ object DungeonManager {
 	 */
 	fun init() {
 		CUSTOM_WAYPOINTS_DIR = SkyblockerMod.CONFIG_DIR.resolve("custom_secret_waypoints.json")
-		if (!SkyblockerConfigManager.get().dungeons.secretWaypoints.enableRoomMatching) {
+		if (!SkyblockerConfigManager.config.dungeons.secretWaypoints.enableRoomMatching) {
 			return
 		}
 		// Execute with MinecraftClient as executor since we need to wait for MinecraftClient#resourceManager to be set
@@ -647,7 +647,7 @@ object DungeonManager {
 		}
 
 		// Process key found messages for door highlight
-		if (SkyblockerConfigManager.get().dungeons.doorHighlight.enableDoorHighlight) {
+		if (SkyblockerConfigManager.config.dungeons.doorHighlight.enableDoorHighlight) {
 			val matcher = KEY_FOUND.matcher(message)
 			if (matcher.matches()) {
 				val name = matcher.group("name")
@@ -778,7 +778,7 @@ object DungeonManager {
 	 * @return whether room matching and dungeon secrets should be processed
 	 */
 	private fun shouldProcess(): Boolean {
-		return SkyblockerConfigManager.get().dungeons.secretWaypoints.enableRoomMatching && isInDungeons
+		return SkyblockerConfigManager.config.dungeons.secretWaypoints.enableRoomMatching && isInDungeons
 	}
 
 	/**

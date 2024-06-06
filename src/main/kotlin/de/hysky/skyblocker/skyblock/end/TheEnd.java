@@ -78,9 +78,9 @@ public class TheEnd {
 
         HudRenderEvents.AFTER_MAIN_HUD.register((drawContext, tickDelta) -> {
             if (!Utils.isInTheEnd()) return;
-            if (!SkyblockerConfigManager.get().otherLocations.end.hudEnabled) return;
+            if (!SkyblockerConfigManager.config.otherLocations.end.hudEnabled) return;
 
-            EndHudWidget.INSTANCE.render(drawContext, SkyblockerConfigManager.get().uiAndVisuals.tabHud.enableHudBackground);
+            EndHudWidget.INSTANCE.render(drawContext, SkyblockerConfigManager.config.uiAndVisuals.tabHud.enableHudBackground);
         });
 
         ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
@@ -264,7 +264,7 @@ public class TheEnd {
     }
 
     private static void renderWaypoint(WorldRenderContext context) {
-        if (!SkyblockerConfigManager.get().otherLocations.end.waypoint) return;
+        if (!SkyblockerConfigManager.config.otherLocations.end.waypoint) return;
         if (currentProtectorLocation == null || stage != 5) return;
         currentProtectorLocation.waypoint().render(context);
     }

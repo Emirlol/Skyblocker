@@ -65,7 +65,7 @@ object ItemRepository {
 		val info = item.info
 		val wikiLink0 = info.first()
 		val wikiLink1 = if (info.size > 1) info[1] else ""
-		val wikiDomain = if (SkyblockerConfigManager.get().general.wikiLookup.officialWiki) "https://wiki.hypixel.net" else "https://hypixel-skyblock.fandom.com"
+		val wikiDomain = if (SkyblockerConfigManager.config.general.wikiLookup.officialWiki) "https://wiki.hypixel.net" else "https://hypixel-skyblock.fandom.com"
 		return when {
 			wikiLink0.startsWith(wikiDomain) -> wikiLink0
 			wikiLink1.startsWith(wikiDomain) -> return wikiLink1

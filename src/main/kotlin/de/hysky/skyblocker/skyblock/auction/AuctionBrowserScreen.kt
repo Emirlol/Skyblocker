@@ -132,7 +132,7 @@ class AuctionBrowserScreen(handler: AuctionHouseScreenHandler?, inventory: Playe
 	}
 
 	override fun drawSlot(context: DrawContext, slot: Slot) {
-		if (SkyblockerConfigManager.get().uiAndVisuals.fancyAuctionHouse.highlightCheapBIN && slot.hasStack() && isSlotHighlighted.getOrDefault(slot.id, false)) {
+		if (SkyblockerConfigManager.config.uiAndVisuals.fancyAuctionHouse.highlightCheapBIN && slot.hasStack() && isSlotHighlighted.getOrDefault(slot.id, false)) {
 			context.drawBorder(slot.x, slot.y, 16, 16, Color(0, 255, 0, 100).rgb)
 		}
 		super.drawSlot(context, slot)
@@ -246,7 +246,7 @@ class AuctionBrowserScreen(handler: AuctionHouseScreenHandler?, inventory: Playe
 						j--
 					}
 				} else if (slotId > 9 && slotId < (handler!!.rows - 1) * 9 && slotId % 9 > 1 && slotId % 9 < 8) {
-					if (!SkyblockerConfigManager.get().uiAndVisuals.fancyAuctionHouse.highlightCheapBIN) return
+					if (!SkyblockerConfigManager.config.uiAndVisuals.fancyAuctionHouse.highlightCheapBIN) return
 					val tooltip = getLore(stack)
 					var k = tooltip.size - 1
 					while (k >= 0) {

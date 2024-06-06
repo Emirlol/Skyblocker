@@ -8,5 +8,5 @@ object ScreenConst {
 	private const val SCREEN_PAD_BASE = 20
 
 	val screenPad: Int
-		get() = (1f / (SkyblockerConfigManager.get().uiAndVisuals.tabHud.tabHudScale.toFloat() / 100f) * SCREEN_PAD_BASE).toInt()
+		get() = (1f / (SkyblockerConfigManager.config.uiAndVisuals.tabHud.tabHudScale.toFloat() / 100f) * SCREEN_PAD_BASE).toInt()
 }

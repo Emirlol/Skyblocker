@@ -1,6 +1,7 @@
 package de.hysky.skyblocker.skyblock.experiment
 
 import de.hysky.skyblocker.config.configs.HelperConfig.Experiments
+import de.hysky.skyblocker.skyblock.experiment.SuperpairsSolver.slots
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.green
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.red
@@ -12,7 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import java.util.function.Predicate
 
-class SuperpairsSolver : ExperimentSolver("^Superpairs \\(\\w+\\)$") {
+object SuperpairsSolver : ExperimentSolver("^Superpairs \\(\\w+\\)$") {
 	private var superpairsPrevClickedSlot = 0
 	private var superpairsCurrentSlot: ItemStack? = null
 	private val superpairsDuplicatedSlots: MutableSet<Int> = HashSet()

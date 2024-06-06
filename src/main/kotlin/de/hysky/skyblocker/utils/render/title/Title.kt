@@ -9,13 +9,7 @@ import net.minecraft.util.Formatting
  *
  * @see TitleContainer
  */
-class Title
-/**
- * Constructs a new title with the given [MutableText].
- * Use [Text.literal] or [Text.translatable] to create a [MutableText]
- *
- * @param text the mutable text
- */(@JvmField var text: MutableText) {
+class Title(var text: MutableText) {
 	var x: Float = -1f
 	var y: Float = -1f
 

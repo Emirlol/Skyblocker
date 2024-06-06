@@ -7,46 +7,44 @@ import de.hysky.skyblocker.utils.render.gui.ColorHighlight
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.green
 import de.hysky.skyblocker.utils.render.gui.ColorHighlight.Companion.yellow
 import de.hysky.skyblocker.utils.render.gui.ContainerSolver
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import net.minecraft.item.ItemStack
-import net.minecraft.util.Util
+import net.minecraft.screen.slot.Slot
 import java.util.*
-import java.util.regex.Pattern
 
-class CroesusProfit : ContainerSolver(".*Catacombs - Floor.*") {
+object CroesusProfit : ContainerSolver(".*Catacombs - Floor.*") {
+	private val ESSENCE_PATTERN = Regex("(?<type>[A-Za-z]+) Essence x(?<amount>[0-9]+)")
 	override val isEnabled: Boolean
-		get() = SkyblockerConfigManager.get().dungeons.dungeonChestProfit.croesusProfit
+		get() = SkyblockerConfigManager.config.dungeons.dungeonChestProfit.croesusProfit
 
-	protected override fun getColors(groups: Array<String?>?, slots: Int2ObjectMap<ItemStack?>?): List<ColorHighlight?>? {
-		val highlights: MutableList<ColorHighlight?> = ArrayList()
+	override fun getColors(groups: Array<String>, slots: List<Slot>): List<ColorHighlight> {
+		val highlights: MutableList<ColorHighlight> = ArrayList()
 		var bestChest: ItemStack? = null
 		var secondBestChest: ItemStack? = null
-		var bestValue: Long = 0
-		var secondBestValue: Long = 0 // If negative value of chest - it is out of the question
+		var bestValue = 0L
+		var secondBestValue = 0L // If negative value of chest - it is out of the question
 		val dungeonKeyPriceData = getItemPrice("DUNGEON_CHEST_KEY") * 2 // lesser ones don't worth the hassle
 
-		for ((_, stack) in slots!!.int2ObjectEntrySet()) {
-			if (stack!!.name.string.contains("Chest")) {
-				val value = valueChest(stack)
+		for (slot in slots) {
+			if (slot.stack.name.string.contains("Chest")) {
+				val value = valueChest(slot.stack)
 				if (value > bestValue) {
 					secondBestChest = bestChest
 					secondBestValue = bestValue
-					bestChest = stack
+					bestChest = slot.stack
 					bestValue = value
 				} else if (value > secondBestValue) {
-					secondBestChest = stack
+					secondBestChest = slot.stack
 					secondBestValue = value
 				}
 			}
 		}
 
-		for (entry in slots.int2ObjectEntrySet()) {
-			val stack = entry.value
-			if (stack != null) {
-				if (stack == bestChest) {
-					highlights.add(green(entry.intKey))
-				} else if (stack == secondBestChest && secondBestValue > dungeonKeyPriceData) {
-					highlights.add(yellow(entry.intKey))
+		for (slot in slots) {
+			if (slot.stack != null) {
+				if (slot.stack == bestChest) {
+					highlights.add(green(slot.id))
+				} else if (slot.stack == secondBestChest && secondBestValue > dungeonKeyPriceData) {
+					highlights.add(yellow(slot.id))
 				}
 			}
 		}
@@ -55,27 +53,27 @@ class CroesusProfit : ContainerSolver(".*Catacombs - Floor.*") {
 
 
 	private fun valueChest(chest: ItemStack): Long {
-		var chestValue: Long = 0
+		var chestValue = 0L
 		var chestPrice = 0
 		val chestItems: MutableList<String> = ArrayList()
 
 		var processingContents = false
 		for (line in getLore(chest)) {
 			val lineString = line.string
-			if (lineString.contains("Contents")) {
-				processingContents = true
-				continue
-			} else if (lineString.isEmpty()) {
-				processingContents = false
-			} else if (lineString.contains("Coins") && !processingContents) {
-				chestPrice = lineString.replace(",".toRegex(), "").replace("\\D".toRegex(), "").toInt()
+			when {
+				lineString.contains("Contents") -> {
+					processingContents = true
+					continue
+				}
+				lineString.isEmpty() -> processingContents = false
+				lineString.contains("Coins") && !processingContents -> chestPrice = lineString.replace(",".toRegex(), "").replace("\\D".toRegex(), "").toInt()
 			}
 
 			if (processingContents) {
 				if (lineString.contains("Essence")) {
-					val matcher = ESSENCE_PATTERN.matcher(lineString)
-					if (matcher.matches()) {    // add to chest value result of multiplying price of essence on it's amount
-						chestValue += getItemPrice(("ESSENCE_" + matcher.group("type")).uppercase(Locale.getDefault())) * matcher.group("amount").toInt()
+					val matcher = ESSENCE_PATTERN.matchEntire(lineString)
+					if (matcher != null) {    // add to chest value result of multiplying price of essence on it's amount
+						chestValue += getItemPrice(("ESSENCE_" + matcher.groups["type"]!!.value).uppercase(Locale.getDefault())) * matcher.groups["amount"]!!.value.toInt()
 					}
 				} else {
 					if (lineString.contains("Spirit")) {    // TODO: make code like this to detect recombed gear (it can drop with 1% chance, according to wiki, tho I never saw any?)
@@ -96,165 +94,159 @@ class CroesusProfit : ContainerSolver(".*Catacombs - Floor.*") {
 	private fun getItemPrice(itemDisplayName: String): Long {
 		val bazaarPrices = TooltipInfoType.BAZAAR.data
 		val lbinPrices = TooltipInfoType.LOWEST_BINS.data
-		val itemValue: Long = 0
+		val itemValue = 0L
 		val id = dungeonDropsNameToId[itemDisplayName]
 
 		if (bazaarPrices == null || lbinPrices == null) return 0
 
-		if (bazaarPrices.has(id)) {
+		return if (bazaarPrices.has(id)) {
 			val item = bazaarPrices[id].asJsonObject
 			val isPriceNull = item["sellPrice"].isJsonNull
-			return (if (isPriceNull) 0L else item["sellPrice"].asLong)
+			if (isPriceNull) 0L else item["sellPrice"].asLong
 		} else if (lbinPrices.has(id)) {
-			return lbinPrices[id].asLong
-		}
-		return itemValue
+			lbinPrices[id].asLong
+		} else itemValue
 	}
-
 
 	// I did a thing :(
-	private val dungeonDropsNameToId: Map<String, String> = Util.make(HashMap()) { map: HashMap<String, String> ->
-		map["Enchanted Book (Ultimate Jerry I)"] = "ENCHANTMENT_ULTIMATE_JERRY_1" // ultimate books start
-		map["Enchanted Book (Ultimate Jerry II)"] = "ENCHANTMENT_ULTIMATE_JERRY_2"
-		map["Enchanted Book (Ultimate Jerry III)"] = "ENCHANTMENT_ULTIMATE_JERRY_3"
-		map["Enchanted Book (Bank I)"] = "ENCHANTMENT_ULTIMATE_BANK_1"
-		map["Enchanted Book (Bank II)"] = "ENCHANTMENT_ULTIMATE_BANK_2"
-		map["Enchanted Book (Bank III)"] = "ENCHANTMENT_ULTIMATE_BANK_3"
-		map["Enchanted Book (Combo I)"] = "ENCHANTMENT_ULTIMATE_COMBO_1"
-		map["Enchanted Book (Combo II)"] = "ENCHANTMENT_ULTIMATE_COMBO_2"
-		map["Enchanted Book (No Pain No Gain I)"] = "ENCHANTMENT_ULTIMATE_NO_PAIN_NO_GAIN_1"
-		map["Enchanted Book (No Pain No Gain II)"] = "ENCHANTMENT_ULTIMATE_NO_PAIN_NO_GAIN_2"
-		map["Enchanted Book (Ultimate Wise I)"] = "ENCHANTMENT_ULTIMATE_WISE_1"
-		map["Enchanted Book (Ultimate Wise II)"] = "ENCHANTMENT_ULTIMATE_WISE_2"
-		map["Enchanted Book (Wisdom I)"] = "ENCHANTMENT_ULTIMATE_WISDOM_1"
-		map["Enchanted Book (Wisdom II)"] = "ENCHANTMENT_ULTIMATE_WISDOM_2"
-		map["Enchanted Book (Last Stand I)"] = "ENCHANTMENT_ULTIMATE_LAST_STAND_1"
-		map["Enchanted Book (Last Stand II)"] = "ENCHANTMENT_ULTIMATE_LAST_STAND_2"
-		map["Enchanted Book (Rend I)"] = "ENCHANTMENT_ULTIMATE_REND_1"
-		map["Enchanted Book (Rend II)"] = "ENCHANTMENT_ULTIMATE_REND_2"
-		map["Enchanted Book (Legion I)"] = "ENCHANTMENT_ULTIMATE_LEGION_1"
-		map["Enchanted Book (Swarm I)"] = "ENCHANTMENT_ULTIMATE_SWARM_1"
-		map["Enchanted Book (One For All I)"] = "ENCHANTMENT_ULTIMATE_ONE_FOR_ALL_1"
-		map["Enchanted Book (Soul Eater I)"] = "ENCHANTMENT_ULTIMATE_SOUL_EATER_1" // ultimate books end
-		map["Enchanted Book (Infinite Quiver VI)"] = "ENCHANTMENT_INFINITE_QUIVER_6" // enchanted books start
-		map["Enchanted Book (Infinite Quiver VII)"] = "ENCHANTMENT_INFINITE_QUIVER_7"
-		map["Enchanted Book (Feather Falling VI)"] = "ENCHANTMENT_FEATHER_FALLING_6"
-		map["Enchanted Book (Feather Falling VII)"] = "ENCHANTMENT_FEATHER_FALLING_7"
-		map["Enchanted Book (Rejuvenate I)"] = "ENCHANTMENT_REJUVENATE_1"
-		map["Enchanted Book (Rejuvenate II)"] = "ENCHANTMENT_REJUVENATE_2"
-		map["Enchanted Book (Rejuvenate III)"] = "ENCHANTMENT_REJUVENATE_3"
-		map["Enchanted Book (Overload)"] = "ENCHANTMENT_OVERLOAD_1"
-		map["Enchanted Book (Lethality VI)"] = "ENCHANTMENT_LETHALITY_6"
-		map["Enchanted Book (Thunderlord VII)"] = "ENCHANTMENT_THUNDERLORD_7" // enchanted books end
+	private val dungeonDropsNameToId = hashMapOf(
+		"Enchanted Book (Ultimate Jerry I)" to "ENCHANTMENT_ULTIMATE_JERRY_1", // ultimate books start
+		"Enchanted Book (Ultimate Jerry II)" to "ENCHANTMENT_ULTIMATE_JERRY_2",
+		"Enchanted Book (Ultimate Jerry III)" to "ENCHANTMENT_ULTIMATE_JERRY_3",
+		"Enchanted Book (Bank I)" to "ENCHANTMENT_ULTIMATE_BANK_1",
+		"Enchanted Book (Bank II)" to "ENCHANTMENT_ULTIMATE_BANK_2",
+		"Enchanted Book (Bank III)" to "ENCHANTMENT_ULTIMATE_BANK_3",
+		"Enchanted Book (Combo I)" to "ENCHANTMENT_ULTIMATE_COMBO_1",
+		"Enchanted Book (Combo II)" to "ENCHANTMENT_ULTIMATE_COMBO_2",
+		"Enchanted Book (No Pain No Gain I)" to "ENCHANTMENT_ULTIMATE_NO_PAIN_NO_GAIN_1",
+		"Enchanted Book (No Pain No Gain II)" to "ENCHANTMENT_ULTIMATE_NO_PAIN_NO_GAIN_2",
+		"Enchanted Book (Ultimate Wise I)" to "ENCHANTMENT_ULTIMATE_WISE_1",
+		"Enchanted Book (Ultimate Wise II)" to "ENCHANTMENT_ULTIMATE_WISE_2",
+		"Enchanted Book (Wisdom I)" to "ENCHANTMENT_ULTIMATE_WISDOM_1",
+		"Enchanted Book (Wisdom II)" to "ENCHANTMENT_ULTIMATE_WISDOM_2",
+		"Enchanted Book (Last Stand I)" to "ENCHANTMENT_ULTIMATE_LAST_STAND_1",
+		"Enchanted Book (Last Stand II)" to "ENCHANTMENT_ULTIMATE_LAST_STAND_2",
+		"Enchanted Book (Rend I)" to "ENCHANTMENT_ULTIMATE_REND_1",
+		"Enchanted Book (Rend II)" to "ENCHANTMENT_ULTIMATE_REND_2",
+		"Enchanted Book (Legion I)" to "ENCHANTMENT_ULTIMATE_LEGION_1",
+		"Enchanted Book (Swarm I)" to "ENCHANTMENT_ULTIMATE_SWARM_1",
+		"Enchanted Book (One For All I)" to "ENCHANTMENT_ULTIMATE_ONE_FOR_ALL_1",
+		"Enchanted Book (Soul Eater I)" to "ENCHANTMENT_ULTIMATE_SOUL_EATER_1", // ultimate books end
+		"Enchanted Book (Infinite Quiver VI)" to "ENCHANTMENT_INFINITE_QUIVER_6", // enchanted books start
+		"Enchanted Book (Infinite Quiver VII)" to "ENCHANTMENT_INFINITE_QUIVER_7",
+		"Enchanted Book (Feather Falling VI)" to "ENCHANTMENT_FEATHER_FALLING_6",
+		"Enchanted Book (Feather Falling VII)" to "ENCHANTMENT_FEATHER_FALLING_7",
+		"Enchanted Book (Rejuvenate I)" to "ENCHANTMENT_REJUVENATE_1",
+		"Enchanted Book (Rejuvenate II)" to "ENCHANTMENT_REJUVENATE_2",
+		"Enchanted Book (Rejuvenate III)" to "ENCHANTMENT_REJUVENATE_3",
+		"Enchanted Book (Overload)" to "ENCHANTMENT_OVERLOAD_1",
+		"Enchanted Book (Lethality VI)" to "ENCHANTMENT_LETHALITY_6",
+		"Enchanted Book (Thunderlord VII)" to "ENCHANTMENT_THUNDERLORD_7", // enchanted books end
 
-		map["Hot Potato Book"] = "HOT_POTATO_BOOK" // HPB, FPB, Recomb (universal drops)
-		map["Fuming Potato Book"] = "FUMING_POTATO_BOOK"
-		map["Recombobulator 3000"] = "RECOMBOBULATOR_3000"
-		map["Necromancer's Brooch"] = "NECROMANCER_BROOCH"
-		map["ESSENCE_WITHER"] = "ESSENCE_WITHER" // Essences. Really stupid way of doing this
-		map["ESSENCE_UNDEAD"] = "ESSENCE_UNDEAD"
-		map["ESSENCE_DRAGON"] = "ESSENCE_DRAGON"
-		map["ESSENCE_SPIDER"] = "ESSENCE_SPIDER"
-		map["ESSENCE_ICE"] = "ESSENCE_ICE"
-		map["ESSENCE_DIAMOND"] = "ESSENCE_DIAMOND"
-		map["ESSENCE_GOLD"] = "ESSENCE_GOLD"
-		map["ESSENCE_CRIMSON"] = "ESSENCE_CRIMSON"
-		map["DUNGEON_CHEST_KEY"] = "DUNGEON_CHEST_KEY"
+		"Hot Potato Book" to "HOT_POTATO_BOOK", // HPB, FPB, Recomb (universal drops)
+		"Fuming Potato Book" to "FUMING_POTATO_BOOK",
+		"Recombobulator 3000" to "RECOMBOBULATOR_3000",
+		"Necromancer's Brooch" to "NECROMANCER_BROOCH",
+		"ESSENCE_WITHER" to "ESSENCE_WITHER", // Essences. Really stupid way of doing this
+		"ESSENCE_UNDEAD" to "ESSENCE_UNDEAD",
+		"ESSENCE_DRAGON" to "ESSENCE_DRAGON",
+		"ESSENCE_SPIDER" to "ESSENCE_SPIDER",
+		"ESSENCE_ICE" to "ESSENCE_ICE",
+		"ESSENCE_DIAMOND" to "ESSENCE_DIAMOND",
+		"ESSENCE_GOLD" to "ESSENCE_GOLD",
+		"ESSENCE_CRIMSON" to "ESSENCE_CRIMSON",
+		"DUNGEON_CHEST_KEY" to "DUNGEON_CHEST_KEY",
 
-		map["Bonzo's Staff"] = "BONZO_STAFF" // F1 M1
-		map["Master Skull - Tier 1"] = "MASTER_SKULL_TIER_1"
-		map["Bonzo's Mask"] = "BONZO_MASK"
-		map["Balloon Snake"] = "BALLOON_SNAKE"
-		map["Red Nose"] = "RED_NOSE"
+		"Bonzo's Staff" to "BONZO_STAFF", // F1 M1
+		"Master Skull - Tier 1" to "MASTER_SKULL_TIER_1",
+		"Bonzo's Mask" to "BONZO_MASK",
+		"Balloon Snake" to "BALLOON_SNAKE",
+		"Red Nose" to "RED_NOSE",
 
-		map["Red Scarf"] = "RED_SCARF" // F2 M2
-		map["Adaptive Blade"] = "STONE_BLADE"
-		map["Master Skull - Tier 2"] = "MASTER_SKULL_TIER_2"
-		map["Adaptive Belt"] = "ADAPTIVE_BELT"
-		map["Scarf's Studies"] = "SCARF_STUDIES"
+		"Red Scarf" to "RED_SCARF", // F2 M2
+		"Adaptive Blade" to "STONE_BLADE",
+		"Master Skull - Tier 2" to "MASTER_SKULL_TIER_2",
+		"Adaptive Belt" to "ADAPTIVE_BELT",
+		"Scarf's Studies" to "SCARF_STUDIES",
 
-		map["First Master Star"] = "FIRST_MASTER_STAR" // F3 M3
-		map["Adaptive Helmet"] = "ADAPTIVE_HELMET"
-		map["Adaptive Chestplate"] = "ADAPTIVE_CHESTPLATE"
-		map["Adaptive Leggings"] = "ADAPTIVE_LEGGINGS"
-		map["Adaptive Boots"] = "ADAPTIVE_BOOTS"
-		map["Master Skull - Tier 3"] = "MASTER_SKULL_TIER_3"
-		map["Suspicious Vial"] = "SUSPICIOUS_VIAL"
+		"First Master Star" to "FIRST_MASTER_STAR", // F3 M3
+		"Adaptive Helmet" to "ADAPTIVE_HELMET",
+		"Adaptive Chestplate" to "ADAPTIVE_CHESTPLATE",
+		"Adaptive Leggings" to "ADAPTIVE_LEGGINGS",
+		"Adaptive Boots" to "ADAPTIVE_BOOTS",
+		"Master Skull - Tier 3" to "MASTER_SKULL_TIER_3",
+		"Suspicious Vial" to "SUSPICIOUS_VIAL",
 
-		map["Spirit Sword"] = "SPIRIT_SWORD" // F4 M4
-		map["Spirit Shortbow"] = "ITEM_SPIRIT_BOW"
-		map["Spirit Boots"] = "THORNS_BOOTS"
-		map["Spirit"] = "LVL_1_LEGENDARY_SPIRIT" // Spirit pet (Legendary)
-		map["Spirit Epic"] = "LVL_1_EPIC_SPIRIT"
+		"Spirit Sword" to "SPIRIT_SWORD", // F4 M4
+		"Spirit Shortbow" to "ITEM_SPIRIT_BOW",
+		"Spirit Boots" to "THORNS_BOOTS",
+		"Spirit" to "LVL_1_LEGENDARY_SPIRIT", // Spirit pet (Legendary)
+		"Spirit Epic" to "LVL_1_EPIC_SPIRIT",
 
-		map["Second Master Star"] = "SECOND_MASTER_STAR"
-		map["Spirit Wing"] = "SPIRIT_WING"
-		map["Spirit Bone"] = "SPIRIT_BONE"
-		map["Spirit Stone"] = "SPIRIT_DECOY"
+		"Second Master Star" to "SECOND_MASTER_STAR",
+		"Spirit Wing" to "SPIRIT_WING",
+		"Spirit Bone" to "SPIRIT_BONE",
+		"Spirit Stone" to "SPIRIT_DECOY",
 
-		map["Shadow Fury"] = "SHADOW_FURY" // F5 M5
-		map["Last Breath"] = "LAST_BREATH"
-		map["Third Master Star"] = "THIRD_MASTER_STAR"
-		map["Warped Stone"] = "AOTE_STONE"
-		map["Livid Dagger"] = "LIVID_DAGGER"
-		map["Shadow Assassin Helmet"] = "SHADOW_ASSASSIN_HELMET"
-		map["Shadow Assassin Chestplate"] = "SHADOW_ASSASSIN_CHESTPLATE"
-		map["Shadow Assassin Leggings"] = "SHADOW_ASSASSIN_LEGGINGS"
-		map["Shadow Assassin Boots"] = "SHADOW_ASSASSIN_BOOTS"
-		map["Shadow Assassin Cloak"] = "SHADOW_ASSASSIN_CLOAK"
-		map["Master Skull - Tier 4"] = "MASTER_SKULL_TIER_4"
-		map["Dark Orb"] = "DARK_ORB"
+		"Shadow Fury" to "SHADOW_FURY", // F5 M5
+		"Last Breath" to "LAST_BREATH",
+		"Third Master Star" to "THIRD_MASTER_STAR",
+		"Warped Stone" to "AOTE_STONE",
+		"Livid Dagger" to "LIVID_DAGGER",
+		"Shadow Assassin Helmet" to "SHADOW_ASSASSIN_HELMET",
+		"Shadow Assassin Chestplate" to "SHADOW_ASSASSIN_CHESTPLATE",
+		"Shadow Assassin Leggings" to "SHADOW_ASSASSIN_LEGGINGS",
+		"Shadow Assassin Boots" to "SHADOW_ASSASSIN_BOOTS",
+		"Shadow Assassin Cloak" to "SHADOW_ASSASSIN_CLOAK",
+		"Master Skull - Tier 4" to "MASTER_SKULL_TIER_4",
+		"Dark Orb" to "DARK_ORB",
 
-		map["Precursor Eye"] = "PRECURSOR_EYE" // F6 M6
-		map["Giant's Sword"] = "GIANTS_SWORD"
-		map["Necromancer Lord Helmet"] = "NECROMANCER_LORD_HELMET"
-		map["Necromancer Lord Chestplate"] = "NECROMANCER_LORD_CHESTPLATE"
-		map["Necromancer Lord Leggings"] = "NECROMANCER_LORD_LEGGINGS"
-		map["Necromancer Lord Boots"] = "NECROMANCER_LORD_BOOTS"
-		map["Fourth Master Star"] = "FOURTH_MASTER_STAR"
-		map["Summoning Ring"] = "SUMMONING_RING"
-		map["Fel Skull"] = "FEL_SKULL"
-		map["Necromancer Sword"] = "NECROMANCER_SWORD"
-		map["Soulweaver Gloves"] = "SOULWEAVER_GLOVES"
-		map["Sadan's Brooch"] = "SADAN_BROOCH"
-		map["Giant Tooth"] = "GIANT_TOOTH"
+		"Precursor Eye" to "PRECURSOR_EYE", // F6 M6
+		"Giant's Sword" to "GIANTS_SWORD",
+		"Necromancer Lord Helmet" to "NECROMANCER_LORD_HELMET",
+		"Necromancer Lord Chestplate" to "NECROMANCER_LORD_CHESTPLATE",
+		"Necromancer Lord Leggings" to "NECROMANCER_LORD_LEGGINGS",
+		"Necromancer Lord Boots" to "NECROMANCER_LORD_BOOTS",
+		"Fourth Master Star" to "FOURTH_MASTER_STAR",
+		"Summoning Ring" to "SUMMONING_RING",
+		"Fel Skull" to "FEL_SKULL",
+		"Necromancer Sword" to "NECROMANCER_SWORD",
+		"Soulweaver Gloves" to "SOULWEAVER_GLOVES",
+		"Sadan's Brooch" to "SADAN_BROOCH",
+		"Giant Tooth" to "GIANT_TOOTH",
 
-		map["Precursor Gear"] = "PRECURSOR_GEAR" // F7 M7
-		map["Necron Dye"] = "DYE_NECRON"
-		map["Storm the Fish"] = "STORM_THE_FISH"
-		map["Maxor the Fish"] = "MAXOR_THE_FISH"
-		map["Goldor the Fish"] = "GOLDOR_THE_FISH"
-		map["Dark Claymore"] = "DARK_CLAYMORE"
-		map["Necron's Handle"] = "NECRON_HANDLE"
-		map["Master Skull - Tier 5"] = "MASTER_SKULL_TIER_5"
-		map["Shadow Warp"] = "SHADOW_WARP_SCROLL"
-		map["Wither Shield"] = "WITHER_SHIELD_SCROLL"
-		map["Implosion"] = "IMPLOSION_SCROLL"
-		map["Fifth Master Star"] = "FIFTH_MASTER_STAR"
-		map["Auto Recombobulator"] = "AUTO_RECOMBOBULATOR"
-		map["Wither Helmet"] = "WITHER_HELMET"
-		map["Wither Chestplate"] = "WITHER_CHESTPLATE"
-		map["Wither Leggings"] = "WITHER_LEGGINGS"
-		map["Wither Boots"] = "WITHER_BOOTS"
-		map["Wither Catalyst"] = "WITHER_CATALYST"
-		map["Wither Cloak Sword"] = "WITHER_CLOAK"
-		map["Wither Blood"] = "WITHER_BLOOD"
+		"Precursor Gear" to "PRECURSOR_GEAR", // F7 M7
+		"Necron Dye" to "DYE_NECRON",
+		"Storm the Fish" to "STORM_THE_FISH",
+		"Maxor the Fish" to "MAXOR_THE_FISH",
+		"Goldor the Fish" to "GOLDOR_THE_FISH",
+		"Dark Claymore" to "DARK_CLAYMORE",
+		"Necron's Handle" to "NECRON_HANDLE",
+		"Master Skull - Tier 5" to "MASTER_SKULL_TIER_5",
+		"Shadow Warp" to "SHADOW_WARP_SCROLL",
+		"Wither Shield" to "WITHER_SHIELD_SCROLL",
+		"Implosion" to "IMPLOSION_SCROLL",
+		"Fifth Master Star" to "FIFTH_MASTER_STAR",
+		"Auto Recombobulator" to "AUTO_RECOMBOBULATOR",
+		"Wither Helmet" to "WITHER_HELMET",
+		"Wither Chestplate" to "WITHER_CHESTPLATE",
+		"Wither Leggings" to "WITHER_LEGGINGS",
+		"Wither Boots" to "WITHER_BOOTS",
+		"Wither Catalyst" to "WITHER_CATALYST",
+		"Wither Cloak Sword" to "WITHER_CLOAK",
+		"Wither Blood" to "WITHER_BLOOD",
 
-		map["Shiny Wither Helmet"] = "SHINY_WITHER_HELMET" // M7 shiny drops
-		map["Shiny Wither Chestplate"] = "SHINY_WITHER_CHESTPLATE"
-		map["Shiny Wither Leggings"] = "SHINY_WITHER_LEGGINGS"
-		map["Shiny Wither Boots"] = "SHINY_WITHER_BOOTS"
-		map["Shiny Necron's Handle"] = "SHINY_NECRON_HANDLE" // cool thing
+		"Shiny Wither Helmet" to "SHINY_WITHER_HELMET", // M7 shiny drops
+		"Shiny Wither Chestplate" to "SHINY_WITHER_CHESTPLATE",
+		"Shiny Wither Leggings" to "SHINY_WITHER_LEGGINGS",
+		"Shiny Wither Boots" to "SHINY_WITHER_BOOTS",
+		"Shiny Necron's Handle" to "SHINY_NECRON_HANDLE", // cool thing
 
-		map["Dungeon Disc"] = "DUNGEON_DISC_1"
-		map["Clown Disc"] = "DUNGEON_DISC_2"
-		map["Watcher Disc"] = "DUNGEON_DISC_3"
-		map["Old Disc"] = "DUNGEON_DISC_4"
-		map["Necron Disc"] = "DUNGEON_DISC_5"
-	}
-
-	companion object {
-		private val ESSENCE_PATTERN: Pattern = Pattern.compile("(?<type>[A-Za-z]+) Essence x(?<amount>[0-9]+)")
-	}
+		"Dungeon Disc" to "DUNGEON_DISC_1",
+		"Clown Disc" to "DUNGEON_DISC_2",
+		"Watcher Disc" to "DUNGEON_DISC_3",
+		"Old Disc" to "DUNGEON_DISC_4",
+		"Necron Disc" to "DUNGEON_DISC_5",
+	)
 }
 

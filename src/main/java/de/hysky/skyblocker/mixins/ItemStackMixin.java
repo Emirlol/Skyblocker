@@ -51,7 +51,7 @@ public abstract class ItemStackMixin implements SkyblockerStack {
 	@ModifyReturnValue(method = "getName", at = @At("RETURN"))
 	private Text skyblocker$customItemNames(Text original) {
 		if (Utils.isOnSkyblock()) {
-			return SkyblockerConfigManager.get().general.customItemNames.getOrDefault(ItemUtils.getItemUuid((ItemStack) (Object) this), original);
+			return SkyblockerConfigManager.config.general.customItemNames.getOrDefault(ItemUtils.getItemUuid((ItemStack) (Object) this), original);
 		}
 
 		return original;
@@ -106,7 +106,7 @@ public abstract class ItemStackMixin implements SkyblockerStack {
 
 	@Unique
 	private boolean skyblocker$shouldProcess() {
-		return Utils.isOnSkyblock() && SkyblockerConfigManager.get().mining.enableDrillFuel && ItemUtils.hasCustomDurability((ItemStack) (Object) this);
+		return Utils.isOnSkyblock() && SkyblockerConfigManager.config.mining.enableDrillFuel && ItemUtils.hasCustomDurability((ItemStack) (Object) this);
 	}
 
 	@Unique

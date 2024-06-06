@@ -45,7 +45,7 @@ object CustomArmorDyeColors {
 				val itemUuid = getItemUuid(heldItem)
 
 				if (!itemUuid.isEmpty()) {
-					val customDyeColors = SkyblockerConfigManager.get().general.customDyeColors
+					val customDyeColors = SkyblockerConfigManager.config.general.customDyeColors
 
 					if (hex == null) {
 						if (customDyeColors.containsKey(itemUuid)) {

@@ -66,7 +66,7 @@ object FishingHelper {
 	@JvmStatic
     fun onSound(packet: PlaySoundS2CPacket) {
 		val path = packet.sound.value().id.path
-		if (SkyblockerConfigManager.get().helpers.fishing.enableFishingHelper && startTimeFish != 0L && System.currentTimeMillis() >= startTimeFish + 2000 && ("entity.generic.splash" == path || "entity.player.splash" == path)) {
+		if (SkyblockerConfigManager.config.helpers.fishing.enableFishingHelper && startTimeFish != 0L && System.currentTimeMillis() >= startTimeFish + 2000 && ("entity.generic.splash" == path || "entity.player.splash" == path)) {
 			val player = MinecraftClient.getInstance().player
 			if (player?.fishHook != null) {
 				val soundToFishHook = player.fishHook!!.pos.subtract(packet.x, 0.0, packet.z)
@@ -81,13 +81,13 @@ object FishingHelper {
 	}
 
 	fun render(context: WorldRenderContext?) {
-		if (SkyblockerConfigManager.get().helpers.fishing.enableFishingTimer && startTime != 0L) {
+		if (SkyblockerConfigManager.config.helpers.fishing.enableFishingTimer && startTime != 0L) {
 			val player = MinecraftClient.getInstance().player
 			if (player?.fishHook != null) {
 				val time = ((System.currentTimeMillis() - startTime) / 100f).toInt() / 10f //leave 1dp in seconds
-				val scale = SkyblockerConfigManager.get().helpers.fishing.fishingTimerScale
+				val scale = SkyblockerConfigManager.config.helpers.fishing.fishingTimerScale
 				val pos = player.fishHook!!.pos.add(0.0, 0.4 + scale / 10, 0.0)
-				val text: Text = if (time >= 20 && SkyblockerConfigManager.get().helpers.fishing.changeTimerColor) {
+				val text: Text = if (time >= 20 && SkyblockerConfigManager.config.helpers.fishing.changeTimerColor) {
 					Text.literal(time.toString()).formatted(Formatting.GREEN)
 				} else {
 					Text.literal(time.toString())

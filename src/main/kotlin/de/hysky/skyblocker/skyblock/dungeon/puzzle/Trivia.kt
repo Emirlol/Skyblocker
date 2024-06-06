@@ -18,7 +18,7 @@ class Trivia : ChatPatternListener("^ +(?:([A-Za-z,' ]*\\?)| ([ⓐⓑⓒ]) ([a-z
 	private var solutions = emptyList<String>()
 
 	public override fun state(): ChatFilterResult {
-		return if (SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveTrivia) ChatFilterResult.FILTER else ChatFilterResult.PASS
+		return if (SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveTrivia) ChatFilterResult.FILTER else ChatFilterResult.PASS
 	}
 
 	public override fun onMatch(message: Text?, matcher: Matcher?): Boolean {

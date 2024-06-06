@@ -15,7 +15,7 @@ class PlayerComponent(ple: PlayerListEntry) : Component() {
 	private val tex: Identifier
 
 	init {
-		val plainNames = SkyblockerConfigManager.get().uiAndVisuals.tabHud.plainPlayerNames
+		val plainNames = SkyblockerConfigManager.config.uiAndVisuals.tabHud.plainPlayerNames
 		val team = ple.scoreboardTeam
 		val username = ple.profile.name
 		name = if ((team != null && !plainNames)) Text.empty().append(team.prefix).append(Text.literal(username).formatted(team.color)).append(team.suffix) else Text.of(username)

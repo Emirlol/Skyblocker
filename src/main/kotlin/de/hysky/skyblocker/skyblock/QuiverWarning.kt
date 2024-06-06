@@ -19,7 +19,7 @@ object QuiverWarning {
 
 	fun onChatMessage(text: Text, overlay: Boolean): Boolean {
 		val message = text.string
-		if (SkyblockerConfigManager.get().general.quiverWarning.enableQuiverWarning && message.endsWith("left in your Quiver!")) {
+		if (SkyblockerConfigManager.config.general.quiverWarning.enableQuiverWarning && message.endsWith("left in your Quiver!")) {
 			MinecraftClient.getInstance().inGameHud.setDefaultTitleFade()
 			if (message.startsWith("You only have 50")) {
 				onChatMessage(Type.FIFTY_LEFT)
@@ -35,14 +35,14 @@ object QuiverWarning {
 	private fun onChatMessage(warning: Type) {
 		if (!isInDungeons) {
 			MinecraftClient.getInstance().inGameHud.setTitle(Text.translatable(warning.key).formatted(Formatting.RED))
-		} else if (SkyblockerConfigManager.get().general.quiverWarning.enableQuiverWarningInDungeons) {
+		} else if (SkyblockerConfigManager.config.general.quiverWarning.enableQuiverWarningInDungeons) {
 			MinecraftClient.getInstance().inGameHud.setTitle(Text.translatable(warning.key).formatted(Formatting.RED))
 			QuiverWarning.warning = warning
 		}
 	}
 
 	fun update() {
-		if (warning != null && SkyblockerConfigManager.get().general.quiverWarning.enableQuiverWarning && SkyblockerConfigManager.get().general.quiverWarning.enableQuiverWarningAfterDungeon && !isInDungeons) {
+		if (warning != null && SkyblockerConfigManager.config.general.quiverWarning.enableQuiverWarning && SkyblockerConfigManager.config.general.quiverWarning.enableQuiverWarningAfterDungeon && !isInDungeons) {
 			val inGameHud = MinecraftClient.getInstance().inGameHud
 			inGameHud.setDefaultTitleFade()
 			inGameHud.setTitle(Text.translatable(warning!!.key).formatted(Formatting.RED))

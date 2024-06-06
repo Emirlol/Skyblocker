@@ -34,7 +34,7 @@ object GlaciteColdOverlay {
 	}
 
 	private fun update() {
-		if (!isInDwarvenMines || System.currentTimeMillis() - resetTime < 3000 || !SkyblockerConfigManager.get().mining.glacite.coldOverlay) {
+		if (!isInDwarvenMines || System.currentTimeMillis() - resetTime < 3000 || !SkyblockerConfigManager.config.mining.glacite.coldOverlay) {
 			cold = 0
 			return
 		}
@@ -63,7 +63,7 @@ object GlaciteColdOverlay {
 
 	@JvmStatic
 	fun render(context: DrawContext) {
-		if (isInDwarvenMines && SkyblockerConfigManager.get().mining.glacite.coldOverlay) {
+		if (isInDwarvenMines && SkyblockerConfigManager.config.mining.glacite.coldOverlay) {
 			renderOverlay(context, POWDER_SNOW_OUTLINE, cold / 100f)
 		}
 	}

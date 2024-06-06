@@ -33,7 +33,7 @@ class IceFill private constructor() : DungeonPuzzle("ice-fill", "ice-path") {
 	private val iceFillPaths: List<MutableList<Vector2ic>> = java.util.List.of<MutableList<Vector2ic>>(ArrayList(), ArrayList(), ArrayList())
 
 	override fun tick(client: MinecraftClient?) {
-		if (!SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveIceFill || client!!.world == null || !DungeonManager.isCurrentRoomMatched() || solve != null && !solve!!.isDone) {
+		if (!SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveIceFill || client!!.world == null || !DungeonManager.isCurrentRoomMatched() || solve != null && !solve!!.isDone) {
 			return
 		}
 		val room = DungeonManager.getCurrentRoom()
@@ -108,7 +108,7 @@ class IceFill private constructor() : DungeonPuzzle("ice-fill", "ice-path") {
 	}
 
 	override fun render(context: WorldRenderContext?) {
-		if (!SkyblockerConfigManager.get().dungeons.puzzleSolvers.solveIceFill || !DungeonManager.isCurrentRoomMatched()) {
+		if (!SkyblockerConfigManager.config.dungeons.puzzleSolvers.solveIceFill || !DungeonManager.isCurrentRoomMatched()) {
 			return
 		}
 		val room = DungeonManager.getCurrentRoom()

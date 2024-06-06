@@ -8,7 +8,7 @@ import kotlin.arrayOf
 
 class ShowOffFilter : SimpleChatFilter("(?:\\[[0-9]+\\] )?(?:[" + Constants.LEVEL_EMBLEMS + "] )?(?:\\[[A-Z+]+\\] )?([A-Za-z0-9_]+) (?:" + String.join("|", *SHOW_TYPES) + ") \\[(.+)\\]") {
 	override fun state(): ChatFilterResult {
-		return SkyblockerConfigManager.get().chat.hideShowOff
+		return SkyblockerConfigManager.config.chat.hideShowOff
 	}
 
 	companion object {

@@ -59,7 +59,7 @@ object EggFinder {
 	}
 
 	fun checkIfEgg(armorStand: ArmorStandEntity) {
-		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return
+		if (!SkyblockerConfigManager.config.helpers.chocolateFactory.enableEggFinder) return
 		if (SkyblockTime.skyblockSeason.get() != SkyblockTime.Season.SPRING) return
 		if (armorStand.hasCustomName() || !armorStand.isInvisible || !armorStand.shouldHideBasePlate()) return
 		if (location == null) { //The location is unknown upon world change and will be changed via /locraw soon, so we can queue it for now
@@ -81,7 +81,7 @@ object EggFinder {
 	}
 
 	private fun invalidateState() {
-		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return
+		if (!SkyblockerConfigManager.config.helpers.chocolateFactory.enableEggFinder) return
 		isLocationCorrect = false
 		for (type in EggType.entries) {
 			type.egg = null
@@ -89,9 +89,9 @@ object EggFinder {
 	}
 
 	private fun handleFoundEgg(entity: ArmorStandEntity, eggType: EggType) {
-		eggType.egg = Egg(entity, Waypoint(entity.blockPos.up(2), SkyblockerConfigManager.get().helpers.chocolateFactory.waypointType, getFloatComponents(eggType.color)))
+		eggType.egg = Egg(entity, Waypoint(entity.blockPos.up(2), SkyblockerConfigManager.config.helpers.chocolateFactory.waypointType, getFloatComponents(eggType.color)))
 
-		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.sendEggFoundMessages) return
+		if (!SkyblockerConfigManager.config.helpers.chocolateFactory.sendEggFoundMessages) return
 		MinecraftClient.getInstance().player!!.sendMessage(
 			Constants.PREFIX.get()
 				.append("Found a ")
@@ -101,14 +101,14 @@ object EggFinder {
 	}
 
 	private fun renderWaypoints(context: WorldRenderContext) {
-		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return
+		if (!SkyblockerConfigManager.config.helpers.chocolateFactory.enableEggFinder) return
 		for (type in EggType.entries) {
 			if (type.egg?.waypoint?.shouldRender() == true) type.egg!!.waypoint.render(context)
 		}
 	}
 
 	private fun onChatMessage(text: Text, overlay: Boolean) {
-		if (overlay || !SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return
+		if (overlay || !SkyblockerConfigManager.config.helpers.chocolateFactory.enableEggFinder) return
 		eggFoundPattern.find(text.string)?.let {
 			try {
 				EggType.valueOf(it.groupValues[1].uppercase())?.egg?.waypoint?.setFound()

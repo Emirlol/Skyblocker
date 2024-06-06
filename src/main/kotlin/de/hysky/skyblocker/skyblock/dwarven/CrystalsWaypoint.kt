@@ -63,7 +63,7 @@ class CrystalsWaypoint internal constructor(val category: Category?, val name: T
 	}
 
 	companion object {
-		private val CONFIG = Supplier { SkyblockerConfigManager.get().uiAndVisuals.waypoints }
+		private val CONFIG = Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints }
 		private val TYPE_SUPPLIER = Supplier { CONFIG.get().waypointType }
 		fun getSquaredDistanceToFunction(entity: Entity): ToDoubleFunction<CrystalsWaypoint> {
 			return ToDoubleFunction { crystalsWaypoint: CrystalsWaypoint -> entity.squaredDistanceTo(crystalsWaypoint.centerPos) }

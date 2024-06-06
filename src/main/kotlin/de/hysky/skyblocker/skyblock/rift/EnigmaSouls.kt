@@ -35,7 +35,7 @@ import java.util.function.Supplier
 
 object EnigmaSouls {
 	private val LOGGER: Logger = LoggerFactory.getLogger(EnigmaSouls::class.java)
-	private val TYPE_SUPPLIER = Supplier { SkyblockerConfigManager.get().uiAndVisuals.waypoints.waypointType }
+	private val TYPE_SUPPLIER = Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType }
 	private val WAYPOINTS_JSON = Identifier(SkyblockerMod.NAMESPACE, "rift/enigma_soul_waypoints.json")
 	private val SOUL_WAYPOINTS: MutableMap<BlockPos, ProfileAwareWaypoint> = HashMap(42)
 	private val FOUND_SOULS_FILE: Path = SkyblockerMod.CONFIG_DIR.resolve("found_enigma_souls.json")
@@ -106,7 +106,7 @@ object EnigmaSouls {
 	}
 
 	fun render(context: WorldRenderContext?) {
-		val config = SkyblockerConfigManager.get().otherLocations.rift
+		val config = SkyblockerConfigManager.config.otherLocations.rift
 
 		if (isInTheRift && config.enigmaSoulWaypoints && soulsLoaded!!.isDone) {
 			for (soul in SOUL_WAYPOINTS.values) {

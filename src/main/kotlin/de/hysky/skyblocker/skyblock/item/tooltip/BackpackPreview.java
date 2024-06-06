@@ -150,7 +150,7 @@ public class BackpackPreview {
             int itemX = x + (i - 9) % 9 * 18 + 8;
             int itemY = y + (i - 9) / 9 * 18 + 18;
 
-            if (SkyblockerConfigManager.get().general.itemInfoDisplay.itemRarityBackgrounds) {
+            if (SkyblockerConfigManager.config.general.itemInfoDisplay.itemRarityBackgrounds) {
                 ItemRarityBackgrounds.tryDraw(currentStack, context, itemX, itemY);
             }
 

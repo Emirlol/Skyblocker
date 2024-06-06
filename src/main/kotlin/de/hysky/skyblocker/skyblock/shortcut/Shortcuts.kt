@@ -167,14 +167,14 @@ object Shortcuts {
 		}
 		dispatcher.register(ClientCommandManager.literal(SkyblockerMod.NAMESPACE).then(ClientCommandManager.literal("help").executes { context: CommandContext<FabricClientCommandSource> ->
 			val source = context.source
-			var status = if (SkyblockerConfigManager.get().general.shortcuts.enableShortcuts && SkyblockerConfigManager.get().general.shortcuts.enableCommandShortcuts) "§a§l (Enabled)" else "§c§l (Disabled)"
+			var status = if (SkyblockerConfigManager.config.general.shortcuts.enableShortcuts && SkyblockerConfigManager.config.general.shortcuts.enableCommandShortcuts) "§a§l (Enabled)" else "§c§l (Disabled)"
 			source.sendFeedback(Text.of("§e§lSkyblocker §fCommand Shortcuts$status"))
 			if (!isShortcutsLoaded()) {
 				source.sendFeedback(Text.translatable("skyblocker.shortcuts.notLoaded"))
 			} else for ((key, value) in commands) {
 				source.sendFeedback(Text.of("§7$key §f→ §7$value"))
 			}
-			status = if (SkyblockerConfigManager.get().general.shortcuts.enableShortcuts && SkyblockerConfigManager.get().general.shortcuts.enableCommandArgShortcuts) "§a§l (Enabled)" else "§c§l (Disabled)"
+			status = if (SkyblockerConfigManager.config.general.shortcuts.enableShortcuts && SkyblockerConfigManager.config.general.shortcuts.enableCommandArgShortcuts) "§a§l (Enabled)" else "§c§l (Disabled)"
 			source.sendFeedback(Text.of("§e§lSkyblocker §fCommand Argument Shortcuts$status"))
 			if (!isShortcutsLoaded()) {
 				source.sendFeedback(Text.translatable("skyblocker.shortcuts.notLoaded"))
@@ -191,16 +191,16 @@ object Shortcuts {
 
 	private fun modifyCommand(command: String): String {
 		var command = command
-		if (SkyblockerConfigManager.get().general.shortcuts.enableShortcuts) {
+		if (SkyblockerConfigManager.config.general.shortcuts.enableShortcuts) {
 			if (!isShortcutsLoaded()) {
 				LOGGER.warn("[Skyblocker] Shortcuts not loaded yet, skipping shortcut for command: {}", command)
 				return command
 			}
 			command = "/$command"
-			if (SkyblockerConfigManager.get().general.shortcuts.enableCommandShortcuts) {
+			if (SkyblockerConfigManager.config.general.shortcuts.enableCommandShortcuts) {
 				command = commands.getOrDefault(command, command)
 			}
-			if (SkyblockerConfigManager.get().general.shortcuts.enableCommandArgShortcuts) {
+			if (SkyblockerConfigManager.config.general.shortcuts.enableCommandArgShortcuts) {
 				val messageArgs = command.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 				for (i in messageArgs.indices) {
 					messageArgs[i] = commandArgs.getOrDefault(messageArgs[i], messageArgs[i])

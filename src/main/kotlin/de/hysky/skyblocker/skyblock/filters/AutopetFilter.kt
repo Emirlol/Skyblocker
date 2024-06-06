@@ -10,7 +10,7 @@ import java.util.regex.Matcher
 
 class AutopetFilter : ChatPatternListener("^Autopet equipped your .*! VIEW RULE$") {
 	public override fun onMatch(_message: Text?, matcher: Matcher?): Boolean {
-		if (SkyblockerConfigManager.get().chat.hideAutopet == ChatFilterResult.ACTION_BAR) {
+		if (SkyblockerConfigManager.config.chat.hideAutopet == ChatFilterResult.ACTION_BAR) {
 			Objects.requireNonNull(MinecraftClient.getInstance().player).sendMessage(
 				Text.literal(
 					_message!!.string.replace("VIEW RULE", "")
@@ -21,7 +21,7 @@ class AutopetFilter : ChatPatternListener("^Autopet equipped your .*! VIEW RULE$
 	}
 
 	public override fun state(): ChatFilterResult {
-		return if (SkyblockerConfigManager.get().chat.hideAutopet == ChatFilterResult.ACTION_BAR) ChatFilterResult.FILTER
-		else SkyblockerConfigManager.get().chat.hideAutopet
+		return if (SkyblockerConfigManager.config.chat.hideAutopet == ChatFilterResult.ACTION_BAR) ChatFilterResult.FILTER
+		else SkyblockerConfigManager.config.chat.hideAutopet
 	}
 }

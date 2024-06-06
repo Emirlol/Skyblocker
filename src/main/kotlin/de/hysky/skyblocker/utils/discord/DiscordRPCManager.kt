@@ -45,11 +45,11 @@ object DiscordRPCManager {
 	 */
 	fun updateDataAndPresence() {
 		// If the custom message is empty, discord will keep the last message, this is can serve as a default if the user doesn't want a custom message
-		if (SkyblockerConfigManager.get().misc.richPresence.customMessage.isEmpty()) {
-			SkyblockerConfigManager.get().misc.richPresence.customMessage = "Playing Skyblock"
+		if (SkyblockerConfigManager.config.misc.richPresence.customMessage.isEmpty()) {
+			SkyblockerConfigManager.config.misc.richPresence.customMessage = "Playing Skyblock"
 			SkyblockerConfigManager.save()
 		}
-		if (SkyblockerConfigManager.get().misc.richPresence.cycleMode) cycleCount = (cycleCount + 1) % 3
+		if (SkyblockerConfigManager.config.misc.richPresence.cycleMode) cycleCount = (cycleCount + 1) % 3
 		initAndUpdatePresence()
 	}
 
@@ -77,7 +77,7 @@ object DiscordRPCManager {
 	private fun initAndUpdatePresence(initialization: Boolean = false) {
 		if (updateTask == null || updateTask!!.isDone) {
 			updateTask = CompletableFuture.runAsync {
-				if (SkyblockerConfigManager.get().misc.richPresence.enableRichPresence && isOnSkyblock) {
+				if (SkyblockerConfigManager.config.misc.richPresence.enableRichPresence && isOnSkyblock) {
 					if (!DiscordIPC.isConnected()) {
 						if (DiscordIPC.start(934607927837356052L, null)) {
 							LOGGER.info("[Skyblocker] Discord RPC connected successfully")
@@ -103,7 +103,7 @@ object DiscordRPCManager {
 		val presence = RichPresence()
 		presence.setLargeImage("skyblocker-default", null)
 		presence.setStart(startTimeStamp)
-		presence.setDetails(SkyblockerConfigManager.get().misc.richPresence.customMessage)
+		presence.setDetails(SkyblockerConfigManager.config.misc.richPresence.customMessage)
 		presence.setState(info)
 		return presence
 	}
@@ -111,13 +111,13 @@ object DiscordRPCManager {
 	val info: String?
 		get() {
 			var info: String? = null
-			if (!SkyblockerConfigManager.get().misc.richPresence.cycleMode) {
-				info = when (SkyblockerConfigManager.get().misc.richPresence.info) {
+			if (!SkyblockerConfigManager.config.misc.richPresence.cycleMode) {
+				info = when (SkyblockerConfigManager.config.misc.richPresence.info) {
 					MiscConfig.Info.BITS -> "Bits: " + DECIMAL_FORMAT.format(bits.toLong())
 					MiscConfig.Info.PURSE -> "Purse: " + DECIMAL_FORMAT.format(purse)
 					MiscConfig.Info.LOCATION -> islandArea
 				}
-			} else if (SkyblockerConfigManager.get().misc.richPresence.cycleMode) {
+			} else if (SkyblockerConfigManager.config.misc.richPresence.cycleMode) {
 				when (cycleCount) {
 					0 -> info = "Bits: " + DECIMAL_FORMAT.format(bits.toLong())
 					1 -> info = "Purse: " + DECIMAL_FORMAT.format(purse)

@@ -281,7 +281,7 @@ open class Room(val type: Type, vararg physicalPositions: Vector2ic?) : Tickable
 		}
 
 		// Wither and blood door
-		if (SkyblockerConfigManager.get().dungeons.doorHighlight.enableDoorHighlight && doorPos == null) {
+		if (SkyblockerConfigManager.config.dungeons.doorHighlight.enableDoorHighlight && doorPos == null) {
 			doorPos = DungeonMapUtils.getWitherBloodDoorPos(client.world, segments)
 			if (doorPos != null) {
 				doorBox = Box(doorPos!!.x.toDouble(), doorPos!!.y.toDouble(), doorPos!!.z.toDouble(), doorPos!!.x + DOOR_SIZE.getX(), doorPos!!.y + DOOR_SIZE.getY(), doorPos!!.z + DOOR_SIZE.getZ())
@@ -484,7 +484,7 @@ open class Room(val type: Type, vararg physicalPositions: Vector2ic?) : Tickable
 		}
 
 		synchronized(this) {
-			if (SkyblockerConfigManager.get().dungeons.secretWaypoints.enableSecretWaypoints && isMatched) {
+			if (SkyblockerConfigManager.config.dungeons.secretWaypoints.enableSecretWaypoints && isMatched) {
 				for (secretWaypoint in secretWaypoints!!.values()) {
 					if (secretWaypoint.shouldRender()) {
 						secretWaypoint.render(context)
@@ -493,11 +493,11 @@ open class Room(val type: Type, vararg physicalPositions: Vector2ic?) : Tickable
 			}
 		}
 
-		if (!SkyblockerConfigManager.get().dungeons.doorHighlight.enableDoorHighlight || doorPos == null) {
+		if (!SkyblockerConfigManager.config.dungeons.doorHighlight.enableDoorHighlight || doorPos == null) {
 			return
 		}
 		val colorComponents = if (keyFound) GREEN_COLOR_COMPONENTS else RED_COLOR_COMPONENTS
-		when (SkyblockerConfigManager.get().dungeons.doorHighlight.doorHighlightType) {
+		when (SkyblockerConfigManager.config.dungeons.doorHighlight.doorHighlightType) {
 			DungeonsConfig.DoorHighlight.Type.HIGHLIGHT -> renderFilled(context!!, doorPos!!, DOOR_SIZE, colorComponents, 0.5f, true)
 			DungeonsConfig.DoorHighlight.Type.OUTLINED_HIGHLIGHT -> {
 				renderFilled(context!!, doorPos!!, DOOR_SIZE, colorComponents, 0.5f, true)

@@ -19,10 +19,10 @@ object LowerSensitivity {
 				if (isSensitivityLowered) lowerSensitivity(false)
 				return@register
 			}
-			if (SkyblockerConfigManager.get().farming.garden.lockMouseTool) {
+			if (SkyblockerConfigManager.config.farming.garden.lockMouseTool) {
 				val mainHandStack = MinecraftClient.getInstance().player!!.mainHandStack
 				val itemId = getItemId(mainHandStack)
-				val shouldLockMouse = FarmingHudWidget.Companion.FARMING_TOOLS.containsKey(itemId) && (!SkyblockerConfigManager.get().farming.garden.lockMouseGroundOnly || MinecraftClient.getInstance().player!!.isOnGround)
+				val shouldLockMouse = FarmingHudWidget.Companion.FARMING_TOOLS.containsKey(itemId) && (!SkyblockerConfigManager.config.farming.garden.lockMouseGroundOnly || MinecraftClient.getInstance().player!!.isOnGround)
 				if (shouldLockMouse && !isSensitivityLowered) lowerSensitivity(true)
 				else if (!shouldLockMouse && isSensitivityLowered) lowerSensitivity(false)
 			}

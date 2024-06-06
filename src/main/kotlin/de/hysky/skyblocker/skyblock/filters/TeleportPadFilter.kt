@@ -8,6 +8,6 @@ class TeleportPadFilter : SimpleChatFilter(
 			"|This Teleport Pad does not have a destination set!)$"
 ) {
 	public override fun state(): ChatFilterResult {
-		return SkyblockerConfigManager.get().chat.hideTeleportPad
+		return SkyblockerConfigManager.config.chat.hideTeleportPad
 	}
 }

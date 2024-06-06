@@ -9,7 +9,7 @@ open class WorldProvider : DataProvider {
 	protected var world: ClientWorld? = null
 
 	override fun prepareChunk(chunkX: Int, chunkZ: Int): Boolean {
-		this.world = CLIENT.world
+		this.world = MinecraftClient.getInstance().world
 		return this.world != null
 	}
 
@@ -20,9 +20,5 @@ open class WorldProvider : DataProvider {
 
 	override fun cleanup() {
 		this.world = null
-	}
-
-	companion object {
-		private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
 	}
 }

@@ -5,6 +5,6 @@ import de.hysky.skyblocker.utils.chat.ChatFilterResult
 
 class AoteFilter : SimpleChatFilter("^There are blocks in the way!$") {
 	public override fun state(): ChatFilterResult {
-		return SkyblockerConfigManager.get().chat.hideAOTE
+		return SkyblockerConfigManager.config.chat.hideAOTE
 	}
 }

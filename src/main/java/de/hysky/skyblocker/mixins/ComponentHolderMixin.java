@@ -24,7 +24,7 @@ public interface ComponentHolderMixin {
 	private <T> T skyblocker$customArmorTrims(T original, DataComponentType<? extends T> dataComponentType) {
 		if (Utils.isOnSkyblock() && ((Object) this) instanceof ItemStack stack) {
 			if (dataComponentType == DataComponentTypes.TRIM) {
-				Object2ObjectOpenHashMap<String, CustomArmorTrims.ArmorTrimId> customTrims = SkyblockerConfigManager.get().general.customArmorTrims;
+				Object2ObjectOpenHashMap<String, CustomArmorTrims.ArmorTrimId> customTrims = SkyblockerConfigManager.config.general.customArmorTrims;
 				String itemUuid = ItemUtils.getItemUuid(stack);
 
 				if (customTrims.containsKey(itemUuid)) {

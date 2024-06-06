@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 object CompactDamage {
 	private val DAMAGE_PATTERN: Pattern = Pattern.compile("[✧✯]?[\\d,]+[✧✯]?❤?")
 	fun compactDamage(entity: ArmorStandEntity) {
-		if (!SkyblockerConfigManager.get().uiAndVisuals.compactDamage.enabled) return
+		if (!SkyblockerConfigManager.config.uiAndVisuals.compactDamage.enabled) return
 		if (!entity.isInvisible || !entity.hasCustomName() || !entity.isCustomNameVisible) return
 		val customName = entity.customName!!
 		val customNameStringified = customName.string
@@ -30,9 +30,9 @@ object CompactDamage {
 			val prettifiedDmg = prettifyDamageNumber(dmg.toLong())
 			val color = if (text.style.color != null) {
 				if (text.style.color === TextColor.fromFormatting(Formatting.GRAY)) {
-					SkyblockerConfigManager.get().uiAndVisuals.compactDamage.normalDamageColor.rgb and 0x00FFFFFF
+					SkyblockerConfigManager.config.uiAndVisuals.compactDamage.normalDamageColor.rgb and 0x00FFFFFF
 				} else text.style.color!!.rgb
-			} else SkyblockerConfigManager.get().uiAndVisuals.compactDamage.normalDamageColor.rgb and 0x00FFFFFF
+			} else SkyblockerConfigManager.config.uiAndVisuals.compactDamage.normalDamageColor.rgb and 0x00FFFFFF
 			prettierCustomName = Text.empty().append(Text.literal(prettifiedDmg).setStyle(customName.style).withColor(color))
 		} else { //Crit damage
 			val wasDoubled = customNameStringified.contains("❤") //Ring of love ability adds a heart to the end of the damage string
@@ -54,8 +54,8 @@ object CompactDamage {
 				prettierCustomName.append(
 					Text.literal(prettifiedDmg.substring(i, i + 1)).withColor(
 						CustomArmorAnimatedDyes.interpolate(
-							SkyblockerConfigManager.get().uiAndVisuals.compactDamage.critDamageGradientStart.rgb and 0x00FFFFFF,
-							SkyblockerConfigManager.get().uiAndVisuals.compactDamage.critDamageGradientEnd.rgb and 0x00FFFFFF,
+							SkyblockerConfigManager.config.uiAndVisuals.compactDamage.critDamageGradientStart.rgb and 0x00FFFFFF,
+							SkyblockerConfigManager.config.uiAndVisuals.compactDamage.critDamageGradientEnd.rgb and 0x00FFFFFF,
 							i / (length - 1.0)
 						)
 					)
@@ -78,5 +78,5 @@ object CompactDamage {
 		return format(damage / 1000000000000.0) + "T" //This will probably never be reached
 	}
 
-	private fun format(number: Double) = "%.${SkyblockerConfigManager.get().uiAndVisuals.compactDamage.precision}f".format(number)
+	private fun format(number: Double) = "%.${SkyblockerConfigManager.config.uiAndVisuals.compactDamage.precision}f".format(number)
 }

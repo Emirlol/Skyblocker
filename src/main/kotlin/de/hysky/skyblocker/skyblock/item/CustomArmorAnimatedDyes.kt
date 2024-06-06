@@ -72,7 +72,7 @@ object CustomArmorAnimatedDyes {
 				val itemUuid = getItemUuid(heldItem)
 
 				if (!itemUuid.isEmpty()) {
-					val customAnimatedDyes = SkyblockerConfigManager.get().general.customAnimatedDyes
+					val customAnimatedDyes = SkyblockerConfigManager.config.general.customAnimatedDyes
 
 					if (hex1 == null && hex2 == null) {
 						if (customAnimatedDyes.containsKey(itemUuid)) {

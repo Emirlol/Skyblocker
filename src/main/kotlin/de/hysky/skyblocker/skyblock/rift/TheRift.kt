@@ -26,9 +26,9 @@ object TheRift {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(ClientStopping { obj: MinecraftClient? -> EnigmaSouls.save() })
 		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { obj: Text?, text: Boolean -> EnigmaSouls.onMessage(text) })
 		ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { obj: CommandDispatcher<FabricClientCommandSource?>?, dispatcher: CommandRegistryAccess? -> EnigmaSouls.registerCommands(dispatcher) })
-		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: EffigyWaypoints? -> EffigyWaypoints.updateEffigies() }, SkyblockerConfigManager.get().slayers.vampireSlayer.effigyUpdateFrequency)
-		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: TwinClawsIndicator? -> TwinClawsIndicator.updateIce() }, SkyblockerConfigManager.get().slayers.vampireSlayer.holyIceUpdateFrequency)
-		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: ManiaIndicator? -> ManiaIndicator.updateMania() }, SkyblockerConfigManager.get().slayers.vampireSlayer.maniaUpdateFrequency)
-		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: StakeIndicator? -> StakeIndicator.updateStake() }, SkyblockerConfigManager.get().slayers.vampireSlayer.steakStakeUpdateFrequency)
+		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: EffigyWaypoints? -> EffigyWaypoints.updateEffigies() }, SkyblockerConfigManager.config.slayers.vampireSlayer.effigyUpdateFrequency)
+		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: TwinClawsIndicator? -> TwinClawsIndicator.updateIce() }, SkyblockerConfigManager.config.slayers.vampireSlayer.holyIceUpdateFrequency)
+		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: ManiaIndicator? -> ManiaIndicator.updateMania() }, SkyblockerConfigManager.config.slayers.vampireSlayer.maniaUpdateFrequency)
+		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: StakeIndicator? -> StakeIndicator.updateStake() }, SkyblockerConfigManager.config.slayers.vampireSlayer.steakStakeUpdateFrequency)
 	}
 }

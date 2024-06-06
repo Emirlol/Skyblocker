@@ -30,7 +30,7 @@ object CommissionLabels {
 	 * @param completed      if there is a commission completed
 	 */
 	fun update(newCommissions: List<String>, completed: Boolean) {
-		val currentMode = SkyblockerConfigManager.get().mining.commissionWaypoints.mode
+		val currentMode = SkyblockerConfigManager.config.mining.commissionWaypoints.mode
 		if (currentMode == CommissionWaypointMode.OFF) {
 			return
 		}
@@ -52,7 +52,7 @@ object CommissionLabels {
 				}
 			}
 			//add base waypoint if enabled
-			if (SkyblockerConfigManager.get().mining.commissionWaypoints.showBaseCamp) {
+			if (SkyblockerConfigManager.config.mining.commissionWaypoints.showBaseCamp) {
 				activeWaypoints.add(MiningLocationLabel(GlaciteCategory.CAMPFIRE, GlaciteCategory.CAMPFIRE.locations[0]))
 			}
 			return
@@ -71,7 +71,7 @@ object CommissionLabels {
 			}
 		}
 		//if there is a commission completed and enabled show emissary
-		if (SkyblockerConfigManager.get().mining.commissionWaypoints.showEmissary && completed) {
+		if (SkyblockerConfigManager.config.mining.commissionWaypoints.showEmissary && completed) {
 			for (emissaries in DWARVEN_EMISSARIES) {
 				activeWaypoints.add(MiningLocationLabel(emissaries, emissaries.location))
 			}
@@ -84,7 +84,7 @@ object CommissionLabels {
 	 * @param context render context
 	 */
 	private fun render(context: WorldRenderContext) {
-		if (!isInDwarvenMines || SkyblockerConfigManager.get().mining.commissionWaypoints.mode == CommissionWaypointMode.OFF) {
+		if (!isInDwarvenMines || SkyblockerConfigManager.config.mining.commissionWaypoints.mode == CommissionWaypointMode.OFF) {
 			return
 		}
 		for (MiningLocationLabel in activeWaypoints) {

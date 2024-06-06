@@ -29,7 +29,7 @@ object EffigyWaypoints {
 	private val UNBROKEN_EFFIGIES: MutableList<BlockPos> = ArrayList()
 
 	fun updateEffigies() {
-		if (!SkyblockerConfigManager.get().slayers.vampireSlayer.enableEffigyWaypoints || !isOnSkyblock || !isInTheRift || !islandArea.contains("Stillgore Château")) return
+		if (!SkyblockerConfigManager.config.slayers.vampireSlayer.enableEffigyWaypoints || !isOnSkyblock || !isInTheRift || !islandArea.contains("Stillgore Château")) return
 
 		UNBROKEN_EFFIGIES.clear()
 
@@ -56,10 +56,10 @@ object EffigyWaypoints {
 	}
 
 	fun render(context: WorldRenderContext?) {
-		if (SkyblockerConfigManager.get().slayers.vampireSlayer.enableEffigyWaypoints && islandArea.contains("Stillgore Château")) {
+		if (SkyblockerConfigManager.config.slayers.vampireSlayer.enableEffigyWaypoints && islandArea.contains("Stillgore Château")) {
 			for (effigy in UNBROKEN_EFFIGIES) {
 				val colorComponents = DyeColor.RED.colorComponents
-				if (SkyblockerConfigManager.get().slayers.vampireSlayer.compactEffigyWaypoints) {
+				if (SkyblockerConfigManager.config.slayers.vampireSlayer.compactEffigyWaypoints) {
 					renderFilledWithBeaconBeam(context!!, effigy.down(6), colorComponents, 0.5f, true)
 				} else {
 					renderFilledWithBeaconBeam(context!!, effigy, colorComponents, 0.5f, true)

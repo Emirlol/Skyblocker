@@ -48,7 +48,7 @@ object BeaconHighlighter {
 	 * @param context An instance of WorldRenderContext for the RenderHelper to use
 	 */
 	private fun render(context: WorldRenderContext) {
-		if (isInTheEnd && SkyblockerConfigManager.get().slayers.endermanSlayer.highlightBeacons) {
+		if (isInTheEnd && SkyblockerConfigManager.config.slayers.endermanSlayer.highlightBeacons) {
 			for (pos in beaconPositions) {
 				renderFilled(context, pos, RED_COLOR_COMPONENTS, 0.5f, true)
 			}

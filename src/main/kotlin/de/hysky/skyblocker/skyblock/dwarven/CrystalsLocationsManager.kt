@@ -61,7 +61,7 @@ object CrystalsLocationsManager {
 	}
 
 	private fun extractLocationFromMessage(message: Text, overlay: Boolean) {
-		if (!SkyblockerConfigManager.get().mining.crystalsWaypoints.findInChat || !isInCrystalHollows) {
+		if (!SkyblockerConfigManager.config.mining.crystalsWaypoints.findInChat || !isInCrystalHollows) {
 			return
 		}
 
@@ -187,7 +187,7 @@ object CrystalsLocationsManager {
 	}
 
 	fun render(context: WorldRenderContext?) {
-		if (SkyblockerConfigManager.get().mining.crystalsWaypoints.enabled) {
+		if (SkyblockerConfigManager.config.mining.crystalsWaypoints.enabled) {
 			for (crystalsWaypoint in activeWaypoints.values) {
 				if (crystalsWaypoint.shouldRender()) {
 					crystalsWaypoint.render(context)
@@ -201,7 +201,7 @@ object CrystalsLocationsManager {
 	}
 
 	fun update() {
-		if (CLIENT.player == null || CLIENT.networkHandler == null || !SkyblockerConfigManager.get().mining.crystalsWaypoints.enabled || !isInCrystalHollows) {
+		if (CLIENT.player == null || CLIENT.networkHandler == null || !SkyblockerConfigManager.config.mining.crystalsWaypoints.enabled || !isInCrystalHollows) {
 			return
 		}
 

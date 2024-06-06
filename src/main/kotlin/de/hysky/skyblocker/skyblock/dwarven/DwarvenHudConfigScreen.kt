@@ -15,7 +15,7 @@ import net.minecraft.text.Text
 
 class DwarvenHudConfigScreen @JvmOverloads constructor(parent: Screen? = null) : HudConfigScreen(Text.literal("Dwarven HUD Config"), parent, java.util.List.of(HudCommsWidget.INSTANCE_CFG, HudPowderWidget.INSTANCE_CFG)) {
 	init {
-		if (SkyblockerConfigManager.get().mining.dwarvenHud.style == DwarvenHudStyle.CLASSIC) {
+		if (SkyblockerConfigManager.config.mining.dwarvenHud.style == DwarvenHudStyle.CLASSIC) {
 			HudCommsWidget.INSTANCE_CFG.width = 200
 			HudCommsWidget.INSTANCE_CFG.height = 20 * CFG_COMMS.size
 			HudPowderWidget.INSTANCE_CFG.width = 200

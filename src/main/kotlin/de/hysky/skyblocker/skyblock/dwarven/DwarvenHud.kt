@@ -1,27 +1,23 @@
 package de.hysky.skyblocker.skyblock.dwarven
 
-import com.mojang.brigadier.CommandDispatcher
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.config.configs.MiningConfig.DwarvenHudStyle
 import de.hysky.skyblocker.events.HudRenderEvents
-import de.hysky.skyblocker.events.HudRenderEvents.HudRenderStage
 import de.hysky.skyblocker.mixins.accessors.PlayerListHudAccessor
 import de.hysky.skyblocker.skyblock.tabhud.util.Colors.pcntToCol
 import de.hysky.skyblocker.skyblock.tabhud.widget.hud.HudCommsWidget
 import de.hysky.skyblocker.skyblock.tabhud.widget.hud.HudPowderWidget
 import de.hysky.skyblocker.utils.Utils.isInCrystalHollows
 import de.hysky.skyblocker.utils.Utils.isInDwarvenMines
-import de.hysky.skyblocker.utils.scheduler.Scheduler.Companion.queueOpenScreenCommand
+import de.hysky.skyblocker.utils.scheduler.Scheduler
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
-import java.util.stream.Stream
 
 object DwarvenHud {
 	private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
@@ -31,7 +27,8 @@ object DwarvenHud {
 	var gemStonePowder: String = "0"
 	var glacitePowder: String = "0"
 
-	private val COMMISSIONS: List<Pattern> = Stream.of(
+	@Language("RegExp")
+	private val COMMISSIONS: List<Pattern> = sequenceOf(
 		"(?:Titanium|Mithril|Hard Stone) Miner",
 		"(?:Glacite Walker|Golden Goblin|(?<!Golden )Goblin|Goblin Raid|Treasure Hoarder|Automaton|Sludge|Team Treasurite Member|Yog|Boss Corleone|Thyst|Maniac|Mines) Slayer",
 		"(?:Lava Springs|Cliffside Veins|Rampart's Quarry|Upper Mines|Royal Mines) Mithril",
@@ -47,26 +44,26 @@ object DwarvenHud {
 		"(?:Umber|Tungsten|Glacite|Scrap) Collector",
 		"Mineshaft Explorer",
 		"(?:Chest|Corpse) Looter"
-	).map { s: String -> Pattern.compile("($s): (\\d+\\.?\\d*%|DONE)") }.toList()
+	).map { Pattern.compile("($it): (\\d+\\.?\\d*%|DONE)") }.toList()
 	private val MITHRIL_PATTERN: Pattern = Pattern.compile("Mithril: [0-9,]+")
 	private val GEMSTONE_PATTERN: Pattern = Pattern.compile("Gemstone: [0-9,]+")
 	private val GLACITE_PATTERN: Pattern = Pattern.compile("Glacite: [0-9,]+")
 
 	fun init() {
-		ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher: CommandDispatcher<FabricClientCommandSource?>, registryAccess: CommandRegistryAccess? ->
+		ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
 			dispatcher.register(
 				ClientCommandManager.literal("skyblocker")
 					.then(
 						ClientCommandManager.literal("hud")
 							.then(
 								ClientCommandManager.literal("dwarven")
-									.executes(queueOpenScreenCommand { DwarvenHudConfigScreen() })
+									.executes(Scheduler.queueOpenScreenCommand { DwarvenHudConfigScreen() })
 							)
 					)
 			)
-		})
+		}
 
-		HudRenderEvents.AFTER_MAIN_HUD.register(HudRenderStage { context: DrawContext, tickDelta: Float ->
+		HudRenderEvents.AFTER_MAIN_HUD.register{ context: DrawContext, _ ->
 			if (!SkyblockerConfigManager.config.mining.dwarvenHud.enabledCommissions && !SkyblockerConfigManager.config.mining.dwarvenHud.enabledPowder || CLIENT.options.playerListKey.isPressed || CLIENT.player == null || (!isInDwarvenMines && !isInCrystalHollows)) {
 				return@register
 			}
@@ -78,7 +75,7 @@ object DwarvenHud {
 				SkyblockerConfigManager.config.mining.dwarvenHud.powderY,
 				commissionList
 			)
-		})
+		}
 	}
 
 	fun render(hcw: HudCommsWidget, hpw: HudPowderWidget, context: DrawContext, comHudX: Int, comHudY: Int, powderHudX: Int, powderHudY: Int, commissions: List<Commission>) {
@@ -107,17 +104,12 @@ object DwarvenHud {
 		if (SkyblockerConfigManager.config.mining.dwarvenHud.enabledCommissions) {
 			var y = 0
 			for ((commission1, progression) in commissions) {
-				var percentage = if (!progression.contains("DONE")) {
-					progression.substring(0, progression.length - 1).toFloat()
-				} else {
-					100f
-				}
+				val percentage = if (!progression.contains("DONE")) progression.substring(0, progression.length - 1).toFloat() else 100f
 
 				context.drawTextWithShadow(
 					CLIENT.textRenderer,
-					Text.literal("$commission1: ").formatted(Formatting.AQUA).append(
-						Text.literal(progression).withColor(pcntToCol(percentage))
-					),
+					Text.literal("$commission1: ").formatted(Formatting.AQUA)
+						.append(Text.literal(progression).withColor(pcntToCol(percentage))),
 					comHudX + 5, comHudY + y + 5, -0x1
 				)
 				y += 20
@@ -127,12 +119,12 @@ object DwarvenHud {
 			//render mithril powder then gemstone
 			context.drawTextWithShadow(
 				CLIENT.textRenderer,
-				Text.literal("Mithril: " + mithrilPowder).formatted(Formatting.AQUA),
+				Text.literal("Mithril: $mithrilPowder").formatted(Formatting.AQUA),
 				powderHudX + 5, powderHudY + 5, -0x1
 			)
 			context.drawTextWithShadow(
 				CLIENT.textRenderer,
-				Text.literal("Gemstone: " + gemStonePowder).formatted(Formatting.DARK_PURPLE),
+				Text.literal("Gemstone: $gemStonePowder").formatted(Formatting.DARK_PURPLE),
 				powderHudX + 5, powderHudY + 25, -0x1
 			)
 		}
@@ -174,43 +166,41 @@ object DwarvenHud {
 		if (CLIENT.player == null || CLIENT.networkHandler == null || !SkyblockerConfigManager.config.mining.dwarvenHud.enabledCommissions && !SkyblockerConfigManager.config.mining.dwarvenHud.enabledPowder || !isInCrystalHollows && !isInDwarvenMines) {
 			return
 		}
-		val oldCommissionNames = commissionList.stream().map(Commission::commission).toList()
-		val oldCompleted = commissionList.stream().anyMatch { commission: Commission -> commission.progression == "DONE" }
+		val oldCommissionNames = commissionList.map(Commission::commission)
+		val oldCompleted = commissionList.any { it.progression == "DONE" }
 		commissionList = ArrayList()
-		for (playerListEntry in CLIENT.networkHandler!!.playerList.stream().sorted(PlayerListHudAccessor.getOrdering()).toList()) {
-			if (playerListEntry.displayName == null) {
-				continue
-			}
+		for (playerListEntry in CLIENT.networkHandler!!.playerList.asSequence().sortedWith(PlayerListHudAccessor.getOrdering())) {
+			playerListEntry.displayName ?: continue
+
 			//find commissions
 			val name = playerListEntry.displayName!!.string.trim()
 			for (pattern in COMMISSIONS) {
 				val matcher = pattern.matcher(name)
 				if (matcher.matches()) {
-					commissionList.add(Commission(matcher.group(1), matcher.group(2)))
+					commissionList += Commission(matcher.group(1), matcher.group(2))
 				}
 			}
 			//find powder
 			val mithrilMatcher = MITHRIL_PATTERN.matcher(name)
 			if (mithrilMatcher.matches()) {
-				mithrilPowder = mithrilMatcher.group(0).split(": ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+				mithrilPowder = mithrilMatcher.group(0).split(": ").dropLastWhile { it.isEmpty() }[1]
 			}
 			val gemstoneMatcher = GEMSTONE_PATTERN.matcher(name)
 			if (gemstoneMatcher.matches()) {
-				gemStonePowder = gemstoneMatcher.group(0).split(": ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+				gemStonePowder = gemstoneMatcher.group(0).split(": ").dropLastWhile { it.isEmpty() }[1]
 			}
 			val glaciteMatcher = GLACITE_PATTERN.matcher(name)
 			if (glaciteMatcher.matches()) {
-				glacitePowder = glaciteMatcher.group(0).split(": ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+				glacitePowder = glaciteMatcher.group(0).split(": ").dropLastWhile { it.isEmpty() }[1]
 			}
 		}
-		val newCommissionNames = commissionList.stream().map(Commission::commission).toList()
-		val newCompleted = commissionList.stream().anyMatch { commission: Commission -> commission.progression == "DONE" }
+		val newCommissionNames = commissionList.map(Commission::commission)
+		val newCompleted = commissionList.any { it.progression == "DONE" }
 		if (oldCommissionNames != newCommissionNames || oldCompleted != newCompleted) {
 			CommissionLabels.update(newCommissionNames, newCompleted)
 		}
 	}
 
 	// steamroller tactics to get visibility from outside classes (HudCommsWidget)
-	@JvmRecord
 	data class Commission(val commission: String, val progression: String)
 }

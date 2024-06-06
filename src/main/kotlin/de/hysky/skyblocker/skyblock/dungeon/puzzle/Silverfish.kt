@@ -160,10 +160,10 @@ class Silverfish private constructor() : DungeonPuzzle("silverfish", "ice-silver
 				ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher: CommandDispatcher<FabricClientCommandSource?>, registryAccess: CommandRegistryAccess? ->
 					dispatcher.register(ClientCommandManager.literal(SkyblockerMod.NAMESPACE).then(ClientCommandManager.literal("dungeons").then(ClientCommandManager.literal("puzzle").then(ClientCommandManager.literal(INSTANCE.puzzleName)
 						.then(ClientCommandManager.literal("printBoard").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(boardToString(INSTANCE.silverfishBoard)))
+							context.source.sendFeedback(Constants.PREFIX.append(boardToString(INSTANCE.silverfishBoard)))
 							Command.SINGLE_SUCCESS
 						}).then(ClientCommandManager.literal("printPath").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(INSTANCE.silverfishPath.toString()))
+							context.source.sendFeedback(Constants.PREFIX.append(INSTANCE.silverfishPath.toString()))
 							Command.SINGLE_SUCCESS
 						})
 					)

@@ -12,19 +12,17 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import java.awt.Color
-import java.util.function.Predicate
-import java.util.function.Supplier
-import java.util.function.ToDoubleFunction
 
-class CrystalsWaypoint internal constructor(val category: Category?, val name: Text, pos: BlockPos) : Waypoint(pos, TYPE_SUPPLIER, category!!.colorComponents) {
+class CrystalsWaypoint internal constructor(val category: Category, val name: Text, pos: BlockPos) : Waypoint(pos, SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType, category.colorComponents) {
 	private val centerPos: Vec3d = pos.toCenterPos()
 
-	override fun shouldRender(): Boolean {
-		return super.shouldRender()
-	}
+	override fun equals(other: Any?) = super.equals(other) || other is CrystalsWaypoint && category == other.category && name == other.name && pos == other.pos
 
-	override fun equals(obj: Any?): Boolean {
-		return super.equals(obj) || obj is CrystalsWaypoint && category == obj.category && name == obj.name && pos == obj.pos
+	override fun hashCode(): Int {
+		var result = category.hashCode()
+		result = 31 * result + name.hashCode()
+		result = 31 * result + centerPos.hashCode()
+		return result
 	}
 
 	/**
@@ -40,9 +38,9 @@ class CrystalsWaypoint internal constructor(val category: Category?, val name: T
 	}
 
 	/**
-	 * enum for the different waypoints used int the crystals hud each with a [name] and associated [color]
+	 * Enum for the different waypoints used in the crystals HUD, each with a [categoryName] and associated [color]
 	 */
-	enum class Category(override val name: String, val color: Color) {
+	enum class Category(private val categoryName: String, val color: Color) {
 		JUNGLE_TEMPLE("Jungle Temple", Color(DyeColor.PURPLE.signColor)),
 		MINES_OF_DIVAN("Mines of Divan", Color.GREEN),
 		GOBLIN_QUEENS_DEN("Goblin Queen's Den", Color(DyeColor.ORANGE.signColor)),
@@ -57,20 +55,12 @@ class CrystalsWaypoint internal constructor(val category: Category?, val name: T
 
 		val colorComponents: FloatArray = color.getColorComponents(null)
 
-		override fun toString(): String {
-			return name
-		}
+		override fun toString()= categoryName
+
 	}
 
 	companion object {
-		private val CONFIG = Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints }
-		private val TYPE_SUPPLIER = Supplier { CONFIG.get().waypointType }
-		fun getSquaredDistanceToFunction(entity: Entity): ToDoubleFunction<CrystalsWaypoint> {
-			return ToDoubleFunction { crystalsWaypoint: CrystalsWaypoint -> entity.squaredDistanceTo(crystalsWaypoint.centerPos) }
-		}
-
-		fun getRangePredicate(entity: Entity): Predicate<CrystalsWaypoint> {
-			return Predicate { crystalsWaypoint: CrystalsWaypoint -> entity.squaredDistanceTo(crystalsWaypoint.centerPos) <= 36.0 }
-		}
+		fun getSquaredDistanceToFunction(entity: Entity): (CrystalsWaypoint) -> Double = { crystalsWaypoint: CrystalsWaypoint -> entity.squaredDistanceTo(crystalsWaypoint.centerPos) }
+		fun getRangePredicate(entity: Entity): (CrystalsWaypoint) -> Boolean = { crystalsWaypoint: CrystalsWaypoint -> entity.squaredDistanceTo(crystalsWaypoint.centerPos) <= 36.0 }
 	}
 }

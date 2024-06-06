@@ -60,7 +60,7 @@ object CustomArmorAnimatedDyes {
 
 	private fun customizeAnimatedDye(source: FabricClientCommandSource, hex1: String?, hex2: String?, samples: Int, cycleBack: Boolean, tickDelay: Int): Int {
 		if (hex1 != null && hex2 != null && (!CustomArmorDyeColors.isHexadecimalColor(hex1) || !CustomArmorDyeColors.isHexadecimalColor(hex2))) {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.invalidHex")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.invalidHex")))
 
 			return Command.SINGLE_SUCCESS
 		}
@@ -78,25 +78,25 @@ object CustomArmorAnimatedDyes {
 						if (customAnimatedDyes.containsKey(itemUuid)) {
 							customAnimatedDyes.remove(itemUuid)
 							SkyblockerConfigManager.save()
-							source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.removed")))
+							source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.removed")))
 						} else {
-							source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.neverHad")))
+							source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.neverHad")))
 						}
 					} else {
 						val animatedDye = AnimatedDye(Integer.decode("0x" + hex1!!.replace("#", "")), Integer.decode("0x" + hex2!!.replace("#", "")), samples, cycleBack, tickDelay)
 
 						customAnimatedDyes[itemUuid] = animatedDye
 						SkyblockerConfigManager.save()
-						source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.added")))
+						source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.added")))
 					}
 				} else {
-					source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.noItemUuid")))
+					source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.noItemUuid")))
 				}
 			} else {
-				source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.notDyeable")))
+				source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.notDyeable")))
 			}
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customAnimatedDyes.unableToSetDye")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customAnimatedDyes.unableToSetDye")))
 		}
 
 		return Command.SINGLE_SUCCESS

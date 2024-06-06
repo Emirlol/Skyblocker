@@ -53,7 +53,7 @@ object QuickNav {
 		} catch (e: PatternSyntaxException) {
 			LOGGER.error("[Skyblocker] Failed to parse Quick Nav Button with regex: {}", buttonInfo.uiTitle, e)
 			val player = MinecraftClient.getInstance().player
-			player?.sendMessage(Constants.PREFIX.get().append(Text.literal("Invalid regex in Quick Nav Button " + (id + 1) + "!").formatted(Formatting.RED)), false)
+			player?.sendMessage(Constants.PREFIX.append(Text.literal("Invalid regex in Quick Nav Button " + (id + 1) + "!").formatted(Formatting.RED)), false)
 		}
 		return QuickNavButton(id, uiTitleMatches, buttonInfo.clickEvent, stack)
 	}

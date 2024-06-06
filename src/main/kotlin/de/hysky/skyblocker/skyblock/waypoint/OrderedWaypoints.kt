@@ -151,7 +151,7 @@ object OrderedWaypoints {
 		SEMAPHORE.acquireUninterruptibly()
 
 		if (hex != null && !CustomArmorDyeColors.isHexadecimalColor(hex)) {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.add.invalidHexColor")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.add.invalidHexColor")))
 			SEMAPHORE.release()
 
 			return Command.SINGLE_SUCCESS
@@ -168,11 +168,11 @@ object OrderedWaypoints {
 
 			group.waypoints.add(indexToAddAt, waypoint)
 			INDEX_STORE.removeInt(group.name)
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.addAt.success", group.name, indexToAddAt)))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.addAt.success", group.name, indexToAddAt)))
 		} else {
 			group.waypoints.add(waypoint)
 			INDEX_STORE.removeInt(group.name)
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.add.success", group.name, pos.toShortString())))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.add.success", group.name, pos.toShortString())))
 		}
 
 		SEMAPHORE.release()
@@ -186,9 +186,9 @@ object OrderedWaypoints {
 			WAYPOINTS.remove(groupName)
 			INDEX_STORE.removeInt(groupName)
 			SEMAPHORE.release()
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.removeGroup.success", groupName)))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.removeGroup.success", groupName)))
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.groupNonExistent", groupName)))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.groupNonExistent", groupName)))
 		}
 
 		return Command.SINGLE_SUCCESS
@@ -204,7 +204,7 @@ object OrderedWaypoints {
 
 				group!!.waypoints.removeIf { waypoint: OrderedWaypoint -> waypoint.getPos() == pos }
 				INDEX_STORE.removeInt(group.name)
-				source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.remove.success", pos.toShortString(), group.name)))
+				source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.remove.success", pos.toShortString(), group.name)))
 			}
 
 			if (index != Int.MIN_VALUE) {
@@ -212,12 +212,12 @@ object OrderedWaypoints {
 
 				group.waypoints.removeAt(indexToRemove)
 				INDEX_STORE.removeInt(group.name)
-				source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.removeAt.success", indexToRemove, group.name)))
+				source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.removeAt.success", indexToRemove, group.name)))
 			}
 
 			SEMAPHORE.release()
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.groupNonExistent", groupName)))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.groupNonExistent", groupName)))
 		}
 
 		return Command.SINGLE_SUCCESS
@@ -228,16 +228,16 @@ object OrderedWaypoints {
 			SEMAPHORE.acquireUninterruptibly()
 			WAYPOINTS[groupName] = WAYPOINTS[groupName]!!.toggle()
 			SEMAPHORE.release()
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.toggle.success", groupName)))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.toggle.success", groupName)))
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.groupNonExistent", groupName)))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.groupNonExistent", groupName)))
 		}
 
 		return Command.SINGLE_SUCCESS
 	}
 
 	private fun showAll(source: FabricClientCommandSource): Int {
-		source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.showAll")))
+		source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.showAll")))
 		showAll = !showAll
 
 		return Command.SINGLE_SUCCESS
@@ -326,10 +326,10 @@ object OrderedWaypoints {
 			val exportCode = PREFIX + encoded
 
 			MinecraftClient.getInstance().keyboard.clipboard = exportCode
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.export.success")))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.export.success")))
 		} catch (e: Exception) {
 			LOGGER.error("[Skyblocker Ordered Waypoints] Failed to export waypoints!", e)
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.export.fail")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.export.fail")))
 		}
 
 		return Command.SINGLE_SUCCESS
@@ -349,14 +349,14 @@ object OrderedWaypoints {
 
 				SEMAPHORE.acquireUninterruptibly()
 				WAYPOINTS.putAll(importedWaypoints)
-				source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.import.skyblocker.success")))
+				source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.import.skyblocker.success")))
 				SEMAPHORE.release()
 			} else {
-				source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.import.skyblocker.unknownFormatHeader")))
+				source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.import.skyblocker.unknownFormatHeader")))
 			}
 		} catch (e: Exception) {
 			LOGGER.error("[Skyblocker Ordered Waypoints] Failed to import waypoints!", e)
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.import.skyblocker.fail")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.import.skyblocker.fail")))
 		}
 
 		return Command.SINGLE_SUCCESS
@@ -365,7 +365,7 @@ object OrderedWaypoints {
 	private fun fromColeWeightFormat(source: FabricClientCommandSource, groupName: String): Int {
 		try {
 			if (WAYPOINTS.containsKey(groupName)) {
-				source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.import.coleWeight.groupAlreadyExists", groupName)))
+				source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.import.coleWeight.groupAlreadyExists", groupName)))
 
 				return Command.SINGLE_SUCCESS
 			}
@@ -385,11 +385,11 @@ object OrderedWaypoints {
 
 			SEMAPHORE.acquireUninterruptibly()
 			WAYPOINTS[groupName] = OrderedWaypointGroup(groupName, true, convertedWaypoints)
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.import.coleWeight.success")))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.import.coleWeight.success")))
 			SEMAPHORE.release()
 		} catch (e: Exception) {
 			LOGGER.error("[Skyblocker Ordered Waypoints] Failed to import waypoints from the Cole Weight format!", e)
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.waypoints.ordered.import.coleWeight.fail")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.waypoints.ordered.import.coleWeight.fail")))
 		}
 
 		return Command.SINGLE_SUCCESS

@@ -1,59 +1,49 @@
 package de.hysky.skyblocker.skyblock.dwarven
 
-import com.mojang.brigadier.CommandDispatcher
 import de.hysky.skyblocker.SkyblockerMod
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.events.HudRenderEvents
-import de.hysky.skyblocker.events.HudRenderEvents.HudRenderStage
 import de.hysky.skyblocker.utils.Utils.isInCrystalHollows
-import de.hysky.skyblocker.utils.scheduler.Scheduler.Companion.queueOpenScreenCommand
+import de.hysky.skyblocker.utils.scheduler.Scheduler
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.RotationAxis
 import org.joml.Vector2i
 import org.joml.Vector2ic
 
 object CrystalsHud {
-	private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
-	val MAP_TEXTURE: Identifier = Identifier(SkyblockerMod.NAMESPACE, "textures/gui/crystals_map.png")
+	val MAP_TEXTURE = Identifier(SkyblockerMod.NAMESPACE, "textures/gui/crystals_map.png")
 	private val MAP_ICON = Identifier("textures/map/decorations/player.png")
 	private val SMALL_LOCATIONS = listOf("Fairy Grotto", "King Yolkar", "Corleone", "Odawa", "Key Guardian")
-
-
+	private val CLIENT = MinecraftClient.getInstance()
 	var visible: Boolean = false
 
-	fun init() {
-		ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher: CommandDispatcher<FabricClientCommandSource?>, registryAccess: CommandRegistryAccess? ->
+	init {
+		ClientCommandRegistrationCallback.EVENT.register{ dispatcher, _ ->
 			dispatcher.register(
 				ClientCommandManager.literal("skyblocker")
 					.then(
 						ClientCommandManager.literal("hud")
 							.then(ClientCommandManager.literal("crystals")
-								.executes(queueOpenScreenCommand { CrystalsHudConfigScreen() })
+								.executes(Scheduler.queueOpenScreenCommand { CrystalsHudConfigScreen() })
 							)
 					)
 			)
-		})
+		}
 
-		HudRenderEvents.AFTER_MAIN_HUD.register(HudRenderStage { context: DrawContext, tickDelta: Float ->
+		HudRenderEvents.AFTER_MAIN_HUD.register{ context, tickDelta ->
 			if (!SkyblockerConfigManager.config.mining.crystalsHud.enabled || CLIENT.player == null || !visible) {
 				return@register
 			}
-			render(
-				context, tickDelta, SkyblockerConfigManager.config.mining.crystalsHud.x,
-				SkyblockerConfigManager.config.mining.crystalsHud.y
-			)
-		})
+			render(context, tickDelta, SkyblockerConfigManager.config.mining.crystalsHud.x, SkyblockerConfigManager.config.mining.crystalsHud.y)
+		}
 	}
 
 	val dimensionsForConfig: Int
 		get() = (62 * SkyblockerConfigManager.config.mining.crystalsHud.mapScaling).toInt()
-
 
 	/**
 	 * Renders the map to the players UI. renders the background image ([CrystalsHud.MAP_TEXTURE]) of the map then if enabled special locations on the map. then finally the player to the map.
@@ -80,9 +70,9 @@ object CrystalsHud {
 		if (SkyblockerConfigManager.config.mining.crystalsHud.showLocations) {
 			val ActiveWaypoints = CrystalsLocationsManager.activeWaypoints
 
-			for (waypoint in ActiveWaypoints!!.values) {
-				val waypointColor = waypoint!!.category!!.color
-				val renderPos = transformLocation(waypoint.pos!!.x.toDouble(), waypoint.pos!!.z.toDouble())
+			for (waypoint in ActiveWaypoints.values) {
+				val waypointColor = waypoint.category!!.color
+				val renderPos = transformLocation(waypoint.pos.x.toDouble(), waypoint.pos.z.toDouble())
 				var locationSize = SkyblockerConfigManager.config.mining.crystalsHud.locationSize
 
 				if (SMALL_LOCATIONS.contains(waypoint.name.string)) { //if small location half the location size
@@ -95,9 +85,7 @@ object CrystalsHud {
 		}
 
 		//draw player on map
-		if (CLIENT.player == null || CLIENT.networkHandler == null) {
-			return
-		}
+		if (CLIENT.player == null || CLIENT.networkHandler == null) return
 
 		//get player location
 		val playerX = CLIENT.player!!.x
@@ -144,10 +132,8 @@ object CrystalsHud {
 	 * Based off code from [net.minecraft.client.render.MapRenderer]
 	 */
 	private fun yaw2Cardinal(yaw: Float): Float {
-		var yaw = yaw
-		yaw += 180f //flip direction
-		val clipped = ((yaw + (if (yaw < 0.0) -8.0 else 8.0)) * 16.0 / 360.0).toInt().toByte()
-
+							//flip direction
+		val clipped = (yaw + 180f).let { flippedYaw -> ((flippedYaw + (if (flippedYaw < 0.0) -8.0 else 8.0)) * 16.0 / 360.0).toInt().toByte() }
 		return (clipped * 360f) / 16f
 	}
 

@@ -1,23 +1,17 @@
 package de.hysky.skyblocker.skyblock.dungeon
 
-import com.mojang.brigadier.CommandDispatcher
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.events.HudRenderEvents
-import de.hysky.skyblocker.events.HudRenderEvents.HudRenderStage
 import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager
 import de.hysky.skyblocker.utils.Utils.isInDungeons
-import de.hysky.skyblocker.utils.scheduler.Scheduler.Companion.queueOpenScreenCommand
+import de.hysky.skyblocker.utils.scheduler.Scheduler
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.MapIdComponent
 import net.minecraft.item.FilledMapItem
@@ -29,20 +23,20 @@ object DungeonMap {
 	private var cachedMapIdComponent: MapIdComponent? = null
 
 	fun init() {
-		HudRenderEvents.AFTER_MAIN_HUD.register(HudRenderStage { context: DrawContext, tickDelta: Float -> render(context) })
-		ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher: CommandDispatcher<FabricClientCommandSource?>, registryAccess: CommandRegistryAccess? ->
+		HudRenderEvents.AFTER_MAIN_HUD.register { context, _ -> render(context) }
+		ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
 			dispatcher.register(
 				ClientCommandManager.literal("skyblocker")
 					.then(
 						ClientCommandManager.literal("hud")
 							.then(
 								ClientCommandManager.literal("dungeon")
-									.executes(queueOpenScreenCommand { DungeonMapConfigScreen() })
+									.executes(Scheduler.queueOpenScreenCommand { DungeonMapConfigScreen() })
 							)
 					)
 			)
-		})
-		ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler: ClientPlayNetworkHandler?, sender: PacketSender?, client: MinecraftClient? -> reset() })
+		}
+		ClientPlayConnectionEvents.JOIN.register { _, _, _ -> reset() }
 	}
 
 	fun render(matrices: MatrixStack) {
@@ -67,17 +61,15 @@ object DungeonMap {
 		matrices.pop()
 	}
 
-	@JvmStatic
-    fun getMapIdComponent(stack: ItemStack): MapIdComponent? {
-		if (stack.isOf(Items.FILLED_MAP) && stack.contains(DataComponentTypes.MAP_ID)) {
-			val mapIdComponent = stack.get(DataComponentTypes.MAP_ID)
-			cachedMapIdComponent = mapIdComponent
-			return mapIdComponent
-		} else return if (cachedMapIdComponent != null) cachedMapIdComponent else DEFAULT_MAP_ID_COMPONENT
-	}
+	fun getMapIdComponent(stack: ItemStack) = if (stack.isOf(Items.FILLED_MAP) && stack.contains(DataComponentTypes.MAP_ID)) {
+		stack.get(DataComponentTypes.MAP_ID).also {
+			cachedMapIdComponent = it
+		}
+	} else if (cachedMapIdComponent != null) cachedMapIdComponent
+	else DEFAULT_MAP_ID_COMPONENT
 
 	private fun render(context: DrawContext) {
-		if (isInDungeons && DungeonScore.isDungeonStarted() && !DungeonManager.isInBoss() && SkyblockerConfigManager.config.dungeons.dungeonMap.enableMap) {
+		if (isInDungeons && DungeonScore.isDungeonStarted && !DungeonManager.isInBoss && SkyblockerConfigManager.config.dungeons.dungeonMap.enableMap) {
 			render(context.matrices)
 		}
 	}

@@ -2,7 +2,6 @@ package de.hysky.skyblocker.skyblock.dungeon
 
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.events.HudRenderEvents
-import de.hysky.skyblocker.events.HudRenderEvents.HudRenderStage
 import de.hysky.skyblocker.utils.Utils.isInDungeons
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -10,15 +9,15 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 object DungeonScoreHUD {
-	fun init() {
-		HudRenderEvents.AFTER_MAIN_HUD.register(HudRenderStage { context: DrawContext, tickDelta: Float -> render(context) })
+	init {
+		HudRenderEvents.AFTER_MAIN_HUD.register { context, _-> render(context) }
 	}
 
 	//This is 4+5 wide, needed to offset the extra width from bold numbers (3×1 wide) in S+ and the "+" (6 wide) so that it doesn't go off the screen if the score is S+ and the hud element is at the right edge of the screen
 	private val extraSpace: Text = Text.literal(" ").append(Text.literal(" ").formatted(Formatting.BOLD))
 
 	private fun render(context: DrawContext) {
-		if (isInDungeons && DungeonScore.isDungeonStarted() && SkyblockerConfigManager.config.dungeons.dungeonScore.enableScoreHUD) {
+		if (isInDungeons && DungeonScore.isDungeonStarted && SkyblockerConfigManager.config.dungeons.dungeonScore.enableScoreHUD) {
 			val x = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreX
 			val y = SkyblockerConfigManager.config.dungeons.dungeonScore.scoreY
 			render(context, x, y)

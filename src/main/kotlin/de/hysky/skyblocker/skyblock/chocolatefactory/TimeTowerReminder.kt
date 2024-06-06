@@ -54,7 +54,7 @@ object TimeTowerReminder {
 
 	private fun sendMessage() {
 		if (MinecraftClient.getInstance().player == null || !isOnSkyblock) return
-		MinecraftClient.getInstance().player!!.sendMessage(Constants.PREFIX.get().append(Text.literal("Your Chocolate Factory's Time Tower has deactivated!").formatted(Formatting.RED)))
+		MinecraftClient.getInstance().player!!.sendMessage(Constants.PREFIX.append(Text.literal("Your Chocolate Factory's Time Tower has deactivated!").formatted(Formatting.RED)))
 
 		val tempFile = SkyblockerMod.CONFIG_DIR.resolve(TIME_TOWER_FILE).toFile()
 		try {

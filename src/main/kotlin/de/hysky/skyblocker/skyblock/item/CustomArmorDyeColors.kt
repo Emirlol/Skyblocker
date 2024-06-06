@@ -36,7 +36,7 @@ object CustomArmorDyeColors {
 		val heldItem = source.player.mainHandStack
 
 		if (hex != null && !isHexadecimalColor(hex)) {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.invalidHex")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.invalidHex")))
 			return Command.SINGLE_SUCCESS
 		}
 
@@ -51,24 +51,24 @@ object CustomArmorDyeColors {
 						if (customDyeColors.containsKey(itemUuid)) {
 							customDyeColors.removeInt(itemUuid)
 							SkyblockerConfigManager.save()
-							source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.removed")))
+							source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.removed")))
 						} else {
-							source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.neverHad")))
+							source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.neverHad")))
 						}
 					} else {
 						customDyeColors.put(itemUuid, Integer.decode("0x" + hex.replace("#", "")))
 						SkyblockerConfigManager.save()
-						source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.added")))
+						source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.added")))
 					}
 				} else {
-					source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.noItemUuid")))
+					source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.noItemUuid")))
 				}
 			} else {
-				source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.notDyeable")))
+				source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.notDyeable")))
 				return Command.SINGLE_SUCCESS
 			}
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customDyeColors.unableToSetColor")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customDyeColors.unableToSetColor")))
 		}
 
 		return Command.SINGLE_SUCCESS

@@ -2,26 +2,23 @@ package de.hysky.skyblocker.skyblock.dungeon
 
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.events.HudRenderEvents
-import de.hysky.skyblocker.events.HudRenderEvents.HudRenderStage
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 object FireFreezeStaffTimer {
 	private var fireFreezeTimer: Long = 0
 
-	fun init() {
-		HudRenderEvents.BEFORE_CHAT.register(HudRenderStage { obj: DrawContext?, context: Float -> onDraw(context) })
-		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { obj: Text?, text: Boolean -> onChatMessage(text) })
-		ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler: ClientPlayNetworkHandler?, sender: PacketSender?, client: MinecraftClient? -> reset() })
+	init {
+		HudRenderEvents.BEFORE_CHAT.register { context, _ -> onDraw(context) }
+		ClientReceiveMessageEvents.GAME.register(::onChatMessage)
+		ClientPlayConnectionEvents.JOIN.register { _, _, _ -> reset() }
 	}
 
-	private fun onDraw(context: DrawContext, v: Float) {
+	private fun onDraw(context: DrawContext) {
 		val client = MinecraftClient.getInstance()
 
 		if (client.currentScreen != null) return
@@ -54,9 +51,9 @@ object FireFreezeStaffTimer {
 	}
 
 	private fun onChatMessage(text: Text, overlay: Boolean) {
-		if (!overlay && SkyblockerConfigManager.config.dungeons.theProfessor.fireFreezeStaffTimer && (Formatting.strip(text.string)
-					== "[BOSS] The Professor: Oh? You found my Guardians' one weakness?")
-		) {
+		if (!overlay
+			&& SkyblockerConfigManager.config.dungeons.theProfessor.fireFreezeStaffTimer
+			&& (Formatting.strip(text.string) == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?")) {
 			fireFreezeTimer = System.currentTimeMillis() + 5000L
 		}
 	}

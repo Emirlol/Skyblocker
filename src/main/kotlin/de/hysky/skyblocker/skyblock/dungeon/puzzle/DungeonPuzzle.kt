@@ -36,9 +36,9 @@ abstract class DungeonPuzzle(@JvmField protected val puzzleName: String, private
 				if (currentRoom != null) {
 					reset()
 					currentRoom.addSubProcess(this)
-					context.source.sendFeedback(Constants.PREFIX.get().append("§aSolving $puzzleName puzzle in the current room."))
+					context.source.sendFeedback(Constants.PREFIX.append("§aSolving $puzzleName puzzle in the current room."))
 				} else {
-					context.source.sendError(Constants.PREFIX.get().append("§cCurrent room is null."))
+					context.source.sendError(Constants.PREFIX.append("§cCurrent room is null."))
 				}
 				Command.SINGLE_SUCCESS
 			})))))

@@ -30,9 +30,11 @@ import de.hysky.skyblocker.skyblock.garden.FarmingHud
 import de.hysky.skyblocker.skyblock.garden.LowerSensitivity
 import de.hysky.skyblocker.skyblock.garden.VisitorHelper
 import de.hysky.skyblocker.skyblock.item.*
+import de.hysky.skyblocker.skyblock.item.slottext.SlotTextManager
 import de.hysky.skyblocker.skyblock.item.tooltip.AccessoriesHelper
 import de.hysky.skyblocker.skyblock.item.tooltip.BackpackPreview
 import de.hysky.skyblocker.skyblock.item.tooltip.ItemTooltip
+import de.hysky.skyblocker.skyblock.item.tooltip.TooltipManager
 import de.hysky.skyblocker.skyblock.itemlist.ItemRepository
 import de.hysky.skyblocker.skyblock.rift.TheRift
 import de.hysky.skyblocker.skyblock.searchoverlay.SearchOverManager
@@ -74,7 +76,7 @@ object SkyblockerMod {
 	val SKYBLOCKER_MOD: ModContainer = FabricLoader.getInstance().getModContainer(NAMESPACE).getOrNull() ?: error("Mod container not found")
 	val VERSION: String = SKYBLOCKER_MOD.metadata.version.friendlyString
 	val CONFIG_DIR: Path = FabricLoader.getInstance().configDir.resolve(NAMESPACE)
-	val GSON: Gson = GsonBuilder().setPrettyPrinting().create()
+	public val GSON: Gson = GsonBuilder().setPrettyPrinting().create()
 	val GSON_COMPACT: Gson = GsonBuilder().create()
 	val statusBarTracker = StatusBarTracker()
 	val globalJob = MainScope() + CoroutineName("Skyblocker")
@@ -97,26 +99,26 @@ object SkyblockerMod {
 		ImageRepoLoader.init()
 		ItemRepository.init()
 		PlayerHeadHashCache.init()
-		HotbarSlotLock.init()
+		HotbarSlotLock
 		ItemTooltip.init()
 		AccessoriesHelper.init()
-		WikiLookup.init()
+		WikiLookup
 		FairySouls.init()
 		Relics.init()
 		MythologicalRitual.init()
 		EnderNodes.init()
 		OrderedWaypoints.init()
 		BackpackPreview.init()
-		ItemCooldowns.init()
+		ItemCooldowns
 		TabHud.init()
 		GlaciteColdOverlay.init()
 		DwarvenHud.init()
-		CommissionLabels.init()
-		CrystalsHud.init()
+		CommissionLabels
+		CrystalsHud
 		FarmingHud.init()
 		LowerSensitivity.init()
 		CrystalsLocationsManager.init()
-		MetalDetector.init()
+		MetalDetector
 		ChatMessageListener.init()
 		Shortcuts.init()
 		ChatRulesHandler.init()
@@ -126,7 +128,7 @@ object SkyblockerMod {
 		LividColor.init()
 		FishingHelper.init()
 		DungeonMap.init()
-		DungeonScoreHUD.init()
+		DungeonScoreHUD
 		DungeonManager.init()
 		DungeonBlaze.init()
 		Waterboard.init()
@@ -135,15 +137,15 @@ object SkyblockerMod {
 		DungeonScore.init()
 		PartyFinderScreen.initClass()
 		ChestValue.init()
-		FireFreezeStaffTimer.init()
+		FireFreezeStaffTimer
 		GuardianHealth.init()
 		TheRift.init()
 		TheEnd.init()
 		SearchOverManager.init()
 		TitleContainer.init()
 		ScreenMaster.init()
-		DungeonTextures.init()
-		OcclusionCulling.init()
+		DungeonTextures
+		OcclusionCulling
 		TeleportOverlay.init()
 		CustomItemNames.init()
 		CustomArmorDyeColors.init()
@@ -166,14 +168,16 @@ object SkyblockerMod {
 		Kuudra.init()
 		RenderHelper.init()
 		FancyStatusBars.init()
-		containerSolverManager.init()
+		ContainerSolverManager
 		statusBarTracker.init()
 		BeaconHighlighter.init()
-		WarpAutocomplete.init()
+		WarpAutocomplete
 		MobBoundingBoxes.init()
 		EggFinder.init()
 		TimeTowerReminder.init()
 		SkyblockTime
+		TooltipManager.init();
+		SlotTextManager.init();
 
 		Scheduler.scheduleCyclic(20) { Utils.update() }
 		Scheduler.scheduleCyclic(200) { DiscordRPCManager.updateDataAndPresence() }

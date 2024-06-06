@@ -62,18 +62,18 @@ object ItemProtection {
 					protectedItems.add(itemUuid)
 					SkyblockerConfigManager.save()
 
-					source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.added", heldItem.name)))
+					source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.added", heldItem.name)))
 				} else {
 					protectedItems.remove(itemUuid)
 					SkyblockerConfigManager.save()
 
-					source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.removed", heldItem.name)))
+					source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.removed", heldItem.name)))
 				}
 			} else {
-				source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.noItemUuid")))
+				source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.noItemUuid")))
 			}
 		} else {
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.unableToProtect")))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.unableToProtect")))
 		}
 
 		return Command.SINGLE_SUCCESS
@@ -83,12 +83,12 @@ object ItemProtection {
 	fun handleKeyPressed(heldItem: ItemStack) {
 		val playerEntity = MinecraftClient.getInstance().player ?: return
 		if (!isOnSkyblock) {
-			playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.unableToProtect")))
+			playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.unableToProtect")))
 			return
 		}
 
 		if (heldItem.isEmpty) {
-			playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.noItemUuid")))
+			playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.noItemUuid")))
 			return
 		}
 
@@ -100,15 +100,15 @@ object ItemProtection {
 				protectedItems.add(itemUuid)
 				SkyblockerConfigManager.save()
 
-				playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.added", heldItem.name)))
+				playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.added", heldItem.name)))
 			} else {
 				protectedItems.remove(itemUuid)
 				SkyblockerConfigManager.save()
 
-				playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.removed", heldItem.name)))
+				playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.removed", heldItem.name)))
 			}
 		} else {
-			playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemProtection.noItemUuid")))
+			playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.itemProtection.noItemUuid")))
 		}
 	}
 

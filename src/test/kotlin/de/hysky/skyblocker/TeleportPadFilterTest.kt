@@ -1,6 +1,5 @@
 package de.hysky.skyblocker
 
-import de.hysky.skyblocker.skyblock.filters.ChatFilterTest
 import de.hysky.skyblocker.skyblock.filters.TeleportPadFilter
 import org.junit.jupiter.api.Test
 

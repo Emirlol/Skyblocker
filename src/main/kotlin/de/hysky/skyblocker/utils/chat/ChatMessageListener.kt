@@ -9,7 +9,6 @@ import de.hysky.skyblocker.skyblock.dwarven.Puzzler
 import de.hysky.skyblocker.skyblock.filters.*
 import de.hysky.skyblocker.utils.Utils.isOnSkyblock
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents.AllowGame
 import net.fabricmc.fabric.api.event.Event
 import net.fabricmc.fabric.api.event.EventFactory
 import net.minecraft.client.MinecraftClient
@@ -26,12 +25,12 @@ fun interface ChatMessageListener {
 		fun init() {
 			val listeners = arrayOf<ChatMessageListener>( // Features
 				Fetchur,
-				Puzzler(),
-				Reparty(),
+				Puzzler,
+				Reparty,
 				Trivia(),
-				TreasureHunter(),
-				HungryHiker(),  // Filters
-				AbilityFilter(),
+				TreasureHunter,
+				HungryHiker,  // Filters
+				AbilityFilter,
 				AdFilter(),
 				AoteFilter(),
 				ComboFilter(),
@@ -51,29 +50,17 @@ fun interface ChatMessageListener {
 				EVENT.register(listener)
 			}
 			// Register EVENT to ClientReceiveMessageEvents.ALLOW_GAME from fabric api
-			ClientReceiveMessageEvents.ALLOW_GAME.register(AllowGame { message: Text, overlay: Boolean ->
-				if (!isOnSkyblock) {
-					return@register true
-				}
-				val result = EVENT.invoker().onMessage(message, Formatting.strip(message.string))
-				when (result) {
-					ChatFilterResult.ACTION_BAR -> {
-						if (overlay) {
-							return@register true
-						}
-						val player = MinecraftClient.getInstance().player
-						if (player != null) {
-							player.sendMessage(message, true)
-							return@register false
-						}
+			ClientReceiveMessageEvents.ALLOW_GAME.register { message: Text, overlay: Boolean ->
+				return@register if (!isOnSkyblock) true else when (EVENT.invoker().onMessage(message, Formatting.strip(message.string)!!)) {
+					ChatFilterResult.ACTION_BAR -> if (overlay) true else {
+						MinecraftClient.getInstance().player?.sendMessage(message, true)
+						false
 					}
 
-					ChatFilterResult.FILTER -> {
-						return@register false
-					}
+					ChatFilterResult.FILTER -> false
+					else -> true
 				}
-				true
-			})
+			}
 		}
 
 		/**

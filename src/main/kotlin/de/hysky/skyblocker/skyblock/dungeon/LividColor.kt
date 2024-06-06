@@ -1,7 +1,6 @@
 package de.hysky.skyblocker.skyblock.dungeon
 
 import de.hysky.skyblocker.config.SkyblockerConfigManager
-import de.hysky.skyblocker.config.configs.DungeonsConfig.Livid
 import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager
 import de.hysky.skyblocker.utils.Constants
 import de.hysky.skyblocker.utils.Utils.isInDungeons
@@ -11,54 +10,51 @@ import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.client.MinecraftClient
 import net.minecraft.registry.Registries
-import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import java.util.*
 
 object LividColor {
-	private val WOOL_TO_FORMATTING: Map<Block, Formatting> = java.util.Map.of(
-		Blocks.RED_WOOL, Formatting.RED,
-		Blocks.YELLOW_WOOL, Formatting.YELLOW,
-		Blocks.LIME_WOOL, Formatting.GREEN,
-		Blocks.GREEN_WOOL, Formatting.DARK_GREEN,
-		Blocks.BLUE_WOOL, Formatting.BLUE,
-		Blocks.MAGENTA_WOOL, Formatting.LIGHT_PURPLE,
-		Blocks.PURPLE_WOOL, Formatting.DARK_PURPLE,
-		Blocks.GRAY_WOOL, Formatting.GRAY,
-		Blocks.WHITE_WOOL, Formatting.WHITE
+	private val WOOL_TO_FORMATTING = mapOf(
+		Blocks.RED_WOOL to Formatting.RED,
+		Blocks.YELLOW_WOOL to Formatting.YELLOW,
+		Blocks.LIME_WOOL to Formatting.GREEN,
+		Blocks.GREEN_WOOL to Formatting.DARK_GREEN,
+		Blocks.BLUE_WOOL to Formatting.BLUE,
+		Blocks.MAGENTA_WOOL to Formatting.LIGHT_PURPLE,
+		Blocks.PURPLE_WOOL to Formatting.DARK_PURPLE,
+		Blocks.GRAY_WOOL to Formatting.GRAY,
+		Blocks.WHITE_WOOL to Formatting.WHITE
 	)
-	private val LIVID_TO_FORMATTING: Map<String, Formatting> = java.util.Map.of(
-		"Hockey Livid", Formatting.RED,
-		"Arcade Livid", Formatting.YELLOW,
-		"Smile Livid", Formatting.GREEN,
-		"Frog Livid", Formatting.DARK_GREEN,
-		"Scream Livid", Formatting.BLUE,
-		"Crossed Livid", Formatting.LIGHT_PURPLE,
-		"Purple Livid", Formatting.DARK_PURPLE,
-		"Doctor Livid", Formatting.GRAY,
-		"Vendetta Livid", Formatting.WHITE
+	private val LIVID_TO_FORMATTING = mapOf(
+		"Hockey Livid" to Formatting.RED,
+		"Arcade Livid" to Formatting.YELLOW,
+		"Smile Livid" to Formatting.GREEN,
+		"Frog Livid" to Formatting.DARK_GREEN,
+		"Scream Livid" to Formatting.BLUE,
+		"Crossed Livid" to Formatting.LIGHT_PURPLE,
+		"Purple Livid" to Formatting.DARK_PURPLE,
+		"Doctor Livid" to Formatting.GRAY,
+		"Vendetta Livid" to Formatting.WHITE
 	)
-	@JvmField
-    val LIVID_NAMES: Set<String> = java.util.Set.copyOf(LIVID_TO_FORMATTING.keys)
-	val CONFIG: Livid = SkyblockerConfigManager.config.dungeons.livid
+
+    val LIVID_NAMES = LIVID_TO_FORMATTING.keys
+	val CONFIG = SkyblockerConfigManager.config.dungeons.livid
 	private var tenTicks = 0
 	private var color: Formatting? = null
 
 	fun init() {
-		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { message: Text, overlay: Boolean ->
-			val config = SkyblockerConfigManager.config.dungeons.livid
-			if ((config.enableLividColorText || config.enableLividColorTitle || config.enableLividColorGlow) && (message.string == "[BOSS] Livid: I respect you for making it to here, but I'll be your undoing.")) {
+		ClientReceiveMessageEvents.GAME.register{ message, _ ->
+			if ((CONFIG.enableLividColorText || CONFIG.enableLividColorTitle || CONFIG.enableLividColorGlow) && (message.string == "[BOSS] Livid: I respect you for making it to here, but I'll be your undoing.")) {
 				tenTicks = 8
 			}
-		})
+		}
 	}
 
 	fun update() {
-		val client = MinecraftClient.getInstance()
 		if (tenTicks != 0) {
-			val config = SkyblockerConfigManager.config.dungeons.livid
-			if ((config.enableLividColorText || config.enableLividColorTitle || config.enableLividColorGlow) && isInDungeons && (client.world != null)) {
+			val client = MinecraftClient.getInstance()
+			if ((CONFIG.enableLividColorText || CONFIG.enableLividColorTitle || CONFIG.enableLividColorGlow) && isInDungeons && (client.world != null)) {
 				if (tenTicks == 1) {
 					onLividColorFound(client, Blocks.RED_WOOL)
 					return
@@ -79,12 +75,8 @@ object LividColor {
 		LividColor.color = WOOL_TO_FORMATTING[color]
 		var colorString = Registries.BLOCK.getId(color).path
 		colorString = colorString.substring(0, colorString.length - 5).uppercase(Locale.getDefault())
-		val message = Constants.PREFIX.get()
-			.append(CONFIG.lividColorText.replace("\\[color]".toRegex(), colorString))
-			.formatted(LividColor.color)
-		if (CONFIG.enableLividColorText) {
-			MessageScheduler.INSTANCE.sendMessageAfterCooldown(message.string)
-		}
+		val message = Constants.PREFIX.append(CONFIG.lividColorText.replace("\\[color]".toRegex(), colorString)).formatted(LividColor.color)
+		if (CONFIG.enableLividColorText) MessageScheduler.sendMessageAfterCooldown(message.string)
 		if (CONFIG.enableLividColorTitle) {
 			client.inGameHud.setDefaultTitleFade()
 			client.inGameHud.setTitle(message)
@@ -92,18 +84,9 @@ object LividColor {
 		tenTicks = 0
 	}
 
-	@JvmStatic
-    fun allowGlow(): Boolean {
-		return !SkyblockerConfigManager.config.dungeons.livid.enableLividColorGlow || !DungeonManager.getBoss().isFloor(5)
-	}
+    fun allowGlow()= !SkyblockerConfigManager.config.dungeons.livid.enableLividColorGlow || !DungeonManager.boss.isFloor(5)
 
-	@JvmStatic
-    fun shouldGlow(name: String): Boolean {
-		return SkyblockerConfigManager.config.dungeons.livid.enableLividColorGlow && color == LIVID_TO_FORMATTING[name]
-	}
+    fun shouldGlow(name: String) = SkyblockerConfigManager.config.dungeons.livid.enableLividColorGlow && color == LIVID_TO_FORMATTING[name]
 
-	@JvmStatic
-    fun getGlowColor(name: String): Int {
-		return if (LIVID_TO_FORMATTING.containsKey(name)) LIVID_TO_FORMATTING[name]!!.colorValue!! else Formatting.WHITE.colorValue!!
-	}
+    fun getGlowColor(name: String) = if (LIVID_TO_FORMATTING.containsKey(name)) LIVID_TO_FORMATTING[name]!!.colorValue!! else Formatting.WHITE.colorValue!!
 }

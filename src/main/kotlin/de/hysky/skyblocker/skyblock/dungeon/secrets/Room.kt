@@ -183,7 +183,7 @@ open class Room(val type: Type, vararg physicalPositions: Vector2ic?) : Tickable
 		val category = CategoryArgumentType.getCategory(context, "category")
 		val waypointName = context.getArgument("name", Text::class.java)
 		addCustomWaypoint(secretIndex, category, waypointName, pos)
-		context.source.sendFeedback(Constants.PREFIX.get().append(Text.stringifiedTranslatable("skyblocker.dungeons.secrets.customWaypointAdded", pos!!.x, pos.y, pos.z, name, secretIndex, category, waypointName)))
+		context.source.sendFeedback(Constants.PREFIX.append(Text.stringifiedTranslatable("skyblocker.dungeons.secrets.customWaypointAdded", pos!!.x, pos.y, pos.z, name, secretIndex, category, waypointName)))
 	}
 
 	/**
@@ -216,9 +216,9 @@ open class Room(val type: Type, vararg physicalPositions: Vector2ic?) : Tickable
 	fun removeCustomWaypoint(context: CommandContext<FabricClientCommandSource>, pos: BlockPos?) {
 		val waypoint = removeCustomWaypoint(pos)
 		if (waypoint != null) {
-			context.source.sendFeedback(Constants.PREFIX.get().append(Text.stringifiedTranslatable("skyblocker.dungeons.secrets.customWaypointRemoved", pos!!.x, pos.y, pos.z, name, waypoint.secretIndex, waypoint.category, waypoint.name)))
+			context.source.sendFeedback(Constants.PREFIX.append(Text.stringifiedTranslatable("skyblocker.dungeons.secrets.customWaypointRemoved", pos!!.x, pos.y, pos.z, name, waypoint.secretIndex, waypoint.category, waypoint.name)))
 		} else {
-			context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.customWaypointNotFound", pos!!.x, pos.y, pos.z, name)))
+			context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.customWaypointNotFound", pos!!.x, pos.y, pos.z, name)))
 		}
 	}
 

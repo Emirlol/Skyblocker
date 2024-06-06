@@ -74,6 +74,11 @@ dependencies {
 	// Apache Commons Math
 	include(implementation("org.apache.commons:commons-math3:${project.property("commons_math_version")}")!!)
 
+	include(modImplementation("net.silkmc:silk-core:${project.property("silk_version")}")!!)
+
+	include(modImplementation("net.silkmc:silk-commands:${project.property("silk_version")}")!!)
+
+	//FLK
 	modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_language_kotlin_version")}")
 }
 

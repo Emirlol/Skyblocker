@@ -11,9 +11,7 @@ open class Waypoint(val pos: BlockPos, val typeSupplier: () -> Type, open val co
 
 	constructor(pos: BlockPos, type: Type, colorComponents: FloatArray, alpha: Float = DEFAULT_HIGHLIGHT_ALPHA, lineWidth: Float = DEFAULT_LINE_WIDTH, throughWalls: Boolean = true, shouldRender: Boolean = true) : this(pos, { type }, colorComponents, alpha, lineWidth, throughWalls, shouldRender)
 
-	open fun shouldRender(): Boolean {
-		return shouldRender
-	}
+	open fun shouldRender() = shouldRender
 
 	open fun setFound() {
 		this.shouldRender = false

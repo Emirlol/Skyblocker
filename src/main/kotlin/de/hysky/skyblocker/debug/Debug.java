@@ -71,7 +71,7 @@ public class Debug {
 		return literal("toggleShowingInvisibleArmorStands")
 				.executes(context -> {
 					showInvisibleArmorStands = !showInvisibleArmorStands;
-					context.getSource().sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.debug.toggledShowingInvisibleArmorStands", showInvisibleArmorStands)));
+					context.getSource().sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.debug.toggledShowingInvisibleArmorStands", showInvisibleArmorStands)));
 					return Command.SINGLE_SUCCESS;
 				});
 	}

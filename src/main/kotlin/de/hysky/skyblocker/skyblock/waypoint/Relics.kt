@@ -124,12 +124,12 @@ object Relics {
 				.then(ClientCommandManager.literal("relics")
 					.then(ClientCommandManager.literal("markAllFound").executes { context: CommandContext<FabricClientCommandSource> ->
 						relics.values.forEach(Consumer { obj: ProfileAwareWaypoint -> obj.setFound() })
-						context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.relics.markAllFound")))
+						context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.relics.markAllFound")))
 						1
 					})
 					.then(ClientCommandManager.literal("markAllMissing").executes { context: CommandContext<FabricClientCommandSource> ->
 						relics.values.forEach(Consumer { obj: ProfileAwareWaypoint -> obj.setMissing() })
-						context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.relics.markAllMissing")))
+						context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.relics.markAllMissing")))
 						1
 					})
 				)

@@ -7,26 +7,12 @@ import net.minecraft.client.option.KeyBinding
 import org.lwjgl.glfw.GLFW
 
 object HotbarSlotLock {
-	var hotbarSlotLock: KeyBinding? = null
+	var hotbarSlotLock: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding("key.hotbarSlotLock", GLFW.GLFW_KEY_H, "key.categories.skyblocker"))
 
-	fun init() {
-		hotbarSlotLock = KeyBindingHelper.registerKeyBinding(
-			KeyBinding(
-				"key.hotbarSlotLock",
-				GLFW.GLFW_KEY_H,
-				"key.categories.skyblocker"
-			)
-		)
-	}
+	fun isLocked(slot: Int) = SkyblockerConfigManager.config.general.lockedSlots.contains(slot)
 
-	@JvmStatic
-	fun isLocked(slot: Int): Boolean {
-		return SkyblockerConfigManager.config.general.lockedSlots.contains(slot)
-	}
-
-	@JvmStatic
 	fun handleInputEvents(player: ClientPlayerEntity) {
-		while (hotbarSlotLock!!.wasPressed()) {
+		while (hotbarSlotLock.wasPressed()) {
 			val lockedSlots = SkyblockerConfigManager.config.general.lockedSlots
 			val selected = player.inventory.selectedSlot
 			if (!isLocked(player.inventory.selectedSlot)) lockedSlots.add(selected)

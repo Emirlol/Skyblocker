@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType
 import net.minecraft.util.Identifier
 
 object DungeonTextures {
-	fun init() {
+	init {
 		ResourceManagerHelper.registerBuiltinResourcePack(
 			Identifier(SkyblockerMod.NAMESPACE, "recolored_dungeon_items"),
 			SkyblockerMod.SKYBLOCKER_MOD,

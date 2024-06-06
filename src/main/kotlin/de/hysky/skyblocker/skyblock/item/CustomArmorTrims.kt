@@ -11,7 +11,6 @@ import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.debug.Debug
 import de.hysky.skyblocker.events.SkyblockEvents
 import de.hysky.skyblocker.events.SkyblockEvents.SkyblockJoin
-import de.hysky.skyblocker.skyblock.item.CustomArmorTrims.ArmorTrimId
 import de.hysky.skyblocker.utils.Constants
 import de.hysky.skyblocker.utils.ItemUtils.getItemUuid
 import de.hysky.skyblocker.utils.Utils.isOnSkyblock
@@ -41,6 +40,7 @@ import org.slf4j.LoggerFactory
 
 object CustomArmorTrims {
 	private val LOGGER: Logger = LoggerFactory.getLogger(CustomArmorTrims::class.java)
+
 	@JvmField
 	val TRIMS_CACHE: Object2ObjectOpenHashMap<ArmorTrimId, ArmorTrim?> = Object2ObjectOpenHashMap()
 	private var trimsInitialized = false
@@ -102,65 +102,58 @@ object CustomArmorTrims {
 	private fun customizeTrim(source: FabricClientCommandSource, material: Identifier?, pattern: Identifier?): Int {
 		val heldItem = source.player.mainHandStack
 
-		if (isOnSkyblock && heldItem != null) {
-			if (heldItem.item is ArmorItem) {
-				val itemUuid = getItemUuid(heldItem)
+		if (!isOnSkyblock || heldItem.isEmpty) {
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.unableToSetTrim")))
+			return 0
+		}
 
-				if (!itemUuid.isEmpty()) {
-					val customArmorTrims = SkyblockerConfigManager.config.general.customArmorTrims
+		if (heldItem.item !is ArmorItem) {
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.notAnArmorPiece")))
+			return 0
+		}
 
-					if (material == null && pattern == null) {
-						if (customArmorTrims.containsKey(itemUuid)) {
-							customArmorTrims.remove(itemUuid)
-							SkyblockerConfigManager.save()
-							source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.removed")))
-						} else {
-							source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.neverHad")))
-						}
-					} else {
-						// Ensure that the material & trim are valid
-						val trimId = ArmorTrimId(material, pattern)
-						if (TRIMS_CACHE[trimId] == null) {
-							source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.invalidMaterialOrPattern")))
+		val itemUuid = getItemUuid(heldItem)
+		if (itemUuid.isNullOrEmpty()) {
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.noItemUuid")))
+			return 0
+		}
 
-							return Command.SINGLE_SUCCESS
-						}
-
-						customArmorTrims[itemUuid] = trimId
-						SkyblockerConfigManager.save()
-						source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.added")))
-					}
-				} else {
-					source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.noItemUuid")))
-				}
+		val customArmorTrims = SkyblockerConfigManager.config.general.customArmorTrims
+		if (material == null && pattern == null) {
+			if (customArmorTrims.containsKey(itemUuid)) {
+				customArmorTrims.remove(itemUuid)
+				SkyblockerConfigManager.save()
+				source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.removed")))
 			} else {
-				source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.notAnArmorPiece")))
-				return Command.SINGLE_SUCCESS
+				source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.neverHad")))
 			}
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.customArmorTrims.unableToSetTrim")))
+			// Ensure that the material & trim are valid
+			val trimId = ArmorTrimId(material!!, pattern!!)
+			if (TRIMS_CACHE[trimId] == null) {
+				source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.invalidMaterialOrPattern")))
+				return 0
+			}
+
+			customArmorTrims[itemUuid] = trimId
+			SkyblockerConfigManager.save()
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.customArmorTrims.added")))
 		}
 
 		return Command.SINGLE_SUCCESS
 	}
 
-	@JvmRecord
-	data class ArmorTrimId(@field:SerialEntry @param:SerialEntry val material: Identifier?, @field:SerialEntry @param:SerialEntry val pattern: Identifier?) : Pair<Identifier?, Identifier?> {
-		override fun left(): Identifier? {
-			return material
-		}
+	data class ArmorTrimId(@SerialEntry val material: Identifier, @SerialEntry val pattern: Identifier) : Pair<Identifier, Identifier> {
+		override fun left() = material
 
-		override fun right(): Identifier? {
-			return pattern
-		}
+		override fun right() = pattern
 
 		companion object {
-			val CODEC: Codec<ArmorTrimId?> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<ArmorTrimId?> ->
+			val CODEC: Codec<ArmorTrimId> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<ArmorTrimId> ->
 				instance.group(
 					Identifier.CODEC.fieldOf("material").forGetter(ArmorTrimId::material),
 					Identifier.CODEC.fieldOf("pattern").forGetter(ArmorTrimId::pattern)
-				)
-					.apply(instance) { material: Identifier?, pattern: Identifier? -> ArmorTrimId(material, pattern) }
+				).apply(instance) { material, pattern -> ArmorTrimId(material, pattern) }
 			}
 		}
 	}

@@ -9,14 +9,10 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterTranslucent
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import net.minecraft.util.Util
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
@@ -28,68 +24,68 @@ object MetalDetector {
 	private val LIGHT_GRAY = floatArrayOf(192 / 255f, 192 / 255f, 192 / 255f)
 	private val TREASURE_PATTERN: Pattern = Pattern.compile("(§3§lTREASURE: §b)(\\d+\\.?\\d?)m")
 	private val KEEPER_PATTERN: Pattern = Pattern.compile("Keeper of (\\w+)")
-	private val keeperOffsets: HashMap<String?, Vec3i?> = Util.make(HashMap()) { map: HashMap<String?, Vec3i?> ->
-		map["Diamond"] = Vec3i(33, 0, 3)
-		map["Lapis"] = Vec3i(-33, 0, -3)
-		map["Emerald"] = Vec3i(-3, 0, 33)
-		map["Gold"] = Vec3i(3, 0, -33)
-	}
-	private val knownChestOffsets: HashSet<Vec3i?> = Util.make(HashSet()) { set: HashSet<Vec3i?> ->
-		set.add(Vec3i(-38, -22, 26)) // -38, -22, 26
-		set.add(Vec3i(38, -22, -26)) // 38, -22, -26
-		set.add(Vec3i(-40, -22, 18)) // -40, -22, 18
-		set.add(Vec3i(-41, -20, 22)) // -41, -20, 22
-		set.add(Vec3i(-5, -21, 16)) // -5, -21, 16
-		set.add(Vec3i(40, -22, -30)) // 40, -22, -30
-		set.add(Vec3i(-42, -20, -28)) // -42, -20, -28
-		set.add(Vec3i(-43, -22, -40)) // -43, -22, -40
-		set.add(Vec3i(42, -19, -41)) // 42, -19, -41
-		set.add(Vec3i(43, -21, -16)) // 43, -21, -16
-		set.add(Vec3i(-1, -22, -20)) // -1, -22, -20
-		set.add(Vec3i(6, -21, 28)) // 6, -21, 28
-		set.add(Vec3i(7, -21, 11)) // 7, -21, 11
-		set.add(Vec3i(7, -21, 22)) // 7, -21, 22
-		set.add(Vec3i(-12, -21, -44)) // -12, -21, -44
-		set.add(Vec3i(12, -22, 31)) // 12, -22, 31
-		set.add(Vec3i(12, -22, -22)) // 12, -22, -22
-		set.add(Vec3i(12, -21, 7)) // 12, -21, 7
-		set.add(Vec3i(12, -21, -43)) // 12, -21, -43
-		set.add(Vec3i(-14, -21, 43)) // -14, -21, 43
-		set.add(Vec3i(-14, -21, 22)) // -14, -21, 22
-		set.add(Vec3i(-17, -21, 20)) // -17, -21, 20
-		set.add(Vec3i(-20, -22, 0)) // -20, -22, 0
-		set.add(Vec3i(1, -21, 20)) // 1, -21, 20
-		set.add(Vec3i(19, -22, 29)) // 19, -22, 29
-		set.add(Vec3i(20, -22, 0)) // 20, -22, 0
-		set.add(Vec3i(20, -21, -26)) // 20, -21, -26
-		set.add(Vec3i(-23, -22, 40)) // -23, -22, 40
-		set.add(Vec3i(22, -21, -14)) // 22, -21, -14
-		set.add(Vec3i(-24, -22, 12)) // -24, -22, 12
-		set.add(Vec3i(23, -22, 26)) // 23, -22, 26
-		set.add(Vec3i(23, -22, -39)) // 23, -22, -39
-		set.add(Vec3i(24, -22, 27)) // 24, -22, 27
-		set.add(Vec3i(25, -22, 17)) // 25, -22, 17
-		set.add(Vec3i(29, -21, -44)) // 29, -21, -44
-		set.add(Vec3i(-31, -21, -12)) // -31, -21, -12
-		set.add(Vec3i(-31, -21, -40)) // -31, -21, -40
-		set.add(Vec3i(30, -21, -25)) // 30, -21, -25
-		set.add(Vec3i(-32, -21, -40)) // -32, -21, -40
-		set.add(Vec3i(-36, -20, 42)) // -36, -20, 42
-		set.add(Vec3i(-37, -21, -14)) // -37, -21, -14
-		set.add(Vec3i(-37, -21, -22)) // -37, -21, -22
-	}
+	private val keeperOffsets = hashMapOf(
+		"Diamond" to Vec3i(33, 0, 3),
+		"Lapis" to Vec3i(-33, 0, -3),
+		"Emerald" to Vec3i(-3, 0, 33),
+		"Gold" to Vec3i(3, 0, -33)
+	)
+	private val knownChestOffsets = hashSetOf(
+		Vec3i(-38, -22, 26), // -38, -22, 26
+		Vec3i(38, -22, -26), // 38, -22, -26
+		Vec3i(-40, -22, 18), // -40, -22, 18
+		Vec3i(-41, -20, 22), // -41, -20, 22
+		Vec3i(-5, -21, 16), // -5, -21, 16
+		Vec3i(40, -22, -30), // 40, -22, -30
+		Vec3i(-42, -20, -28), // -42, -20, -28
+		Vec3i(-43, -22, -40), // -43, -22, -40
+		Vec3i(42, -19, -41), // 42, -19, -41
+		Vec3i(43, -21, -16), // 43, -21, -16
+		Vec3i(-1, -22, -20), // -1, -22, -20
+		Vec3i(6, -21, 28), // 6, -21, 28
+		Vec3i(7, -21, 11), // 7, -21, 11
+		Vec3i(7, -21, 22), // 7, -21, 22
+		Vec3i(-12, -21, -44), // -12, -21, -44
+		Vec3i(12, -22, 31), // 12, -22, 31
+		Vec3i(12, -22, -22), // 12, -22, -22
+		Vec3i(12, -21, 7), // 12, -21, 7
+		Vec3i(12, -21, -43), // 12, -21, -43
+		Vec3i(-14, -21, 43), // -14, -21, 43
+		Vec3i(-14, -21, 22), // -14, -21, 22
+		Vec3i(-17, -21, 20), // -17, -21, 20
+		Vec3i(-20, -22, 0), // -20, -22, 0
+		Vec3i(1, -21, 20), // 1, -21, 20
+		Vec3i(19, -22, 29), // 19, -22, 29
+		Vec3i(20, -22, 0), // 20, -22, 0
+		Vec3i(20, -21, -26), // 20, -21, -26
+		Vec3i(-23, -22, 40), // -23, -22, 40
+		Vec3i(22, -21, -14), // 22, -21, -14
+		Vec3i(-24, -22, 12), // -24, -22, 12
+		Vec3i(23, -22, 26), // 23, -22, 26
+		Vec3i(23, -22, -39), // 23, -22, -39
+		Vec3i(24, -22, 27), // 24, -22, 27
+		Vec3i(25, -22, 17), // 25, -22, 17
+		Vec3i(29, -21, -44), // 29, -21, -44
+		Vec3i(-31, -21, -12), // -31, -21, -12
+		Vec3i(-31, -21, -40), // -31, -21, -40
+		Vec3i(30, -21, -25), // 30, -21, -25
+		Vec3i(-32, -21, -40), // -32, -21, -40
+		Vec3i(-36, -20, 42), // -36, -20, 42
+		Vec3i(-37, -21, -14), // -37, -21, -14
+		Vec3i(-37, -21, -22), // -37, -21, -22
+	)
 
 	var minesCenter: Vec3i? = null
 	private var previousDistance = 0.0
 	private var previousPlayerPos: Vec3d? = null
 	var newTreasure: Boolean = true
 	private var startedLooking = false
-	var possibleBlocks: MutableList<Vec3i?> = ArrayList()
+	var possibleBlocks: MutableList<Vec3i> = arrayListOf()
 
-	fun init() {
-		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { obj: Text?, text: Boolean -> getDistanceMessage(text) })
-		WorldRenderEvents.AFTER_TRANSLUCENT.register(AfterTranslucent { obj: WorldRenderContext? -> render() })
-		ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { _handler: ClientPlayNetworkHandler?, _sender: PacketSender?, _client: MinecraftClient? -> reset() })
+	init {
+		ClientReceiveMessageEvents.GAME.register(::getDistanceMessage)
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(::render)
+		ClientPlayConnectionEvents.JOIN.register { _, _, _ -> reset() }
 	}
 
 	/**
@@ -105,9 +101,8 @@ object MetalDetector {
 		}
 		//in the mines of divan
 		val treasureDistanceMature = TREASURE_PATTERN.matcher(text.string)
-		if (!treasureDistanceMature.matches()) {
-			return
-		}
+		if (!treasureDistanceMature.matches()) return
+
 		//find new values
 		val distance = treasureDistanceMature.group(2).toDouble()
 		val playerPos = CLIENT.player!!.pos
@@ -116,7 +111,7 @@ object MetalDetector {
 		//send message when starting looking about how to use mod
 		if (!startedLooking) {
 			startedLooking = true
-			CLIENT.player!!.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.startTip")), false)
+			CLIENT.player!!.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.startTip")), false)
 		}
 
 		//find the center of the mines if possible to speed up search
@@ -132,9 +127,9 @@ object MetalDetector {
 		//if the amount of possible blocks has changed output that to the user
 		if (possibleBlocks.size != previousPossibleBlockCount) {
 			if (possibleBlocks.size == 1) {
-				CLIENT.player!!.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.foundTreasureMessage").formatted(Formatting.GREEN)), false)
+				CLIENT.player!!.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.foundTreasureMessage").formatted(Formatting.GREEN)), false)
 			} else {
-				CLIENT.player!!.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.possibleTreasureLocationsMessage").append(Text.of(possibleBlocks.size.toString()))), false)
+				CLIENT.player!!.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.possibleTreasureLocationsMessage").append(Text.of(possibleBlocks.size.toString()))), false)
 			}
 		}
 
@@ -154,7 +149,7 @@ object MetalDetector {
 		}
 		if (text.string.startsWith("You found")) {
 			newTreasure = true
-			possibleBlocks = ArrayList()
+			possibleBlocks = arrayListOf()
 		}
 	}
 
@@ -167,7 +162,7 @@ object MetalDetector {
 	 */
 	fun updatePossibleBlocks(distance: Double, playerPos: Vec3d) {
 		if (newTreasure) {
-			possibleBlocks = ArrayList()
+			possibleBlocks = arrayListOf()
 			newTreasure = false
 			if (minesCenter != null) { //if center of the mines is known use the predefined offsets to filter the locations
 				for (knownOffset in knownChestOffsets) {
@@ -191,14 +186,14 @@ object MetalDetector {
 				}
 			}
 		} else {
-			possibleBlocks.removeIf { location: Vec3i? -> abs(playerPos.distanceTo(Vec3d.of(location)) - distance) >= 0.25 }
+			possibleBlocks.removeIf { abs(playerPos.distanceTo(Vec3d.of(it)) - distance) >= 0.25 }
 		}
 
 		//if possible blocks is of length 0 something has failed reset and try again
 		if (possibleBlocks.isEmpty()) {
 			newTreasure = true
 			if (CLIENT.player != null) {
-				CLIENT.player!!.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.somethingWentWrongMessage").formatted(Formatting.RED)), false)
+				CLIENT.player!!.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.somethingWentWrongMessage").formatted(Formatting.RED)), false)
 			}
 		}
 	}
@@ -211,7 +206,7 @@ object MetalDetector {
 			return
 		}
 		val searchBox = CLIENT.player!!.boundingBox.expand(500.0)
-		val armorStands = CLIENT.world!!.getEntitiesByClass(ArmorStandEntity::class.java, searchBox) { obj: ArmorStandEntity -> obj.hasCustomName() }
+		val armorStands = CLIENT.world!!.getEntitiesByClass(ArmorStandEntity::class.java, searchBox) { it.hasCustomName() }
 
 		for (armorStand in armorStands) {
 			val name = armorStand.name.string
@@ -220,7 +215,7 @@ object MetalDetector {
 			if (nameMatcher.matches()) {
 				val offset = keeperOffsets[nameMatcher.group(1)]
 				minesCenter = armorStand.blockPos.add(offset)
-				CLIENT.player!!.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.foundCenter").formatted(Formatting.GREEN)), false)
+				CLIENT.player!!.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.foundCenter").formatted(Formatting.GREEN)), false)
 				return
 			}
 		}
@@ -228,7 +223,7 @@ object MetalDetector {
 
 	private fun reset() {
 		minesCenter = null
-		possibleBlocks = ArrayList()
+		possibleBlocks = arrayListOf()
 	}
 
 	/**
@@ -242,7 +237,7 @@ object MetalDetector {
 		}
 		//only one location render just that and guiding line to it
 		if (possibleBlocks.size == 1) {
-			val block = possibleBlocks.first!!.add(0, -1, 0) //the block you are taken to is one block above the chest
+			val block = possibleBlocks.first().add(0, -1, 0) //the block you are taken to is one block above the chest
 			val waypoint = CrystalsWaypoint(CrystalsWaypoint.Category.CORLEONE, Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.treasure"), BlockPos(block.x, block.y, block.z))
 			waypoint.render(context)
 			renderLineFromCursor(context, Vec3d.ofCenter(block), LIGHT_GRAY, 1f, 5f)
@@ -250,7 +245,7 @@ object MetalDetector {
 		}
 
 		for (block in possibleBlocks) {
-			val waypoint = CrystalsWaypoint(CrystalsWaypoint.Category.CORLEONE, Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.possible"), BlockPos(block!!.x, block.y, block.z))
+			val waypoint = CrystalsWaypoint(CrystalsWaypoint.Category.CORLEONE, Text.translatable("skyblocker.dwarvenMines.metalDetectorHelper.possible"), BlockPos(block.x, block.y, block.z))
 			waypoint.render(context)
 		}
 	}

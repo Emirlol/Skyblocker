@@ -140,22 +140,22 @@ class IceFill private constructor() : DungeonPuzzle("ice-fill", "ice-path") {
 				ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher: CommandDispatcher<FabricClientCommandSource?>, registryAccess: CommandRegistryAccess? ->
 					dispatcher.register(ClientCommandManager.literal(SkyblockerMod.NAMESPACE).then(ClientCommandManager.literal("dungeons").then(ClientCommandManager.literal("puzzle").then(ClientCommandManager.literal(INSTANCE.puzzleName)
 						.then(ClientCommandManager.literal("printBoard1").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(boardToString(INSTANCE.iceFillBoards[0])))
+							context.source.sendFeedback(Constants.PREFIX.append(boardToString(INSTANCE.iceFillBoards[0])))
 							Command.SINGLE_SUCCESS
 						}).then(ClientCommandManager.literal("printBoard2").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(boardToString(INSTANCE.iceFillBoards[1])))
+							context.source.sendFeedback(Constants.PREFIX.append(boardToString(INSTANCE.iceFillBoards[1])))
 							Command.SINGLE_SUCCESS
 						}).then(ClientCommandManager.literal("printBoard3").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(boardToString(INSTANCE.iceFillBoards[2])))
+							context.source.sendFeedback(Constants.PREFIX.append(boardToString(INSTANCE.iceFillBoards[2])))
 							Command.SINGLE_SUCCESS
 						}).then(ClientCommandManager.literal("printPath1").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(INSTANCE.iceFillPaths.first.toString()))
+							context.source.sendFeedback(Constants.PREFIX.append(INSTANCE.iceFillPaths.first.toString()))
 							Command.SINGLE_SUCCESS
 						}).then(ClientCommandManager.literal("printPath2").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(INSTANCE.iceFillPaths[1].toString()))
+							context.source.sendFeedback(Constants.PREFIX.append(INSTANCE.iceFillPaths[1].toString()))
 							Command.SINGLE_SUCCESS
 						}).then(ClientCommandManager.literal("printPath3").executes { context: CommandContext<FabricClientCommandSource> ->
-							context.source.sendFeedback(Constants.PREFIX.get().append(INSTANCE.iceFillPaths[2].toString()))
+							context.source.sendFeedback(Constants.PREFIX.append(INSTANCE.iceFillPaths[2].toString()))
 							Command.SINGLE_SUCCESS
 						})
 					)

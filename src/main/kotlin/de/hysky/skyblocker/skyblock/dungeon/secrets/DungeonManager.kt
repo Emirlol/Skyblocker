@@ -265,9 +265,9 @@ object DungeonManager {
 									if (currentRoom != null) {
 										currentRoom!!.tickables.clear()
 										currentRoom!!.renderables.clear()
-										context.source.sendFeedback(Constants.PREFIX.get().append("§rCleared sub processes in the current room."))
+										context.source.sendFeedback(Constants.PREFIX.append("§rCleared sub processes in the current room."))
 									} else {
-										context.source.sendError(Constants.PREFIX.get().append("§cCurrent room is null."))
+										context.source.sendError(Constants.PREFIX.append("§cCurrent room is null."))
 									}
 									Command.SINGLE_SUCCESS
 								})
@@ -377,9 +377,9 @@ object DungeonManager {
 		return ClientCommandManager.argument("secretIndex", IntegerArgumentType.integer()).executes { context: CommandContext<FabricClientCommandSource> ->
 			val secretIndex = IntegerArgumentType.getInteger(context, "secretIndex")
 			if (markSecrets(secretIndex, found)) {
-				context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable(if (found) "skyblocker.dungeons.secrets.markSecretFound" else "skyblocker.dungeons.secrets.markSecretMissing", secretIndex)))
+				context.source.sendFeedback(Constants.PREFIX.append(Text.translatable(if (found) "skyblocker.dungeons.secrets.markSecretFound" else "skyblocker.dungeons.secrets.markSecretMissing", secretIndex)))
 			} else {
-				context.source.sendError(Constants.PREFIX.get().append(Text.translatable(if (found) "skyblocker.dungeons.secrets.markSecretFoundUnable" else "skyblocker.dungeons.secrets.markSecretMissingUnable", secretIndex)))
+				context.source.sendError(Constants.PREFIX.append(Text.translatable(if (found) "skyblocker.dungeons.secrets.markSecretFoundUnable" else "skyblocker.dungeons.secrets.markSecretMissingUnable", secretIndex)))
 			}
 			Command.SINGLE_SUCCESS
 		}
@@ -393,7 +393,7 @@ object DungeonManager {
 		if (MinecraftClient.getInstance().crosshairTarget is BlockHitResult && blockHitResult.getType() == HitResult.Type.BLOCK) {
 			return getRelativePos(context.source, blockHitResult.getBlockPos())
 		} else {
-			context.source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.noTarget")))
+			context.source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.noTarget")))
 		}
 		return Command.SINGLE_SUCCESS
 	}
@@ -402,9 +402,9 @@ object DungeonManager {
 		val room = getRoomAtPhysical(pos)
 		if (isRoomMatched(room)) {
 			val relativePos = currentRoom!!.actualToRelative(pos)
-			source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.posMessage", currentRoom.getName(), currentRoom.getDirection().asString(), relativePos!!.x, relativePos.y, relativePos.z)))
+			source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.posMessage", currentRoom.getName(), currentRoom.getDirection().asString(), relativePos!!.x, relativePos.y, relativePos.z)))
 		} else {
-			source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
+			source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
 		}
 		return Command.SINGLE_SUCCESS
 	}
@@ -429,7 +429,7 @@ object DungeonManager {
 		if (isRoomMatched(room)) {
 			room!!.addCustomWaypoint(context, room.actualToRelative(pos))
 		} else {
-			context.source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
+			context.source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
 		}
 		return Command.SINGLE_SUCCESS
 	}
@@ -438,7 +438,7 @@ object DungeonManager {
 		if (isCurrentRoomMatched) {
 			currentRoom!!.addCustomWaypoint(context, pos)
 		} else {
-			context.source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
+			context.source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
 		}
 		return Command.SINGLE_SUCCESS
 	}
@@ -457,7 +457,7 @@ object DungeonManager {
 		if (isRoomMatched(room)) {
 			room!!.removeCustomWaypoint(context, room.actualToRelative(pos))
 		} else {
-			context.source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
+			context.source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
 		}
 		return Command.SINGLE_SUCCESS
 	}
@@ -466,7 +466,7 @@ object DungeonManager {
 		if (isCurrentRoomMatched) {
 			currentRoom!!.removeCustomWaypoint(context, pos)
 		} else {
-			context.source.sendError(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
+			context.source.sendError(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secrets.notMatched")))
 		}
 		return Command.SINGLE_SUCCESS
 	}
@@ -475,22 +475,22 @@ object DungeonManager {
 		return ClientCommandManager.argument("room", StringArgumentType.string()).suggests { context: CommandContext<FabricClientCommandSource?>?, builder: SuggestionsBuilder? -> CommandSource.suggestMatching(ROOMS_DATA.values.stream().map { obj: Map<String?, Map<String, IntArray>> -> obj.values }.flatMap { obj: Collection<Map<String, IntArray>> -> obj.stream() }.map { obj: Map<String, IntArray> -> obj.keys }.flatMap { obj: Set<String> -> obj.stream() }, builder) }
 			.then(ClientCommandManager.argument("direction", DirectionArgumentType.direction()).executes { context: CommandContext<FabricClientCommandSource> ->
 				if (physicalEntrancePos == null || mapEntrancePos == null || mapRoomSize == 0) {
-					context.source.sendError(Constants.PREFIX.get().append("§cYou are not in a dungeon."))
+					context.source.sendError(Constants.PREFIX.append("§cYou are not in a dungeon."))
 					return@executes Command.SINGLE_SUCCESS
 				}
 				val client = MinecraftClient.getInstance()
 				if (client.player == null || client.world == null) {
-					context.source.sendError(Constants.PREFIX.get().append("§cFailed to get player or world."))
+					context.source.sendError(Constants.PREFIX.append("§cFailed to get player or world."))
 					return@executes Command.SINGLE_SUCCESS
 				}
 				val stack = client.player!!.inventory.main[8]
 				if (!stack.isOf(Items.FILLED_MAP)) {
-					context.source.sendError(Constants.PREFIX.get().append("§cFailed to get dungeon map."))
+					context.source.sendError(Constants.PREFIX.append("§cFailed to get dungeon map."))
 					return@executes Command.SINGLE_SUCCESS
 				}
 				val map = FilledMapItem.getMapState(stack.get(DataComponentTypes.MAP_ID), client.world)
 				if (map == null) {
-					context.source.sendError(Constants.PREFIX.get().append("§cFailed to get dungeon map state."))
+					context.source.sendError(Constants.PREFIX.append("§cFailed to get dungeon map state."))
 					return@executes Command.SINGLE_SUCCESS
 				}
 
@@ -499,14 +499,14 @@ object DungeonManager {
 
 				val room = newDebugRoom(roomName, direction, client.player, map)
 				if (room == null) {
-					context.source.sendError(Constants.PREFIX.get().append("§cFailed to find room with name $roomName."))
+					context.source.sendError(Constants.PREFIX.append("§cFailed to find room with name $roomName."))
 					return@executes Command.SINGLE_SUCCESS
 				}
 				if (currentRoom != null) {
 					currentRoom!!.addSubProcess(room)
-					context.source.sendFeedback(Constants.PREFIX.get().append("§rMatching room $roomName with direction $direction against current room."))
+					context.source.sendFeedback(Constants.PREFIX.append("§rMatching room $roomName with direction $direction against current room."))
 				} else {
-					context.source.sendError(Constants.PREFIX.get().append("§cCurrent room is null."))
+					context.source.sendError(Constants.PREFIX.append("§cCurrent room is null."))
 				}
 				Command.SINGLE_SUCCESS
 			})

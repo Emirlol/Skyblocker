@@ -47,7 +47,7 @@ class GeneralConfig {
 	var hitbox: Hitbox = Hitbox()
 
 	@SerialEntry
-	var lockedSlots: List<Int> = ArrayList()
+	var lockedSlots: MutableList<Int> = ArrayList()
 
 	//maybe put this 5 somewhere else
 	@SerialEntry

@@ -1,8 +1,6 @@
 package de.hysky.skyblocker
 
-import de.hysky.skyblocker.ChatPatternListenerTest.assertMatches
 import de.hysky.skyblocker.skyblock.filters.AoteFilter
-import de.hysky.skyblocker.skyblock.filters.ChatFilterTest
 import org.junit.jupiter.api.Test
 
 internal class AoteFilterTest : ChatFilterTest<AoteFilter?>(AoteFilter()) {

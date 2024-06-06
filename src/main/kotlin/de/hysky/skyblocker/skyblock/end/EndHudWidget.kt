@@ -10,16 +10,18 @@ import net.minecraft.component.type.ProfileComponent
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.text.NumberFormat
 import java.util.*
 
-class EndHudWidget(title: MutableText?, colorValue: Int?) : Widget(title!!, colorValue) {
+object EndHudWidget : Widget(Text.literal("The End").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), Formatting.DARK_PURPLE.colorValue!!) {
+	private val ENDERMAN_HEAD = ItemStack(Items.PLAYER_HEAD).apply { set(DataComponentTypes.PROFILE, ProfileComponent(Optional.of("MHF_Enderman"), Optional.empty(), PropertyMap())) }
+	private val POPPY = ItemStack(Items.POPPY).apply { addEnchantment(Enchantments.INFINITY, 1) }
+
 	init {
-		this.x = 5
-		this.y = 5
+		x = SkyblockerConfigManager.config.otherLocations.end.x
+		y = SkyblockerConfigManager.config.otherLocations.end.y
 		this.update()
 	}
 
@@ -49,24 +51,6 @@ class EndHudWidget(title: MutableText?, colorValue: Int?) : Widget(title!!, colo
 			} else {
 				addComponent(PlainTextComponent(Text.translatable("skyblocker.end.hud.location", TheEnd.currentProtectorLocation.name)))
 			}
-		}
-	}
-
-	companion object {
-		private val TITLE: MutableText = Text.literal("The End").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD)
-
-		@JvmField
-        val INSTANCE: EndHudWidget = EndHudWidget(TITLE, Formatting.DARK_PURPLE.colorValue)
-
-		private val ENDERMAN_HEAD = ItemStack(Items.PLAYER_HEAD)
-		private val POPPY = ItemStack(Items.POPPY)
-
-		init {
-			ENDERMAN_HEAD.set(DataComponentTypes.PROFILE, ProfileComponent(Optional.of("MHF_Enderman"), Optional.empty(), PropertyMap()))
-			POPPY.addEnchantment(Enchantments.INFINITY, 1)
-
-			INSTANCE.x = SkyblockerConfigManager.config.otherLocations.end.x
-			INSTANCE.y = SkyblockerConfigManager.config.otherLocations.end.y
 		}
 	}
 }

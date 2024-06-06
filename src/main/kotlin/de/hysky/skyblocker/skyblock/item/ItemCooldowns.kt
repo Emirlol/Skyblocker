@@ -1,30 +1,24 @@
 package de.hysky.skyblocker.skyblock.item
 
-import com.google.gson.JsonObject
 import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.utils.ItemUtils.getItemId
-import de.hysky.skyblocker.utils.ProfileUtils
 import de.hysky.skyblocker.utils.ProfileUtils.updateProfile
+import de.hysky.skyblocker.utils.TextHandler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.fabricmc.fabric.api.event.client.player.ClientPlayerBlockBreakEvents
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.block.BlockState
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.tag.BlockTags
-import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
-import java.util.function.Consumer
 import kotlin.math.max
 
 object ItemCooldowns {
 	private const val JUNGLE_AXE_ID = "JUNGLE_AXE"
 	private const val TREECAPITATOR_ID = "TREECAPITATOR_AXE"
 	private const val GRAPPLING_HOOK_ID = "GRAPPLING_HOOK"
-	private val BAT_ARMOR_IDS = listOf("BAT_PERSON_HELMET", "BAT_PERSON_CHESTPLATE", "BAT_PERSON_LEGGINGS", "BAT_PERSON_BOOTS")
+	private val BAT_ARMOR_IDS = arrayOf("BAT_PERSON_HELMET", "BAT_PERSON_CHESTPLATE", "BAT_PERSON_LEGGINGS", "BAT_PERSON_BOOTS")
 	private val ITEM_COOLDOWNS: MutableMap<String, CooldownEntry> = HashMap()
 	private val EXPERIENCE_LEVELS = intArrayOf(
 		0, 660, 730, 800, 880, 960, 1050, 1150, 1260, 1380, 1510, 1650, 1800, 1960, 2130,
@@ -37,35 +31,39 @@ object ItemCooldowns {
 		561700, 611700, 666700, 726700, 791700, 861700, 936700, 1016700, 1101700, 1191700,
 		1286700, 1386700, 1496700, 1616700, 1746700, 1886700
 	)
-	var monkeyLevel: Int = 1
-	var monkeyExp: Double = 0.0
+	var monkeyLevel = 1
+	var monkeyExp = 0.0
 
-	fun init() {
-		ClientPlayerBlockBreakEvents.AFTER.register(ClientPlayerBlockBreakEvents.After { obj: ClientWorld?, world: ClientPlayerEntity?, player: BlockPos?, pos: BlockState? -> afterBlockBreak(world, player, pos) })
-		UseItemCallback.EVENT.register(UseItemCallback { obj: PlayerEntity?, player: World?, world: Hand? -> onItemInteract(player, world) })
+	init {
+		ClientPlayerBlockBreakEvents.AFTER.register { _, player, _, state -> afterBlockBreak(player, state)}
+		UseItemCallback.EVENT.register { player, _, _ -> onItemInteract(player) }
 	}
 
+	@OptIn(ExperimentalCoroutinesApi::class)
 	fun updateCooldown() {
-		updateProfile().thenAccept(Consumer { player: JsonObject ->
-			for (pet in player.getAsJsonObject("pets_data").getAsJsonArray("pets")) {
-				if (pet.asJsonObject["type"].asString != "MONKEY") continue
-				if (pet.asJsonObject["active"].asString != "true") continue
-				if (pet.asJsonObject["tier"].asString == "LEGENDARY") {
-					monkeyExp = pet.asJsonObject["exp"].asString.toDouble()
-					monkeyLevel = 0
-					for (xpLevel in EXPERIENCE_LEVELS) {
-						if (monkeyExp < xpLevel) {
-							break
-						} else {
-							monkeyExp -= xpLevel.toDouble()
-							monkeyLevel++
+		val deferred = updateProfile()
+
+		deferred.invokeOnCompletion {
+			if (it != null) {
+				TextHandler.error("[Item Cooldown] Failed to get Player Pet Data, is the API Down/Limited?", it)
+			} else {
+				val player = deferred.getCompleted() ?: return@invokeOnCompletion
+				for (pet in player.getAsJsonObject("pets_data").getAsJsonArray("pets")) {
+					if (pet.asJsonObject["type"].asString != "MONKEY") continue
+					if (pet.asJsonObject["active"].asString != "true") continue
+					if (pet.asJsonObject["tier"].asString == "LEGENDARY") {
+						monkeyExp = pet.asJsonObject["exp"].asString.toDouble()
+						monkeyLevel = 0
+						for (xpLevel in EXPERIENCE_LEVELS) {
+							if (monkeyExp < xpLevel) break
+							else {
+								monkeyExp -= xpLevel.toDouble()
+								monkeyLevel++
+							}
 						}
 					}
 				}
 			}
-		}).exceptionally { e: Throwable? ->
-			ProfileUtils.LOGGER.error("[Skyblocker Item Cooldown] Failed to get Player Pet Data, is the API Down/Limited?", e)
-			null
 		}
 	}
 
@@ -76,70 +74,56 @@ object ItemCooldowns {
 			return baseCooldown - monkeyPetCooldownReduction
 		}
 
-	fun afterBlockBreak(world: World?, player: PlayerEntity, pos: BlockPos?, state: BlockState) {
+	private fun afterBlockBreak(player: PlayerEntity, state: BlockState) {
 		if (!SkyblockerConfigManager.config.uiAndVisuals.itemCooldown.enableItemCooldowns) return
 		val usedItemId = getItemId(player.mainHandStack)
-		if (usedItemId.isEmpty()) return
-		if (state.isIn(BlockTags.LOGS)) {
-			if (usedItemId == JUNGLE_AXE_ID || usedItemId == TREECAPITATOR_ID) {
-				updateCooldown()
-				if (!isOnCooldown(JUNGLE_AXE_ID) || !isOnCooldown(TREECAPITATOR_ID)) {
-					ITEM_COOLDOWNS[usedItemId] = CooldownEntry(cooldown)
-				}
+		if (!usedItemId.isNullOrEmpty() && state.isIn(BlockTags.LOGS) && (usedItemId == JUNGLE_AXE_ID || usedItemId == TREECAPITATOR_ID)) {
+			updateCooldown()
+			if (!isOnCooldown(JUNGLE_AXE_ID) || !isOnCooldown(TREECAPITATOR_ID)) {
+				ITEM_COOLDOWNS[usedItemId] = CooldownEntry(cooldown)
 			}
 		}
 	}
 
-	private fun onItemInteract(player: PlayerEntity, world: World, hand: Hand): TypedActionResult<ItemStack?> {
+	private fun onItemInteract(player: PlayerEntity): TypedActionResult<ItemStack?> {
 		if (!SkyblockerConfigManager.config.uiAndVisuals.itemCooldown.enableItemCooldowns) return TypedActionResult.pass(ItemStack.EMPTY)
 		val usedItemId = getItemId(player.mainHandStack)
-		if (usedItemId == GRAPPLING_HOOK_ID && player.fishHook != null) {
-			if (!isOnCooldown(GRAPPLING_HOOK_ID) && !isWearingBatArmor(player)) {
-				ITEM_COOLDOWNS[GRAPPLING_HOOK_ID] = CooldownEntry(2000)
-			}
+		if (usedItemId == GRAPPLING_HOOK_ID && player.fishHook != null && !isOnCooldown(GRAPPLING_HOOK_ID) && !isWearingBatArmor(player)) {
+			ITEM_COOLDOWNS[GRAPPLING_HOOK_ID] = CooldownEntry(2000)
 		}
 
 		return TypedActionResult.pass(ItemStack.EMPTY)
 	}
 
-	@JvmStatic
-    fun isOnCooldown(itemStack: ItemStack?): Boolean {
-		return isOnCooldown(getItemId(itemStack!!))
+	fun isOnCooldown(itemStack: ItemStack): Boolean {
+		return isOnCooldown(getItemId(itemStack))
 	}
 
-	private fun isOnCooldown(itemId: String): Boolean {
-		if (ITEM_COOLDOWNS.containsKey(itemId)) {
-			val cooldownEntry = ITEM_COOLDOWNS[itemId]
-			if (cooldownEntry!!.isOnCooldown) {
-				return true
+	private fun isOnCooldown(itemId: String?): Boolean {
+		if (itemId.isNullOrEmpty()) return false
+		return if (ITEM_COOLDOWNS.containsKey(itemId)) {
+			val cooldownEntry = ITEM_COOLDOWNS[itemId] ?: return false
+			if (cooldownEntry.isOnCooldown) {
+				 true
 			} else {
 				ITEM_COOLDOWNS.remove(itemId)
-				return false
+				false
 			}
-		}
-
-		return false
+		} else false
 	}
 
-	@JvmStatic
-    fun getItemCooldownEntry(itemStack: ItemStack?): CooldownEntry? {
-		return ITEM_COOLDOWNS[getItemId(itemStack!!)]
+	fun getItemCooldownEntry(itemStack: ItemStack): CooldownEntry? {
+		return ITEM_COOLDOWNS[getItemId(itemStack)]
 	}
 
 	private fun isWearingBatArmor(player: PlayerEntity): Boolean {
 		for (stack in player.armorItems) {
-			val itemId = getItemId(stack)
-			if (!BAT_ARMOR_IDS.contains(itemId)) {
-				return false
-			}
+			if (getItemId(stack) !in BAT_ARMOR_IDS) return false
 		}
 		return true
 	}
 
-	@JvmRecord
-	data class CooldownEntry(val cooldown: Int, val startTime: Long) {
-		constructor(cooldown: Int) : this(cooldown, System.currentTimeMillis())
-
+	data class CooldownEntry(val cooldown: Int, val startTime: Long = System.currentTimeMillis()) {
 		val isOnCooldown: Boolean
 			get() = (this.startTime + this.cooldown) > System.currentTimeMillis()
 

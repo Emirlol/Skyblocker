@@ -7,15 +7,10 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterTranslucent
-import net.fabricmc.fabric.api.networking.v1.PacketSender
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 
 object BeaconHighlighter {
-	@JvmField
     val beaconPositions: MutableList<BlockPos> = ArrayList()
 	private val RED_COLOR_COMPONENTS = floatArrayOf(1.0f, 0.0f, 0.0f)
 
@@ -24,14 +19,12 @@ object BeaconHighlighter {
 	 * [BeaconHighlighter.render] is called after translucent rendering.
 	 */
 	fun init() {
-		WorldRenderEvents.AFTER_TRANSLUCENT.register(AfterTranslucent { obj: WorldRenderContext? -> render() })
-		ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { _handler: ClientPlayNetworkHandler?, _sender: PacketSender?, _client: MinecraftClient? -> reset() })
-		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { obj: Text?, text: Boolean -> onMessage(text) })
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(::render)
+		ClientPlayConnectionEvents.JOIN.register { _, _, _-> reset() }
+		ClientReceiveMessageEvents.GAME.register(::onMessage)
 	}
 
-	private fun reset() {
-		beaconPositions.clear()
-	}
+	private fun reset() = beaconPositions.clear()
 
 	private fun onMessage(text: Text, overlay: Boolean) {
 		if (isInTheEnd && !overlay) {

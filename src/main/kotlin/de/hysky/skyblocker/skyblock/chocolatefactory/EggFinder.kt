@@ -93,7 +93,7 @@ object EggFinder {
 
 		if (!SkyblockerConfigManager.config.helpers.chocolateFactory.sendEggFoundMessages) return
 		MinecraftClient.getInstance().player!!.sendMessage(
-			Constants.PREFIX.get()
+			Constants.PREFIX
 				.append("Found a ")
 				.append(Text.literal("Chocolate $eggType Egg").withColor(eggType.color))
 				.append(" at " + entity.blockPos.up(2).toShortString() + "!")

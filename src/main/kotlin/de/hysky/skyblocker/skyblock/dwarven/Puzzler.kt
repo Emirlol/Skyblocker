@@ -1,6 +1,5 @@
 package de.hysky.skyblocker.skyblock.dwarven
 
-import de.hysky.skyblocker.config.SkyblockerConfigManager
 import de.hysky.skyblocker.utils.chat.ChatFilterResult
 import de.hysky.skyblocker.utils.chat.ChatPatternListener
 import net.minecraft.block.Blocks
@@ -9,10 +8,8 @@ import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 import java.util.regex.Matcher
 
-object Puzzler : ChatPatternListener("^\\[NPC] Puzzler: ((?:▲|▶|◀|▼){10})$") {
-	public override fun state(): ChatFilterResult? {
-		return if (SkyblockerConfigManager.config.mining.dwarvenMines.solvePuzzler) null else ChatFilterResult.PASS
-	}
+object Puzzler : ChatPatternListener("^\\[NPC] Puzzler: ([▲▶◀▼]{10})$") {
+	public override fun state(): ChatFilterResult = ChatFilterResult.PASS
 
 	override fun onMatch(message: Text, matcher: Matcher): Boolean {
 		var x = 181

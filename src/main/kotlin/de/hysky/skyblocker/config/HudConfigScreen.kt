@@ -16,7 +16,7 @@ import java.awt.Color
  * Create one subclass for each collection of HUD widgets that are displayed at the same time.
  * (i.e. one for dwarven mines, one for the end, etc.) See an implementation for an example.
  */
-abstract class HudConfigScreen(title: Text?, private val parent: Screen?, private val widgets: List<Widget>) : Screen(title) {
+abstract class HudConfigScreen(title: Text, private val parent: Screen?, private val widgets: List<Widget>) : Screen(title) {
 	private var draggingWidget: Widget? = null
 	private var mouseClickRelativeX = 0.0
 	private var mouseClickRelativeY = 0.0
@@ -27,7 +27,7 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	 * @param parent the parent screen
 	 * @param widget the widget to configure
 	 */
-	constructor(title: Text?, parent: Screen?, widget: Widget) : this(title, parent, java.util.List.of<Widget>(widget))
+	constructor(title: Text, parent: Screen?, widget: Widget) : this(title, parent, listOf(widget))
 
 	/**
 	 * Creates a new HudConfigScreen with the passed title, parent, and widgets
@@ -50,9 +50,9 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	 * @param context the context to render in
 	 * @param widgets the widgets to render
 	 */
-	protected open fun renderWidget(context: DrawContext?, widgets: List<Widget>) {
+	protected open fun renderWidget(context: DrawContext, widgets: List<Widget>) {
 		for (widget in widgets) {
-			widget.render(context!!, SkyblockerConfigManager.config.uiAndVisuals.tabHud.enableHudBackground)
+			widget.render(context, SkyblockerConfigManager.config.uiAndVisuals.tabHud.enableHudBackground)
 		}
 	}
 
@@ -104,7 +104,7 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	 * @param config the config to get the positions from
 	 * @return the positions of the widgets
 	 */
-	protected abstract fun getConfigPos(config: SkyblockerConfig?): List<IntIntMutablePair>
+	protected abstract fun getConfigPos(config: SkyblockerConfig): List<IntIntMutablePair>
 
 	override fun close() {
 		val skyblockerConfig = SkyblockerConfigManager.config
@@ -122,5 +122,5 @@ abstract class HudConfigScreen(title: Text?, private val parent: Screen?, privat
 	 * @param configManager the config so you don't have to get it
 	 * @param widgets the widgets to save
 	 */
-	protected abstract fun savePos(configManager: SkyblockerConfig?, widgets: List<Widget>?)
+	protected abstract fun savePos(configManager: SkyblockerConfig, widgets: List<Widget>)
 }

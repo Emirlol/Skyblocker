@@ -9,24 +9,24 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.text.Text
 
-class CrystalsHudConfigScreen @JvmOverloads constructor(parent: Screen? = null) : HudConfigScreen(Text.of("Crystals HUD Config"), parent, WIDGET) {
+class CrystalsHudConfigScreen(parent: Screen? = null) : HudConfigScreen(Text.of("Crystals HUD Config"), parent, WIDGET) {
 	init {
-		WIDGET.setDimensions(CrystalsHud.getDimensionsForConfig())
+		WIDGET.setDimensions(CrystalsHud.dimensionsForConfig)
 	}
 
 	override fun getConfigPos(config: SkyblockerConfig): List<IntIntMutablePair> {
-		return java.util.List.of(IntIntMutablePair.of(config.mining.crystalsHud.x, config.mining.crystalsHud.y))
+		return listOf(IntIntMutablePair.of(config.mining.crystalsHud.x, config.mining.crystalsHud.y))
 	}
 
 	override fun renderWidget(context: DrawContext, widgets: List<Widget>) {
-		val size = CrystalsHud.getDimensionsForConfig()
+		val size = CrystalsHud.dimensionsForConfig
 		WIDGET.setDimensions(size)
 		context.drawTexture(CrystalsHud.MAP_TEXTURE, WIDGET.x, WIDGET.y, 0f, 0f, size, size, size, size)
 	}
 
 	override fun savePos(configManager: SkyblockerConfig, widgets: List<Widget>) {
-		configManager.mining.crystalsHud.x = widgets.first.x
-		configManager.mining.crystalsHud.y = widgets.first.y
+		configManager.mining.crystalsHud.x = widgets.first().x
+		configManager.mining.crystalsHud.y = widgets.first().y
 	}
 
 	companion object {

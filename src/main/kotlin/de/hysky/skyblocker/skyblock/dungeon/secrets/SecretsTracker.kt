@@ -106,9 +106,9 @@ object SecretsTracker {
 		val playerEntity: PlayerEntity? = MinecraftClient.getInstance().player
 		if (playerEntity != null) {
 			if (success) {
-				playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secretsTracker.feedback", Text.literal(player).withColor(0xf57542), "§7" + secretData!!.secrets, getCacheText(secretData.cached, secretData.cacheAge))))
+				playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secretsTracker.feedback", Text.literal(player).withColor(0xf57542), "§7" + secretData!!.secrets, getCacheText(secretData.cached, secretData.cacheAge))))
 			} else {
-				playerEntity.sendMessage(Constants.PREFIX.get().append(Text.translatable("skyblocker.dungeons.secretsTracker.failFeedback")))
+				playerEntity.sendMessage(Constants.PREFIX.append(Text.translatable("skyblocker.dungeons.secretsTracker.failFeedback")))
 			}
 		}
 	}

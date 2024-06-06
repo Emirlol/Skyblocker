@@ -135,12 +135,12 @@ object EnigmaSouls {
 						.then(ClientCommandManager.literal("enigmaSouls")
 							.then(ClientCommandManager.literal("markAllFound").executes { context: CommandContext<FabricClientCommandSource> ->
 								SOUL_WAYPOINTS.values.forEach(Consumer { obj: ProfileAwareWaypoint -> obj.setFound() })
-								context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.rift.enigmaSouls.markAllFound")))
+								context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.rift.enigmaSouls.markAllFound")))
 								Command.SINGLE_SUCCESS
 							})
 							.then(ClientCommandManager.literal("markAllMissing").executes { context: CommandContext<FabricClientCommandSource> ->
 								SOUL_WAYPOINTS.values.forEach(Consumer { obj: ProfileAwareWaypoint -> obj.setMissing() })
-								context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.rift.enigmaSouls.markAllMissing")))
+								context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.rift.enigmaSouls.markAllMissing")))
 								Command.SINGLE_SUCCESS
 							})
 						)

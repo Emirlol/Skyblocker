@@ -319,7 +319,7 @@ object ItemTooltip {
 
 	fun nullWarning() {
 		if (!sentNullWarning && client.player != null) {
-			LOGGER.warn(Constants.PREFIX.get().append(Text.translatable("skyblocker.itemTooltip.nullMessage")).string)
+			LOGGER.warn(Constants.PREFIX.append(Text.translatable("skyblocker.itemTooltip.nullMessage")).string)
 			sentNullWarning = true
 		}
 	}
@@ -391,7 +391,7 @@ object ItemTooltip {
 		return internalName
 	}
 
-	private fun getCoinsMessage(price: Double, count: Int): Text {
+	fun getCoinsMessage(price: Double, count: Int): Text {
 		// Format the price string once
 		val priceString = String.format(Locale.ENGLISH, "%1$,.1f", price)
 

@@ -11,18 +11,18 @@ import kotlin.jvm.optionals.getOrNull
  * Data class to contain all the settings for a chat rule
  */
 data class ChatRule(
-	val name: String = "New Rule",
+	var name: String = "New Rule",
 	val enabled: Boolean = true,
-	val isPartialMatch: Boolean = false,
-	val isRegex: Boolean = false,
-	val isIgnoreCase: Boolean = true,
-	val filter: String = "",
-	val validLocations: String = "",
-	val hideMessage: Boolean = true,
-	val showActionBar: Boolean = false,
-	val showAnnouncement: Boolean = false,
-	val replaceMessage: String? = null,
-	val customSound: SoundEvent? = null
+	var isPartialMatch: Boolean = false,
+	var isRegex: Boolean = false,
+	var isIgnoreCase: Boolean = true,
+	var filter: String = "",
+	var validLocations: String = "",
+	var hideMessage: Boolean = true,
+	var showActionBar: Boolean = false,
+	var showAnnouncement: Boolean = false,
+	var replaceMessage: String? = null,
+	var customSound: SoundEvent? = null
 ) {
 	/**
 	 * checks every input option and if the games state and the inputted str matches them returns true.

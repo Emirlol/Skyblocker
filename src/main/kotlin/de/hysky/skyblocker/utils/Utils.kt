@@ -6,13 +6,11 @@ import de.hysky.skyblocker.events.SkyblockEvents
 import de.hysky.skyblocker.events.SkyblockEvents.SkyblockJoin
 import de.hysky.skyblocker.mixins.accessors.MessageHandlerAccessor
 import de.hysky.skyblocker.skyblock.item.MuseumItemCache
-import de.hysky.skyblocker.skyblock.item.tooltip.ItemTooltip
 import de.hysky.skyblocker.utils.scheduler.MessageScheduler
 import de.hysky.skyblocker.utils.scheduler.Scheduler
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.PacketSender
@@ -22,7 +20,6 @@ import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 
@@ -30,7 +27,6 @@ import java.util.*
  * Utility variables and methods for retrieving Skyblock related information.
  */
 object Utils {
-	private val LOGGER = LoggerFactory.getLogger(Utils::class.java)
 	private val ALTERNATE_HYPIXEL_ADDRESS = System.getProperty("skyblocker.alternateHypixelAddress", "")
 
 	private const val PROFILE_PREFIX = "Profile: "
@@ -39,8 +35,6 @@ object Utils {
 	var isOnHypixel = false
 		private set
 	var isOnSkyblock = false
-		private set
-	var isInjected = false
 		private set
 
 	/**
@@ -167,10 +161,6 @@ object Utils {
 
 			if (fabricLoader.isDevelopmentEnvironment || sidebar.first().contains("SKYBLOCK") || sidebar.first().contains("SKIBLOCK")) {
 				if (!isOnSkyblock) {
-					if (!isInjected) {
-						isInjected = true
-						ItemTooltipCallback.EVENT.register(ItemTooltip::getTooltip)
-					}
 					isOnSkyblock = true
 					SkyblockEvents.JOIN.invoker().onSkyblockJoin()
 				}

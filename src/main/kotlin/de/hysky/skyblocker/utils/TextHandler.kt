@@ -60,6 +60,8 @@ object TextHandler {
 	//This allows narration to work properly
 	fun chat(message: Text) = player?.sendMessage(message, false)
 
+	fun chat(message: String) = chat(Text.literal(message))
+
 	private fun chat(message: String, formatting: Formatting) = chat(Text.literal(message).formatted(formatting))
 
 	private fun log(message: String, marker: Marker, method: Logger.(Marker, String) -> Unit) {

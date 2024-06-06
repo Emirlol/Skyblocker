@@ -18,14 +18,13 @@ object GlaciteColdOverlay {
 	private var resetTime = System.currentTimeMillis()
 
 	fun init() {
-		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: GlaciteColdOverlay? -> update() }, 20)
-		ClientReceiveMessageEvents.GAME.register(ClientReceiveMessageEvents.Game { obj: Text?, text: Boolean -> coldReset(text) })
+		Scheduler.scheduleCyclic(20, task = ::update)
+		ClientReceiveMessageEvents.GAME.register(::coldReset)
 	}
 
-	private fun coldReset(text: Text, b: Boolean) {
-		if (!isInDwarvenMines || b) {
-			return
-		}
+	private fun coldReset(text: Text, overlay: Boolean) {
+		if (!isInDwarvenMines || overlay) return
+
 		val message = text.string
 		if (message == "The warmth of the campfire reduced your ❄ Cold to 0!") {
 			cold = 0
@@ -41,8 +40,7 @@ object GlaciteColdOverlay {
 		for (line in Utils.STRING_SCOREBOARD) {
 			val coldMatcher = COLD_PATTERN.matcher(line)
 			if (coldMatcher.matches()) {
-				val value = coldMatcher.group(1)
-				cold = value.toInt()
+				cold = coldMatcher.group(1).toInt()
 				return
 			}
 		}
@@ -61,7 +59,6 @@ object GlaciteColdOverlay {
 		context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
 	}
 
-	@JvmStatic
 	fun render(context: DrawContext) {
 		if (isInDwarvenMines && SkyblockerConfigManager.config.mining.glacite.coldOverlay) {
 			renderOverlay(context, POWDER_SNOW_OUTLINE, cold / 100f)

@@ -95,19 +95,19 @@ public class Waterboard extends DungeonPuzzle {
         if (Debug.debugEnabled()) {
             ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(literal(SkyblockerMod.NAMESPACE).then(literal("dungeons").then(literal("puzzle").then(literal(INSTANCE.puzzleName)
                     .then(literal("printBoard").executes(context -> {
-                        context.getSource().sendFeedback(Constants.PREFIX.get().append(boardToString(INSTANCE.cells)));
+                        context.getSource().sendFeedback(Constants.PREFIX.append(boardToString(INSTANCE.cells)));
                         return Command.SINGLE_SUCCESS;
                     })).then(literal("printDoors").executes(context -> {
-                        context.getSource().sendFeedback(Constants.PREFIX.get().append(Integer.toBinaryString(INSTANCE.doors)));
+                        context.getSource().sendFeedback(Constants.PREFIX.append(Integer.toBinaryString(INSTANCE.doors)));
                         return Command.SINGLE_SUCCESS;
                     })).then(literal("printSimulationResults").then(argument("combination", IntegerArgumentType.integer(0, 63)).executes(context -> {
-                        context.getSource().sendFeedback(Constants.PREFIX.get().append(INSTANCE.results[IntegerArgumentType.getInteger(context, "combination")].toString()));
+                        context.getSource().sendFeedback(Constants.PREFIX.append(INSTANCE.results[IntegerArgumentType.getInteger(context, "combination")].toString()));
                         return Command.SINGLE_SUCCESS;
                     }))).then(literal("printCurrentCombination").executes(context -> {
-                        context.getSource().sendFeedback(Constants.PREFIX.get().append(Integer.toBinaryString(INSTANCE.currentCombination)));
+                        context.getSource().sendFeedback(Constants.PREFIX.append(Integer.toBinaryString(INSTANCE.currentCombination)));
                         return Command.SINGLE_SUCCESS;
                     })).then(literal("printBestCombination").executes(context -> {
-                        context.getSource().sendFeedback(Constants.PREFIX.get().append(INSTANCE.bestCombinations.toString()));
+                        context.getSource().sendFeedback(Constants.PREFIX.append(INSTANCE.bestCombinations.toString()));
                         return Command.SINGLE_SUCCESS;
                     }))
             )))));

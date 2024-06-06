@@ -18,25 +18,18 @@ object Fetchur : ChatPatternListener("^\\[NPC] Fetchur: (?:its|theyre) ([a-zA-Z,
 		return true
 	}
 
-	private val answers: MutableMap<String, String> = HashMap()
-
-	init {
-		answers["yellow and see through"] = Text.translatable("block.minecraft.yellow_stained_glass").string
-		answers["circular and sometimes moves"] = Text.translatable("item.minecraft.compass").string
-		answers["expensive minerals"] = "Mithril"
-		answers["useful during celebrations"] = Text.translatable("item.minecraft.firework_rocket").string
-		answers["hot and gives energy"] = "Cheap / Decent / Black Coffee"
-		answers["tall and can be opened"] = String.format(
-			"%s / %s",
-			Text.translatable("block.minecraft.oak_door").string,
-			Text.translatable("block.minecraft.iron_door").string
-		)
-		answers["brown and fluffy"] = Text.translatable("item.minecraft.rabbit_foot").string
-		answers["explosive but more than usual"] = "Superboom TNT"
-		answers["wearable and grows"] = Text.translatable("block.minecraft.pumpkin").string
-		answers["shiny and makes sparks"] = Text.translatable("item.minecraft.flint_and_steel").string
-		answers["green and some dudes trade stuff for it"] = Text.translatable("item.minecraft.emerald").string
-		answers["red and soft"] = Text.translatable("block.minecraft.red_wool").string
-	}
-
+	private val answers = hashMapOf(
+		"yellow and see through" to Text.translatable("block.minecraft.yellow_stained_glass").string,
+		"circular and sometimes moves" to Text.translatable("item.minecraft.compass").string,
+		"expensive minerals" to "Mithril",
+		"useful during celebrations" to Text.translatable("item.minecraft.firework_rocket").string,
+		"hot and gives energy" to "Cheap / Decent / Black Coffee",
+		"tall and can be opened" to String.format("%s / %s", Text.translatable("block.minecraft.oak_door").string, Text.translatable("block.minecraft.iron_door").string),
+		"brown and fluffy" to Text.translatable("item.minecraft.rabbit_foot").string,
+		"explosive but more than usual" to "Superboom TNT",
+		"wearable and grows" to Text.translatable("block.minecraft.pumpkin").string,
+		"shiny and makes sparks" to Text.translatable("item.minecraft.flint_and_steel").string,
+		"green and some dudes trade stuff for it" to Text.translatable("item.minecraft.emerald").string,
+		"red and soft" to Text.translatable("block.minecraft.red_wool").string
+	)
 }

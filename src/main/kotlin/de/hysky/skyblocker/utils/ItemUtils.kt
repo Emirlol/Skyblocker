@@ -69,7 +69,7 @@ object ItemUtils {
 	 * @param stack the item stack to get the internal name from
 	 * @return the internal name of the item stack, or an empty string if the item stack is null or does not have an internal name
 	 */
-	fun getItemId(stack: ItemStack): String = getCustomData(stack).getString(ID)
+	fun getItemId(stack: ItemStack): String? = getCustomData(stack).getString(ID)
 
 	/**
 	 * Gets the UUID of the item stack.
@@ -77,7 +77,7 @@ object ItemUtils {
 	 * @param stack the item stack to get the UUID from
 	 * @return the UUID of the item stack, or an empty string if the item stack is null or does not have a UUID
 	 */
-	fun getItemUuid(stack: ItemStack): String = getCustomData(stack).getString(UUID)
+	fun getItemUuid(stack: ItemStack): String? = getCustomData(stack).getString(UUID)
 
 	/**
 	 * This method converts the "timestamp" variable into the same date format as Hypixel represents it in the museum.

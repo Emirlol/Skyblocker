@@ -6,7 +6,6 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextFieldWidget
-import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
@@ -58,28 +57,25 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 	private var currentSoundIndex: Int
 
 	init {
-		this.currentSoundIndex = getCurrentSoundIndex()
-	}
+		this.currentSoundIndex = fun(): Int {
+				chatRule?.customSound ?: return -1 //if no sound just return -1
 
-	private fun getCurrentSoundIndex(): Int {
-		chatRule?.customSound ?: return -1 //if no sound just return -1
+				val soundOptions = soundsLookup.values.stream().toList()
+				val ruleSoundId = chatRule.customSound!!.id
 
-
-		val soundOptions = soundsLookup.values.stream().toList()
-		val ruleSoundId = chatRule.customSound.id
-
-		for (i in soundOptions.indices) {
-			if (soundOptions[i].id.compareTo(ruleSoundId) == 0) {
-				return i
-			}
-		}
-		//not found
-		return -1
+				for (i in soundOptions.indices) {
+					if (soundOptions[i].id.compareTo(ruleSoundId) == 0) {
+						return i
+					}
+				}
+				//not found
+				return -1
+			}.invoke()
 	}
 
 	override fun init() {
 		super.init()
-		if (client == null) return
+		if (client == null || chatRule == null) return
 		//start centered on the X and 1/3 down on the Y
 		calculateMaxButtonWidth()
 		var currentPos = IntIntPair.of((this.width - this.maxUsedWidth) / 2, ((this.height - this.maxUsedHeight) * 0.33).toInt())
@@ -87,7 +83,7 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		nameLabelTextPos = currentPos
 		var lineXOffset = client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.name")) + SPACER_X
 		nameInput = TextFieldWidget(client!!.textRenderer, currentPos.leftInt() + lineXOffset, currentPos.rightInt(), 100, 20, Text.of(""))
-		nameInput!!.text = chatRule?.name
+		nameInput!!.text = chatRule.name
 		nameInput!!.tooltip = Tooltip.of(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.name.@Tooltip"))
 		currentPos = IntIntPair.of(currentPos.leftInt(), currentPos.rightInt() + SPACER_Y)
 
@@ -105,9 +101,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 
 		partialMatchTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.partialMatch")) + SPACER_X
-		partialMatchToggle = ButtonWidget.builder(enabledButtonText(chatRule.isPartialMatch)) { a: ButtonWidget? ->
-			chatRule.setPartialMatch(!chatRule.getPartialMatch())
-			partialMatchToggle!!.message = enabledButtonText(chatRule.getPartialMatch())
+		partialMatchToggle = ButtonWidget.builder(enabledButtonText(chatRule.isPartialMatch)) {
+			chatRule.isPartialMatch = !chatRule.isPartialMatch
+			partialMatchToggle!!.message = enabledButtonText(chatRule.isPartialMatch)
 		}
 			.position(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 			.size(buttonWidth, 20)
@@ -116,9 +112,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		lineXOffset += buttonWidth + SPACER_X
 		regexTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.regex")) + SPACER_X
-		regexToggle = ButtonWidget.builder(enabledButtonText(chatRule.getRegex())) { a: ButtonWidget? ->
-			chatRule.setRegex(!chatRule.getRegex())
-			regexToggle!!.message = enabledButtonText(chatRule.getRegex())
+		regexToggle = ButtonWidget.builder(enabledButtonText(chatRule.isRegex)) {
+			chatRule.isRegex = !chatRule.isRegex
+			regexToggle!!.message = enabledButtonText(chatRule.isRegex)
 		}
 			.position(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 			.size(buttonWidth, 20)
@@ -127,9 +123,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		lineXOffset += buttonWidth + SPACER_X
 		ignoreCaseTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.ignoreCase")) + SPACER_X
-		ignoreCaseToggle = ButtonWidget.builder(enabledButtonText(chatRule.getIgnoreCase())) { a: ButtonWidget? ->
-			chatRule.setIgnoreCase(!chatRule.getIgnoreCase())
-			ignoreCaseToggle!!.message = enabledButtonText(chatRule.getIgnoreCase())
+		ignoreCaseToggle = ButtonWidget.builder(enabledButtonText(chatRule.isIgnoreCase)) {
+			chatRule.isIgnoreCase = !chatRule.isIgnoreCase
+			ignoreCaseToggle!!.message = enabledButtonText(chatRule.isIgnoreCase)
 		}
 			.position(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 			.size(buttonWidth, 20)
@@ -141,7 +137,7 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		lineXOffset = client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.locations")) + SPACER_X
 		locationsInput = TextFieldWidget(client!!.textRenderer, currentPos.leftInt() + lineXOffset, currentPos.rightInt(), 200, 20, Text.of(""))
 		locationsInput!!.setMaxLength(96)
-		locationsInput!!.text = chatRule.getValidLocations()
+		locationsInput!!.text = chatRule.validLocations
 		val locationToolTip = Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.locations.@Tooltip")
 		locationToolTip.append("\n")
 		ChatRulesHandler.locationsList.forEach(Consumer { location: String? -> locationToolTip.append(" $location,\n") })
@@ -153,9 +149,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 
 		hideMessageTextPos = currentPos
 		lineXOffset = client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.hideMessage")) + SPACER_X
-		hideMessageToggle = ButtonWidget.builder(enabledButtonText(chatRule.getHideMessage())) { a: ButtonWidget? ->
-			chatRule.setHideMessage(!chatRule.getHideMessage())
-			hideMessageToggle!!.message = enabledButtonText(chatRule.getHideMessage())
+		hideMessageToggle = ButtonWidget.builder(enabledButtonText(chatRule.hideMessage)) {
+			chatRule.hideMessage = !chatRule.hideMessage
+			hideMessageToggle!!.message = enabledButtonText(chatRule.hideMessage)
 		}
 			.position(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 			.size(buttonWidth, 20)
@@ -164,9 +160,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		lineXOffset += buttonWidth + SPACER_X
 		actionBarTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.actionBar")) + SPACER_X
-		actionBarToggle = ButtonWidget.builder(enabledButtonText(chatRule.getShowActionBar())) { a: ButtonWidget? ->
-			chatRule.setShowActionBar(!chatRule.getShowActionBar())
-			actionBarToggle!!.message = enabledButtonText(chatRule.getShowActionBar())
+		actionBarToggle = ButtonWidget.builder(enabledButtonText(chatRule.showActionBar)) {
+			chatRule.showActionBar = !chatRule.showActionBar
+			actionBarToggle!!.message = enabledButtonText(chatRule.showActionBar)
 		}
 			.position(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 			.size(buttonWidth, 20)
@@ -177,9 +173,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 
 		announcementTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.announcement")) + SPACER_X
-		announcementToggle = ButtonWidget.builder(enabledButtonText(chatRule.getShowAnnouncement())) { a: ButtonWidget? ->
-			chatRule.setShowAnnouncement(!chatRule.getShowAnnouncement())
-			announcementToggle!!.message = enabledButtonText(chatRule.getShowAnnouncement())
+		announcementToggle = ButtonWidget.builder(enabledButtonText(chatRule.showAnnouncement)) {
+			chatRule.showAnnouncement = !chatRule.showAnnouncement
+			announcementToggle!!.message = enabledButtonText(chatRule.showAnnouncement)
 		}
 			.position(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 			.size(buttonWidth, 20)
@@ -188,7 +184,7 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		lineXOffset += buttonWidth + SPACER_X
 		customSoundLabelTextPos = IntIntPair.of(currentPos.leftInt() + lineXOffset, currentPos.rightInt())
 		lineXOffset += client!!.textRenderer.getWidth(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds")) + SPACER_X
-		soundsToggle = ButtonWidget.builder(soundName) { a: ButtonWidget? ->
+		soundsToggle = ButtonWidget.builder(soundName) {
 			currentSoundIndex += 1
 			if (currentSoundIndex == soundsLookup.size) {
 				currentSoundIndex = -1
@@ -196,7 +192,7 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 			val newText = soundName
 			soundsToggle!!.message = newText
 			val sound = soundsLookup[newText]
-			chatRule.setCustomSound(sound)
+			chatRule.customSound = sound
 			if (client!!.player != null && sound != null) {
 				client!!.player!!.playSound(sound, 100f, 0.1f)
 			}
@@ -212,9 +208,9 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 		replaceMessageInput = TextFieldWidget(client!!.textRenderer, currentPos.leftInt() + lineXOffset, currentPos.rightInt(), 200, 20, Text.of(""))
 		replaceMessageInput!!.setMaxLength(96)
 		replaceMessageInput!!.tooltip = Tooltip.of(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.replace.@Tooltip"))
-		replaceMessageInput!!.text = chatRule.getReplaceMessage()
+		replaceMessageInput!!.text = chatRule.replaceMessage
 
-		val finishButton = ButtonWidget.builder(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.finish")) { a: ButtonWidget? -> close() }
+		val finishButton = ButtonWidget.builder(Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.finish")) { close() }
 			.position(this.width - buttonWidth - SPACER_Y, this.height - SPACER_Y)
 			.size(buttonWidth, 20)
 			.build()
@@ -312,22 +308,16 @@ class ChatRuleConfigScreen(private val parent: Screen, private val chatRuleIndex
 	}
 
 	private fun save() {
-		chatRule.setName(nameInput!!.text)
-		chatRule.setFilter(filterInput!!.text)
-		chatRule.setReplaceMessage(replaceMessageInput!!.text)
-		chatRule.setValidLocations(locationsInput!!.text)
+		chatRule?.name = nameInput!!.text
+		chatRule?.filter = filterInput!!.text
+		chatRule?.replaceMessage = replaceMessageInput!!.text
+		chatRule?.validLocations = locationsInput!!.text
 
 		ChatRulesHandler.chatRuleList[chatRuleIndex] = chatRule
 	}
 
 	private val soundName: MutableText
-		get() {
-			if (currentSoundIndex == -1) {
-				return Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.none")
-			}
-
-			return soundsLookup.keys.stream().toList()[currentSoundIndex]
-		}
+		get() = if (currentSoundIndex == -1) Text.translatable("skyblocker.config.chat.chatRules.screen.ruleScreen.sounds.none") else soundsLookup.keys.stream().toList()[currentSoundIndex]
 
 	companion object {
 		private const val SPACER_X = 5

@@ -136,12 +136,12 @@ object FairySouls {
 				.then(ClientCommandManager.literal("fairySouls")
 					.then(ClientCommandManager.literal("markAllInCurrentIslandFound").executes { context: CommandContext<FabricClientCommandSource> ->
 						markAllFairiesOnCurrentIslandFound()
-						context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.fairySouls.markAllFound")))
+						context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.fairySouls.markAllFound")))
 						1
 					})
 					.then(ClientCommandManager.literal("markAllInCurrentIslandMissing").executes { context: CommandContext<FabricClientCommandSource> ->
 						markAllFairiesOnCurrentIslandMissing()
-						context.source.sendFeedback(Constants.PREFIX.get().append(Text.translatable("skyblocker.fairySouls.markAllMissing")))
+						context.source.sendFeedback(Constants.PREFIX.append(Text.translatable("skyblocker.fairySouls.markAllMissing")))
 						1
 					})
 				)

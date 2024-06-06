@@ -5,43 +5,34 @@ import de.hysky.skyblocker.utils.Utils.isInTheEnd
 import de.hysky.skyblocker.utils.scheduler.Scheduler
 import de.hysky.skyblocker.utils.waypoint.Waypoint
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair
-import it.unimi.dsi.fastutil.ints.IntIntPair
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterTranslucent
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.ClientPlayNetworkHandler
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.ActionResult
 import net.minecraft.util.DyeColor
-import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
-import java.util.function.Supplier
 
 object EnderNodes {
 	private val client: MinecraftClient = MinecraftClient.getInstance()
 	private val enderNodes: MutableMap<BlockPos, EnderNode> = HashMap()
 
 	fun init() {
-		Scheduler.INSTANCE.scheduleCyclic(Runnable { obj: EnderNodes? -> update() }, 20)
-		WorldRenderEvents.AFTER_TRANSLUCENT.register(AfterTranslucent { obj: WorldRenderContext? -> render() })
-		AttackBlockCallback.EVENT.register(AttackBlockCallback { player: PlayerEntity?, world: World?, hand: Hand?, pos: BlockPos, direction: Direction? ->
+		Scheduler.scheduleCyclic(20, task = ::update)
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(::render)
+		AttackBlockCallback.EVENT.register { _, _, _, pos: BlockPos, _ ->
 			enderNodes.remove(pos)
 			ActionResult.PASS
-		})
-		ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler: ClientPlayNetworkHandler?, sender: PacketSender?, client: MinecraftClient? -> reset() })
+		}
+		ClientPlayConnectionEvents.JOIN.register { _, _, _ -> reset() }
 	}
 
-	@JvmStatic
-    fun onParticle(packet: ParticleS2CPacket) {
+	fun onParticle(packet: ParticleS2CPacket) {
 		if (!shouldProcess()) return
 		val particleType = packet.parameters.type
 		if (ParticleTypes.PORTAL.type != particleType && ParticleTypes.WITCH.type != particleType) return
@@ -54,31 +45,37 @@ object EnderNodes {
 		val zFrac = MathHelper.floorMod(z, 1.0)
 		val pos: BlockPos
 		val direction: Direction
-		if (yFrac == 0.25) {
-			pos = BlockPos.ofFloored(x, y - 1, z)
-			direction = Direction.UP
-		} else if (yFrac == 0.75) {
-			pos = BlockPos.ofFloored(x, y + 1, z)
-			direction = Direction.DOWN
-		} else if (xFrac == 0.25) {
-			pos = BlockPos.ofFloored(x - 1, y, z)
-			direction = Direction.EAST
-		} else if (xFrac == 0.75) {
-			pos = BlockPos.ofFloored(x + 1, y, z)
-			direction = Direction.WEST
-		} else if (zFrac == 0.25) {
-			pos = BlockPos.ofFloored(x, y, z - 1)
-			direction = Direction.SOUTH
-		} else if (zFrac == 0.75) {
-			pos = BlockPos.ofFloored(x, y, z + 1)
-			direction = Direction.NORTH
-		} else {
-			return
+		when {
+			yFrac == 0.25 -> {
+				pos = BlockPos.ofFloored(x, y - 1, z)
+				direction = Direction.UP
+			}
+			yFrac == 0.75 -> {
+				pos = BlockPos.ofFloored(x, y + 1, z)
+				direction = Direction.DOWN
+			}
+			xFrac == 0.25 -> {
+				pos = BlockPos.ofFloored(x - 1, y, z)
+				direction = Direction.EAST
+			}
+			xFrac == 0.75 -> {
+				pos = BlockPos.ofFloored(x + 1, y, z)
+				direction = Direction.WEST
+			}
+			zFrac == 0.25 -> {
+				pos = BlockPos.ofFloored(x, y, z - 1)
+				direction = Direction.SOUTH
+			}
+			zFrac == 0.75 -> {
+				pos = BlockPos.ofFloored(x, y, z + 1)
+				direction = Direction.NORTH
+			}
+			else -> return
 		}
 
-		val enderNode = enderNodes.computeIfAbsent(pos) { pos: BlockPos -> EnderNode(pos) }
-		val particles = enderNode.particles[direction]
-		particles!!.left(particles.leftInt() + 1)
+		val enderNode = enderNodes.computeIfAbsent(pos) { EnderNode(it) }
+		val particles = enderNode.particles[direction]!!
+		particles.left(particles.leftInt() + 1)
 		particles.right(particles.rightInt() + 1)
 	}
 
@@ -100,37 +97,31 @@ object EnderNodes {
 		}
 	}
 
-	private fun shouldProcess(): Boolean {
-		return SkyblockerConfigManager.config.otherLocations.end.enableEnderNodeHelper && isInTheEnd
-	}
+	private fun shouldProcess() = SkyblockerConfigManager.config.otherLocations.end.enableEnderNodeHelper && isInTheEnd
 
-	private fun reset() {
-		enderNodes.clear()
-	}
+	private fun reset() = enderNodes.clear()
 
-	class EnderNode(pos: BlockPos) : Waypoint(pos, Supplier { SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType }, DyeColor.CYAN.colorComponents, false) {
-		val particles: Map<Direction, IntIntPair> = java.util.Map.of<Direction, IntIntPair>(
-			Direction.UP, IntIntMutablePair(0, 0),
-			Direction.DOWN, IntIntMutablePair(0, 0),
-			Direction.EAST, IntIntMutablePair(0, 0),
-			Direction.WEST, IntIntMutablePair(0, 0),
-			Direction.SOUTH, IntIntMutablePair(0, 0),
-			Direction.NORTH, IntIntMutablePair(0, 0)
+	class EnderNode(pos: BlockPos) : Waypoint(pos, SkyblockerConfigManager.config.uiAndVisuals.waypoints.waypointType, DyeColor.CYAN.colorComponents, throughWalls = false) {
+		val particles = mapOf(
+			Direction.UP to IntIntMutablePair(0, 0),
+			Direction.DOWN to IntIntMutablePair(0, 0),
+			Direction.EAST to IntIntMutablePair(0, 0),
+			Direction.WEST to IntIntMutablePair(0, 0),
+			Direction.SOUTH to  IntIntMutablePair(0, 0),
+			Direction.NORTH to IntIntMutablePair(0, 0)
 		)
-		private var lastConfirmed: Long = 0
+		private var lastConfirmed = 0L
 
 		fun updateParticles() {
 			val currentTimeMillis = System.currentTimeMillis()
-			if (lastConfirmed + 2000 > currentTimeMillis || client.world == null || !particles.entries.stream().allMatch { entry: Map.Entry<Direction, IntIntPair> -> entry.value.leftInt() >= 5 && entry.value.rightInt() >= 5 || !client.world!!.getBlockState(pos!!.offset(entry.key)).isAir }) return
+			if (lastConfirmed + 2000 > currentTimeMillis || client.world == null || !particles.all { entry -> entry.value.leftInt() >= 5 && entry.value.rightInt() >= 5 || !client.world!!.getBlockState(pos.offset(entry.key)).isAir }) return
 			lastConfirmed = currentTimeMillis
-			for ((_, value) in particles) {
+			for (value in particles.values) {
 				value.left(0)
 				value.right(0)
 			}
 		}
 
-		override fun shouldRender(): Boolean {
-			return super.shouldRender() && lastConfirmed + 5000 > System.currentTimeMillis()
-		}
+		override fun shouldRender() = super.shouldRender() && lastConfirmed + 5000 > System.currentTimeMillis()
 	}
 }

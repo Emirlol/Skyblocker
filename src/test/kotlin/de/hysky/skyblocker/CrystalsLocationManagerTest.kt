@@ -24,7 +24,7 @@ class CrystalsLocationManagerTest {
 
 	@Test
 	fun testSetLocationMessage() {
-		Assertions.assertEquals(CrystalsLocationsManager.getSetLocationMessage("Jungle Temple", BlockPos(10, 11, 12)).string, de.hysky.skyblocker.utils.Constants.PREFIX.get().string + "Added waypoint for Jungle Temple at : 10 11 12.")
-		Assertions.assertEquals(CrystalsLocationsManager.getSetLocationMessage("Fairy Grotto", BlockPos(0, 0, 0)).string, de.hysky.skyblocker.utils.Constants.PREFIX.get().string + "Added waypoint for Fairy Grotto at : 0 0 0.")
+		Assertions.assertEquals(CrystalsLocationsManager.getSetLocationMessage("Jungle Temple", BlockPos(10, 11, 12)).string, de.hysky.skyblocker.utils.Constants.PREFIX.string + "Added waypoint for Jungle Temple at : 10 11 12.")
+		Assertions.assertEquals(CrystalsLocationsManager.getSetLocationMessage("Fairy Grotto", BlockPos(0, 0, 0)).string, de.hysky.skyblocker.utils.Constants.PREFIX.string + "Added waypoint for Fairy Grotto at : 0 0 0.")
 	}
 }

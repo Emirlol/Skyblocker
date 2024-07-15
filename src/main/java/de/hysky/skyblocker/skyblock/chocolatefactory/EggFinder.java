@@ -17,18 +17,25 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.apache.commons.lang3.text.WordUtils;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import org.apache.commons.text.WordUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,10 +43,8 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class EggFinder {
-	private static final Pattern eggFoundPattern = Pattern.compile("^(?:HOPPITY'S HUNT You found a Chocolate|You have already collected this Chocolate) (Breakfast|Lunch|Dinner)");
 	private static final Pattern newEggPattern = Pattern.compile("^HOPPITY'S HUNT A Chocolate (Breakfast|Lunch|Dinner) Egg has appeared!$");
 	private static final Logger logger = LoggerFactory.getLogger("Skyblocker Egg Finder");
-	private static final LinkedList<ArmorStandEntity> armorStandQueue = new LinkedList<>();
 	private static final Location[] possibleLocations = {Location.CRIMSON_ISLE, Location.CRYSTAL_HOLLOWS, Location.DUNGEON_HUB, Location.DWARVEN_MINES, Location.HUB, Location.THE_END, Location.THE_PARK, Location.GOLD_MINE, Location.DEEP_CAVERNS, Location.SPIDERS_DEN, Location.THE_FARMING_ISLAND};
 	private static boolean isLocationCorrect = false;
 
@@ -62,6 +67,20 @@ public class EggFinder {
 												})))))));
 	}
 
+	public static void onParticle(ParticleS2CPacket packet) {
+		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder
+				|| MinecraftClient.getInstance().world == null
+				|| SkyblockTime.skyblockSeason.get() != SkyblockTime.Season.SPRING
+				|| !isLocationCorrect) return;
+		BlockPos blockPos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
+
+		if (packet.getCount() == 0 && packet.getParameters() instanceof DustParticleEffect dustParticleEffect && dustParticleEffect.getScale() == 1) {
+			searchForEntities(blockPos, dustParticleEffect.getColor());
+		} else if (packet.getCount() == 3 && packet.getParameters().getType() == ParticleTypes.CRIT) {
+			searchForEntities(blockPos, null);
+		}
+	}
+
 	private static void handleLocationChange(Location location) {
 		for (Location possibleLocation : possibleLocations) {
 			if (location == possibleLocation) {
@@ -69,129 +88,116 @@ public class EggFinder {
 				break;
 			}
 		}
-		if (!isLocationCorrect) {
-			armorStandQueue.clear();
-			return;
-		}
+	}
 
-		while (!armorStandQueue.isEmpty()) {
-			handleArmorStand(armorStandQueue.poll());
+	private static void searchForEntities(@NotNull BlockPos blockPos, @Nullable Vector3f color) {
+		assert MinecraftClient.getInstance().world != null;
+		List<ArmorStandEntity> entities = MinecraftClient.getInstance().world.getEntitiesByClass(ArmorStandEntity.class, new Box(getEggLocFromParticle(blockPos)), entity -> true);
+		for (ArmorStandEntity entity : entities) {
+			handleArmorStand(entity, color);
 		}
 	}
 
-	public static void checkIfEgg(Entity entity) {
-		if (entity instanceof ArmorStandEntity armorStand) checkIfEgg(armorStand);
-	}
-
-	public static void checkIfEgg(ArmorStandEntity armorStand) {
-		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return;
-		if (SkyblockTime.skyblockSeason.get() != SkyblockTime.Season.SPRING) return;
+	private static void handleArmorStand(@NotNull ArmorStandEntity armorStand, @Nullable Vector3f color) {
 		if (armorStand.hasCustomName() || !armorStand.isInvisible() || !armorStand.shouldHideBasePlate()) return;
-		if (Utils.getLocation() == Location.UNKNOWN) { //The location is unknown upon world change and will be changed via /locraw soon, so we can queue it for now
-			armorStandQueue.add(armorStand);
-			return;
-		}
-		if (isLocationCorrect) handleArmorStand(armorStand);
-	}
-
-	private static void handleArmorStand(ArmorStandEntity armorStand) {
 		for (ItemStack itemStack : armorStand.getArmorItems()) {
 			ItemUtils.getHeadTextureOptional(itemStack).ifPresent(texture -> {
 				for (EggType type : EggType.entries) { //Compare blockPos rather than entity to avoid incorrect matches when the entity just moves rather than a new one being spawned elsewhere
-					if (texture.equals(type.texture) && (type.egg == null || !type.egg.entity.getBlockPos().equals(armorStand.getBlockPos()))) {
-						handleFoundEgg(armorStand, type);
-						return;
+					if (texture.equals(type.texture) ) {
+						if (color == null) {
+							if (type.waypoint == null) type.waypoint = new Waypoint(getEggLocFromEntity(armorStand), SkyblockerConfigManager.get().helpers.chocolateFactory.waypointType, ColorUtils.getFloatComponents(type.color), false);
+							else type.waypoint.setFound();
+							return;
+						} else if (type.particleColors.equals(color) && type.waypoint == null) {
+							type.waypoint = new Waypoint(getEggLocFromEntity(armorStand), SkyblockerConfigManager.get().helpers.chocolateFactory.waypointType, ColorUtils.getFloatComponents(type.color));
+
+							MinecraftClient.getInstance().player.sendMessage(
+									Constants.PREFIX.get()
+									                .append("Found a ")
+									                .append(Text.literal("Chocolate " + type + " Egg")
+									                            .withColor(type.color))
+									                .append(" at " + armorStand.getBlockPos().up(2).toShortString() + "!")
+									                .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker eggFinder shareLocation " + PosUtils.toSpaceSeparatedString(getEggLocFromEntity(armorStand)) + " " + type))
+									                                      .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to share the location in chat!").formatted(Formatting.GREEN)))));
+							return;
+						}
+						logger.error("[Skyblocker Egg Finder] Found an egg with the correct texture but incorrect color. Expected: {} for type {}, Found: {}", type.particleColors, type, color);
 					}
 				}
 			});
 		}
 	}
 
+	private static @NotNull BlockPos getEggLocFromEntity(@NotNull ArmorStandEntity armorStandEntity) {
+		return armorStandEntity.getBlockPos().up(2);
+	}
+
+	private static @NotNull BlockPos getEggLocFromParticle(@NotNull BlockPos blockPos) {
+		return blockPos.down(2);
+	}
+
 	private static void invalidateState() {
 		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return;
 		isLocationCorrect = false;
 		for (EggType type : EggType.entries) {
-			type.egg = null;
+			type.waypoint = null;
 		}
-	}
-
-	private static void handleFoundEgg(ArmorStandEntity entity, EggType eggType) {
-		eggType.egg = new Egg(entity, new Waypoint(entity.getBlockPos().up(2), SkyblockerConfigManager.get().helpers.chocolateFactory.waypointType, ColorUtils.getFloatComponents(eggType.color)));
-
-		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.sendEggFoundMessages || System.currentTimeMillis() - eggType.messageLastSent < 1000) return;
-		eggType.messageLastSent = System.currentTimeMillis();
-		MinecraftClient.getInstance().player.sendMessage(
-				Constants.PREFIX.get()
-				                .append("Found a ")
-				                .append(Text.literal("Chocolate " + eggType + " Egg")
-				                            .withColor(eggType.color))
-				                .append(" at " + entity.getBlockPos().up(2).toShortString() + "!")
-				                .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/skyblocker eggFinder shareLocation " + entity.getBlockX() + " " + (entity.getBlockY() + 2) + " " + entity.getBlockZ() + " " + eggType))
-				                                      .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to share the location in chat!").formatted(Formatting.GREEN)))));
 	}
 
 	private static void renderWaypoints(WorldRenderContext context) {
 		if (!SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return;
 		for (EggType type : EggType.entries) {
-			Egg egg = type.egg;
-			if (egg != null && egg.waypoint.shouldRender()) egg.waypoint.render(context);
+			Waypoint waypoint = type.waypoint;
+			if (waypoint != null && waypoint.shouldRender()) waypoint.render(context);
 		}
 	}
 
 	private static void onChatMessage(Text text, boolean overlay) {
 		if (overlay || !SkyblockerConfigManager.get().helpers.chocolateFactory.enableEggFinder) return;
-		Matcher matcher = eggFoundPattern.matcher(text.getString());
+		Matcher matcher = newEggPattern.matcher(text.getString());
 		if (matcher.find()) {
 			try {
-				Egg egg = EggType.valueOf(matcher.group(1).toUpperCase()).egg;
-				if (egg != null) egg.waypoint.setFound();
-			} catch (IllegalArgumentException e) {
-				logger.error("[Skyblocker Egg Finder] Failed to find egg type for egg found message. Tried to match against: " + matcher.group(0), e);
-			}
-		}
-
-		matcher.usePattern(newEggPattern);
-		if (matcher.find()) {
-			try {
-				EggType.valueOf(matcher.group(1).toUpperCase()).egg = null;
+				EggType eggType = EggType.from(matcher.group(1).toUpperCase());
+				if (eggType != null) eggType.waypoint = null;
 			} catch (IllegalArgumentException e) {
 				logger.error("[Skyblocker Egg Finder] Failed to find egg type for egg spawn message. Tried to match against: " + matcher.group(0), e);
 			}
 		}
 	}
 
-	record Egg(ArmorStandEntity entity, Waypoint waypoint) {}
-
-	@SuppressWarnings("DataFlowIssue") //Removes that pesky "unboxing of Integer might cause NPE" warning when we already know it's not null
+	@SuppressWarnings("DataFlowIssue")
+	//Removes that pesky "unboxing of Integer might cause NPE" warning when we already know it's not null
 	public enum EggType {
-		LUNCH(Formatting.BLUE.getColorValue(), "ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjU2ODExMiwKICAicHJvZmlsZUlkIiA6ICI3NzUwYzFhNTM5M2Q0ZWQ0Yjc2NmQ4ZGUwOWY4MjU0NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWVkcmVsIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdhZTZkMmQzMWQ4MTY3YmNhZjk1MjkzYjY4YTRhY2Q4NzJkNjZlNzUxZGI1YTM0ZjJjYmM2NzY2YTAzNTZkMGEiCiAgICB9CiAgfQp9"),
-		DINNER(Formatting.GREEN.getColorValue(), "ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY0OTcwMSwKICAicHJvZmlsZUlkIiA6ICI3NGEwMzQxNWY1OTI0ZTA4YjMyMGM2MmU1NGE3ZjJhYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZXp6aXIiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVlMzYxNjU4MTlmZDI4NTBmOTg1NTJlZGNkNzYzZmY5ODYzMTMxMTkyODNjMTI2YWNlMGM0Y2M0OTVlNzZhOCIKICAgIH0KICB9Cn0"),
-		BREAKFAST(Formatting.GOLD.getColorValue(), "ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY3MzE0OSwKICAicHJvZmlsZUlkIiA6ICJiN2I4ZTlhZjEwZGE0NjFmOTY2YTQxM2RmOWJiM2U4OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmFiYW5hbmFZZzciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQ5MzMzZDg1YjhhMzE1ZDAzMzZlYjJkZjM3ZDhhNzE0Y2EyNGM1MWI4YzYwNzRmMWI1YjkyN2RlYjUxNmMyNCIKICAgIH0KICB9Cn0");
+		LUNCH(Formatting.BLUE.getColorValue(), new Vector3f(0.0f, 0.0f, 1.0f), "ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjU2ODExMiwKICAicHJvZmlsZUlkIiA6ICI3NzUwYzFhNTM5M2Q0ZWQ0Yjc2NmQ4ZGUwOWY4MjU0NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWVkcmVsIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdhZTZkMmQzMWQ4MTY3YmNhZjk1MjkzYjY4YTRhY2Q4NzJkNjZlNzUxZGI1YTM0ZjJjYmM2NzY2YTAzNTZkMGEiCiAgICB9CiAgfQp9"),
+		DINNER(Formatting.GREEN.getColorValue(), new Vector3f(0.0f, 0.5019608f, 0.0f), "ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY0OTcwMSwKICAicHJvZmlsZUlkIiA6ICI3NGEwMzQxNWY1OTI0ZTA4YjMyMGM2MmU1NGE3ZjJhYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZXp6aXIiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVlMzYxNjU4MTlmZDI4NTBmOTg1NTJlZGNkNzYzZmY5ODYzMTMxMTkyODNjMTI2YWNlMGM0Y2M0OTVlNzZhOCIKICAgIH0KICB9Cn0"),
+		BREAKFAST(Formatting.GOLD.getColorValue(), new Vector3f(1.0f, 0.64705884f, 0.0f), "ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY3MzE0OSwKICAicHJvZmlsZUlkIiA6ICJiN2I4ZTlhZjEwZGE0NjFmOTY2YTQxM2RmOWJiM2U4OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmFiYW5hbmFZZzciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQ5MzMzZDg1YjhhMzE1ZDAzMzZlYjJkZjM3ZDhhNzE0Y2EyNGM1MWI4YzYwNzRmMWI1YjkyN2RlYjUxNmMyNCIKICAgIH0KICB9Cn0");
 
-		private Egg egg = null;
+		private @Nullable Waypoint waypoint;
 		public final int color;
+		public final Vector3f particleColors;
 		public final String texture;
-		/*
-			When a new egg spawns in the player's range, the order of packets/messages goes like this:
-			set_equipment -> new egg message -> set_entity_data
-			We have to set the egg to null to prevent the highlight from staying where it was before the new egg spawned,
-			and doing so causes the found message to get sent twice. This is the reason for the existence of this field, so that we can not send the 2nd message.
-			This doesn't fix the field being set twice, but that's not an issue anyway. It'd be much harder to fix the highlight issue mentioned above if it wasn't being set twice.
-		 */
-		private long messageLastSent = 0;
 
 		//This is to not create an array each time we iterate over the values
-		public static final ObjectImmutableList<EggType> entries = ObjectImmutableList.of(EggType.values());
+		public static final ObjectImmutableList<EggType> entries = ObjectImmutableList.of(BREAKFAST, LUNCH, DINNER);
 
-		EggType(int color, String texture) {
+		EggType(int color, Vector3f particleColor, String texture) {
 			this.color = color;
+			this.particleColors = particleColor;
 			this.texture = texture;
 		}
 
+		@Nullable
+		public static EggType from(String name) {
+			try {
+				return valueOf(name);
+			} catch (IllegalArgumentException e) {
+				return null;
+			}
+		}
+
 		@Override
-		@SuppressWarnings("deprecation") // It's either a new dependency or a deprecated method, and I'd rather use the deprecated method
 		public String toString() {
-			return WordUtils.capitalizeFully(this.name());
+			return WordUtils.capitalizeFully(name());
 		}
 	}
 }

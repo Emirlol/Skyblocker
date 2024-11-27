@@ -15,10 +15,25 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class SkyblockTime {
 	private static final long SKYBLOCK_EPOCH = 1560275700000L;
+	/**
+	 * The current skyblock year.
+	 */
 	public static final AtomicInteger skyblockYear = new AtomicInteger(0);
+	/**
+	 * The season of the year, {@link Season#SPRING}-{@link Season#WINTER}.
+	 */
 	public static final AtomicReference<Season> skyblockSeason = new AtomicReference<>(Season.SPRING);
+	/**
+	 * The month of the year, {@link Month#EARLY_SPRING}-{@link Month#LATE_WINTER}.
+	 */
 	public static final AtomicReference<Month> skyblockMonth = new AtomicReference<>(Month.EARLY_SPRING);
-	public static final AtomicInteger skyblockDay = new AtomicInteger(0);
+	/**
+	 * The day of the month, 1-31.
+	 */
+	public static final AtomicInteger skyblockDay = new AtomicInteger(1);
+	/**
+	 * The hour of the day, 0-23.
+	 */
 	public static final AtomicInteger skyblockHour = new AtomicInteger(0);
 	private static final Logger LOGGER = LoggerFactory.getLogger("Skyblocker Time");
 

@@ -7,7 +7,7 @@ import de.hysky.skyblocker.config.SkyblockerConfigManager;
 import de.hysky.skyblocker.config.configs.SlayersConfig;
 import de.hysky.skyblocker.skyblock.CompactDamage;
 import de.hysky.skyblocker.skyblock.FishingHelper;
-import de.hysky.skyblocker.skyblock.chocolatefactory.EggFinder;
+import de.hysky.skyblocker.skyblock.chocolatefactory.eggfinder.EggFinder;
 import de.hysky.skyblocker.skyblock.crimson.dojo.DojoManager;
 import de.hysky.skyblocker.skyblock.crimson.slayer.FirePillarAnnouncer;
 import de.hysky.skyblocker.skyblock.dungeon.DungeonScore;

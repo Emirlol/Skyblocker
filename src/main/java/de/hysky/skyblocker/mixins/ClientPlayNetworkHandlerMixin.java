@@ -12,7 +12,7 @@ import de.hysky.skyblocker.skyblock.CompactDamage;
 import de.hysky.skyblocker.skyblock.HealthBars;
 import de.hysky.skyblocker.skyblock.fishing.FishingHelper;
 import de.hysky.skyblocker.skyblock.SmoothAOTE;
-import de.hysky.skyblocker.skyblock.chocolatefactory.EggFinder;
+import de.hysky.skyblocker.skyblock.chocolatefactory.eggfinder.EggFinder;
 import de.hysky.skyblocker.skyblock.crimson.dojo.DojoManager;
 import de.hysky.skyblocker.skyblock.dungeon.DungeonScore;
 import de.hysky.skyblocker.skyblock.dungeon.puzzle.TeleportMaze;
